@@ -1,0 +1,63 @@
+.container {
+    width: 100%;
+    height: 20em;
+    border: solid 2px black;
+    display: grid;
+    /*grid-template-columns: 1fr 2fr;*/
+    grid-template-rows: 1fr 2fr 1fr;
+}
+
+/*nrfunerurefberfberfrebuf*/
+.upper {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    /*grid-template-rows: 1fr 2fr 1fr;*/
+}
+
+.blue {
+    background-color: blue;
+
+}
+
+.red {
+
+    background-color: red;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.gray {
+    background-color: gray;
+}
+
+.black {
+    background-color: black;
+}
+
+.green {
+    background-color: green;
+}
+
+.purple {
+    background-color: purple;
+}
+
+.orange {
+    background-color: orange;
+}
+
+.middle {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    /*grid-template-rows: 1fr 2fr 1fr;*/
+}
+
+.bottom {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    /*grid-template-rows: 1fr 2fr 1fr;*/
+
+
+}

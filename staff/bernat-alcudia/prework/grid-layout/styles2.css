@@ -1,0 +1,77 @@
+.container {
+    width: 100%;
+    height: 20em;
+    border: solid 2px black;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.upper {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    height: 100%;
+}
+
+.blue {
+    background-color: blue;
+    width: 100%;
+    height: 40%;
+}
+
+.red {
+    width: 100%;
+    height: 40%;
+    background-color: red;
+}
+
+.yellow {
+    height: 20%;
+    width: 100%;
+    background-color: yellow;
+}
+
+.gray {
+    height: 20%;
+    width: 100%;
+    background-color: gray;
+}
+
+.black {
+    height: 50%;
+    width: 100%;
+    background-color: black;
+}
+
+.green {
+    height: 30%;
+    width: 100%;
+    background-color: green;
+}
+
+.purple {
+    width: 100%;
+    height: 40%;
+    background-color: purple;
+}
+
+.orange {
+    width: 100%;
+    height: 20%;
+    background-color: orange;
+}
+
+.middle {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
