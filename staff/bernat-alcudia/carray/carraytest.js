@@ -17,3 +17,10 @@ var c = new Carray(10, 20, 30)
 
 console.log(c)
 //Carray { 0: 10, 1: 20,2: 30,length: 3}
+
+console.log('CASE constructs an instance with string elements')
+
+var c = new Carray('Ana', 'Adrian', 'Javier', 'Sergio', 'Bernat', 'Maite', 'Sara')
+
+console.log(c)
+//Carray { 0: 'Ana',1: 'Adrian', 2: 'Javier',3: 'Sergio',4: 'Bernat',5: 'Maite',6: 'Sara',lenght: 7}
