@@ -5,13 +5,7 @@ import Products from '../components/Products';
 
 const { ContentError } = errors
 
-function Home({ searchQuery, onChangeText }) {
-
-
-    onChangeText = () => {
-        console.log('hola mundo')
-    }
-
+function Home({ searchQuery }) {
 
     return <ScrollView >
 

@@ -10,6 +10,13 @@ const styles = StyleSheet.create({
     image: {
         width: 350,
         height: 350,
+        borderRadius: 15,
+        margin: 10
+    },
+    productContainer: {
+        marginBottom: 20,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
     },
 });
 
@@ -83,16 +90,18 @@ function ProductDetail() {
 
     const isAuthor = product.author.id === logic.getLoggedInUserId()
 
-    return <ScrollView >
-        <View style={{ padding: 30 }} key={product.id} >
-            {product.images.map((image, index) => (
-                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
-            ))}
-        </View>
+    return <ScrollView style={styles.productContainer}>
+        <ScrollView horizontal>
+            <View style={{ padding: 30, flexDirection: 'row' }} key={product.id} >
+                {product.images.map((image, index) => (
+                    <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
+                ))}
+            </View>
+        </ScrollView>
         <View style={{ padding: 30 }}>
             <Text>Last Modified:{utils.formatDate(new Date(product.date))}</Text>
-            <Text> Title: {product.title}</Text>
-            <Text> Brand: {product.brand}</Text>
+            <Text>Title: {product.title}</Text>
+            <Text>Brand: {product.brand}</Text>
             <Text>Price: ${product.price}</Text>
             <Text>State: {product.state}</Text>
             <Text>Stock: {product.stock}</Text>

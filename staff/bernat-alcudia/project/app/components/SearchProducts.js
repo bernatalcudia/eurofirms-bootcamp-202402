@@ -8,8 +8,6 @@ function SearchProduct({ onSearch }) {
 
     const handlerNewText = newText => {
         setText(newText)
-        //storeData('search', newText)
-        //onChangeText()
         onSearch(newText)
     }
 

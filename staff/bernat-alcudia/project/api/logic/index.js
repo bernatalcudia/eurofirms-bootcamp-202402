@@ -11,6 +11,10 @@ import toggleLikeProduct from './toggleLikeProduct.js'
 import toggleSaveProduct from './toggleSaveProduct.js'
 import retrieveSavedProducts from './retrieveSavedProducts.js'
 import searchProduct from './searchProduct.js'
+import createComment from './createComment.js'
+import modifyComment from './modifyComment.js'
+import removeComment from './removeComment.js'
+import retrieveComments from './retrieveComments.js'
 
 
 const logic = {
@@ -26,7 +30,11 @@ const logic = {
     toggleLikeProduct,
     toggleSaveProduct,
     retrieveSavedProducts,
-    searchProduct
+    searchProduct,
+    createComment,
+    modifyComment,
+    removeComment,
+    retrieveComments
 }
 
 export default logic

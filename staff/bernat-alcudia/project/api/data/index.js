@@ -85,6 +85,28 @@ const product = new Schema({
     }
 })
 
+const comment = new Schema({
+    product: {
+        type: ObjectId,
+        required: true,
+        ref: 'Product',
+    },
+    author: {
+        type: ObjectId,
+        required: true,
+        ref: 'User'
+    },
+    text: {
+        type: String,
+        required: true,
+    },
+    date: {
+        type: Date,
+        required: true
+    }
+
+})
+
 const message = new Schema({
     from: {
         type: ObjectId,
@@ -117,11 +139,12 @@ const chat = new Schema({
 })
 
 
-
 const User = model('User', user)
 const Product = model('Product', product)
+const Comment = model('Comment', comment)
 
 export {
     User,
-    Product
+    Product,
+    Comment
 }

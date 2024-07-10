@@ -440,6 +440,147 @@ mongoose.connect(MONGO_URL)
             }
         })
 
+        // ---------------------------------Create Comment ---------------------------------
+
+        server.post('/comments', jsonBodyParser, (req, res) => {
+            try {
+                const { authorization } = req.headers
+
+                const token = authorization.slice(7)
+
+                const { sub: userId } = jwt.verify(token, JWT_SECRET)
+                const { productId, text } = req.body
+
+                logic.createComment(userId, productId, text)
+                    .then(() => res.status(201).send())
+                    .catch(error => {
+                        let status = 500
+
+                        if (error instanceof MatchError) status = 401
+
+                        res.status(status).json({ error: error.constructor.name, message: error.message })
+                    })
+            } catch (error) {
+                let status = 500
+
+                if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError) status = 400
+                else if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
+                    status = 401
+
+                    error = new MatchError(error.message)
+
+                    res.status(status).json({ error: error.constructor.name, message: error.message })
+                }
+            }
+        })
+
+        // ---------------------------------Modify Comments---------------------------------
+
+        server.patch('/comments/:commentId', jsonBodyParser, (req, res) => {
+            try {
+                const { authorization } = req.headers
+
+                const token = authorization.slice(7)
+
+                const { sub: userId } = jwt.verify(token, JWT_SECRET)
+
+                const { commentId } = req.params
+
+                const { text } = req.body
+
+                logic.modifyComment(userId, commentId, text)
+                    .then(() => res.status(204).send())
+                    .catch(error => {
+                        let status = 500
+
+                        if (error instanceof MatchError) status = 404
+
+                        res.status(status).json({ error: error.constructor.name, message: error.message })
+                    })
+            } catch (error) {
+                let status = 500
+
+                if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError) status = 400
+
+                else if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
+                    status = 401
+
+                    error = new MatchError(error.message)
+                    res.status(status).json({ error: error.constructor.name, message: error.message })
+                }
+            }
+        })
+
+        // ---------------------------------Remove Comments---------------------------------
+
+        server.delete('/comments/:commentId', (req, res) => {
+            try {
+                const { authorization } = req.headers
+
+                const token = authorization.slice(7)
+
+                const { sub: userId } = jwt.verify(token, JWT_SECRET)
+
+                const { commentId } = req.params
+
+
+                logic.removeComment(userId, commentId)
+                    .then(() => res.status(204).send())
+                    .catch(error => {
+                        let status = 500
+
+                        if (error instanceof MatchError) status = 404
+
+                        res.status(status).json({ error: error.constructor.name, message: error.message })
+                    })
+            } catch (error) {
+                let status = 500
+
+                if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError) status = 400
+                else if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
+                    status = 401
+
+                    error = new MatchError(error.message)
+                    res.status(status).json({ error: error.constructor.name, message: error.message })
+                }
+            }
+        })
+
+        // ---------------------------------Retrieve Comments---------------------------------
+        server.get('/comments/:productId', (req, res) => {
+            try {
+                const { authorization } = req.headers
+
+                const token = authorization.slice(7)
+
+                const { sub: userId } = jwt.verify(token, JWT_SECRET)
+
+                const { productId } = req.params
+
+                logic.retrieveComments(userId, productId)
+                    .then(products => res.json(products))
+                    .catch(error => {
+                        let status = 500
+
+                        if (error instanceof MatchError) status = 404
+
+                        res.status(status).json({ error: error.constructor.name, message: error.message })
+                    })
+            } catch (error) {
+                let status = 500
+
+                if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError) status = 400
+
+                else if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
+                    status = 401
+
+                    error = new MatchError(error.message)
+                    res.status(status).json({ error: error.constructor.name, message: error.message })
+                }
+            }
+        })
+
+
 
         server.listen(PORT, () => console.log(`API started on port ${PORT}`))
     })

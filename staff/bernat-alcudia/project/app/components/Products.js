@@ -193,9 +193,12 @@ function Products({ searchQuery }) {
                             <Text>State: {product.state}</Text>
                         </View>
                         <View style={{ padding: 8, flexDirection: 'row', flex: 1, width: '100%', height: 40, justifyContent: 'space-between' }}>
-                            <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
-                                <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
-                            </TouchableOpacity>
+                            <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+                                <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
+                                    <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
+                                </TouchableOpacity>
+                                <Text style={{ fontSize: 20 }}  >{product.likes.length}</Text>
+                            </View>
                             <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
                                 <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
                             </TouchableOpacity>

@@ -52,11 +52,13 @@ function RetrieveSavedProducts() {
     return <ScrollView >
         {products.map(product => {
             return <View style={styles.productContainer} >
-                <View style={{ padding: 30 }} key={product.id} >
-                    {product.images.map((image, index) => (
-                        <Image style={styles.image} key={index} source={{ uri: 'data:image/png;base64,' + image }} onError={(error) => console.error('Error loading image:', error)} />
-                    ))}
-                </View>
+                <ScrollView horizontal>
+                    <View style={{ padding: 30, flexDirection: 'row' }} key={product.id} >
+                        {product.images.map((image, index) => (
+                            <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
+                        ))}
+                    </View>
+                </ScrollView>
                 <View style={{ padding: 30, marginLeft: 15 }} >
                     <Text>{utils.formatDate(new Date(product.date))}</Text>
                     <Text>{product.title}</Text>
