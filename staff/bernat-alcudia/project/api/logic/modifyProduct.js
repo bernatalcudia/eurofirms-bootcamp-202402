@@ -19,7 +19,7 @@ function modifyProduct(userId, productId, images, title, description, brand, pri
         .catch(error => { throw new SystemError(error.message) })
         .then(user => {
             if (!user) throw new MatchError('user not found')
-
+            if (user.role !== 'buyer') throw new MatchError('user is not buyer')
             return Product.findById(productId)
                 .catch(error => { throw new SystemError(error.message) })
         })
@@ -28,7 +28,6 @@ function modifyProduct(userId, productId, images, title, description, brand, pri
 
 
             if (product.author.toString() !== userId) throw new MatchError('product does not belong user')
-
 
 
             const date = new Date()

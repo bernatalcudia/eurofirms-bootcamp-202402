@@ -5,9 +5,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import logic from '../logic';
 
+import Comments from './Comments';
+
 function Products({ searchQuery }) {
     const [products, setProducts] = useState([])
     const [user, setUser] = useState()
+
+    const [toggleComments, seToggleComments] = useState("")
+    const [viewComments, setViewComments] = useState(false)
 
     const navigation = useNavigation()
 
@@ -46,6 +51,16 @@ function Products({ searchQuery }) {
             alert(feedback)
         }
     }, [products])
+
+    const handleToggleComment = (productId) => {
+        seToggleComments(productId)
+        setViewComments(true)
+    }
+
+    const returnFromComment = () => {
+        seToggleComments("")
+        setViewComments(false)
+    }
 
     const handleLogout = () => {
         logic.logoutUser()
@@ -191,6 +206,11 @@ function Products({ searchQuery }) {
                             <Text >{product.brand}</Text>
                             <Text >Price: ${product.price}</Text>
                             <Text>State: {product.state}</Text>
+                            <TouchableOpacity onPress={() => handleToggleComment(product.id)}>
+                                <Text>Comments</Text>
+                                <Text>{product.id}</Text>
+                            </TouchableOpacity>
+                            {toggleComments === product.id && <Comments productId={product.id} visible={viewComments} onClose={() => returnFromComment()}></Comments>}
                         </View>
                         <View style={{ padding: 8, flexDirection: 'row', flex: 1, width: '100%', height: 40, justifyContent: 'space-between' }}>
                             <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>

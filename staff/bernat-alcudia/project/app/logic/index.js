@@ -17,6 +17,11 @@ import toggleSavedProduct from './toggleSavedProduct.js';
 import retrieveUserProductSaved from './retrieveUserProductSaved.js';
 import searchProducts from './searchProducts.js';
 
+import createComment from './createComment.js';
+import modifyComment from './modifyComment.js';
+import removeComment from './removeComment.js';
+import retrieveComments from './retrieveComments.js';
+
 
 const logic = {
     registerSeller,
@@ -36,8 +41,12 @@ const logic = {
     toggleLikeProduct,
     toggleSavedProduct,
     retrieveUserProductSaved,
-    searchProducts
+    searchProducts,
 
+    createComment,
+    modifyComment,
+    removeComment,
+    retrieveComments
 }
 
 export default logic

@@ -1,25 +1,24 @@
-import { errors, validate } from '../com';
+import { validate, error, errors } from '../com';
 import SessionStorage from 'react-native-session-storage';
 
 const { SystemError } = errors
 
-function loginUser(username, password) {
-    validate.username(username)
-    validate.password(password)
+function retrieveComments(productId) {
+    validate.token(SessionStorage.getItem('token'))
+    validate.id(productId, 'productId')
 
-
-    return fetch(`${process.env.EXPO_PUBLIC_API_URL}/users/auth`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+    return fetch(`${process.env.EXPO_PUBLIC_API_URL}/comments/${productId}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${SessionStorage.getItem('token')}`
+        }
     })
+
         .catch(error => { throw new SystemError(error.message) })
         .then(res => {
             if (res.status === 200) return res.json()
                 .catch(error => { throw new SystemError(error.message) })
-                .then(token => {
-                    SessionStorage.setItem('token', token)
-                })
+                .then(comments => comments)
 
             return res.json()
                 .catch(error => { throw new SystemError(error.message) })
@@ -33,4 +32,4 @@ function loginUser(username, password) {
         })
 }
 
-export default loginUser
+export default retrieveComments

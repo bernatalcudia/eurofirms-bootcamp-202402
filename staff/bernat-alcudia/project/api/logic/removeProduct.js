@@ -12,6 +12,8 @@ function removeProduct(userId, productId) {
         .catch(error => { throw new SystemError(error.message) })
         .then(user => {
             if (!user) throw new MatchError('user not found')
+            if (user.role !== 'buyer') throw new MatchError('user is not buyer')
+
 
 
             return Product.findById(productId)

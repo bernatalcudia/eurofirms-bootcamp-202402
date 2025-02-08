@@ -17,8 +17,8 @@ function LoginUser() {
     const navigation = useNavigation()
 
 
-    const handleSubmit = () => {
 
+    const handleSubmit = () => {
         try {
             logic.loginUser(username, password)
                 .then(() => {
