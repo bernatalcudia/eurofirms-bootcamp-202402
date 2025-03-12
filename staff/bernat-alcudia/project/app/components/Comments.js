@@ -9,17 +9,37 @@ function Comments({ visible, onClose, productId }) {
 
     const styles = StyleSheet.create({
         list: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            display: 'flex',
+            alignContent: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'whitesmoke',
+        }, input: {
+            width: '80%',
+            padding: 10,
+            borderWidth: 1,
+            borderColor: '#ccc',
+            borderRadius: 5,
+        }, button: {
+            width: '80%',
+            padding: 15,
+            backgroundColor: 'black',
+            borderRadius: 5,
+        }, text: {
+            alignSelf: 'flex-start',
+            paddingLeft: 40
         }
+
     })
     const [timestamp, setTimeStamp] = useState(null)
     const [commentsList, setCommentsList] = useState('')
     const [comments, setComments] = useState('')
+    const [text, seText] = useState('')
+
+
 
     useEffect(() => {
         try {
-            logic.retrieveComments(productId)
+            logic.retrieveComments(productId)//Retrieve all comments
                 .then(commentsList => setCommentsList(commentsList))
                 .catch(error => {
                     console.error(error.message)
@@ -48,7 +68,7 @@ function Comments({ visible, onClose, productId }) {
 
     const handleCreateComment = () => {
         try {
-            logic.createComment(productId, comments)
+            logic.createComment(productId, comments)//Create comment
 
                 .then(() => {
                     alert('created comment')
@@ -69,7 +89,7 @@ function Comments({ visible, onClose, productId }) {
 
     const handleDeleteComment = (commentId) => {
         try {
-            logic.removeComment(commentId)
+            logic.removeComment(commentId)//Delete comment
                 .then(() => {
                     alert('deleted comment')
                     setTimeStamp(Date.now())
@@ -89,22 +109,22 @@ function Comments({ visible, onClose, productId }) {
 
     const renderItem = ({ item }) => (
         <View style={styles.list}>
-            <Text>{item.author.username}</Text>
-            <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
+            <Text style={styles.text}>{item.author.username}</Text>
+            <TouchableOpacity style={styles.button} onPress={() => handleDeleteComment(item.id)}>
                 <MaterialCommunityIcons name={'trash-can-outline'} size={25} color={'red'} />
             </TouchableOpacity>
-            <Text>{item.text}</Text>
+            <Text style={styles.text}>{item.text}</Text>
         </View>
     )
 
     return (
 
-        <Modal visible={visible} animationType="slide">
-            <Text>{productId}</Text>
-            <TouchableOpacity onPress={handleCreateComment}>
+        <Modal visible={visible} animationType='slide' >
+            <Text style={styles.text}>{productId}</Text>
+            <TouchableOpacity style={styles.button} onPress={handleCreateComment}>
                 <MaterialCommunityIcons name={'comment-plus-outline'} size={25} color={'red'} />
             </TouchableOpacity>
-            <TextInput placeholder='add comment' value={comments} onChangeText={setComments}></TextInput>
+            <TextInput style={styles.input} placeholder='add comment' value={comments} onChangeText={setComments}></TextInput>
             <FlatList
                 data={commentsList}
                 renderItem={renderItem}

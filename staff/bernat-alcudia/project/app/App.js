@@ -20,10 +20,10 @@ const Stack = createStackNavigator()
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="LoginUser">
-        <Stack.Screen name="LoginUser" component={LoginUser} />
-        <Stack.Screen name="RegisterSeller" component={RegisterSeller} />
-        <Stack.Screen name="RegisterBuyer" component={RegisterBuyer} />
+      <Stack.Navigator initialRouteName='LoginUser'>
+        <Stack.Screen name='LoginUser' component={LoginUser} />
+        <Stack.Screen name='RegisterSeller' component={RegisterSeller} />
+        <Stack.Screen name='RegisterBuyer' component={RegisterBuyer} />
         <Stack.Screen name='tabs' component={MyTabs} options={{
           headerShown: false, headerLeft: null
         }}
@@ -33,7 +33,7 @@ export default function App() {
         <Stack.Screen name='CreateProduct' component={CreateProduct} />
         <Stack.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} />
       </Stack.Navigator>
-      <StatusBar style="auto" />
+      <StatusBar style='auto' />
     </NavigationContainer>
   );
 }
