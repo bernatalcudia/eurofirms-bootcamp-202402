@@ -4,16 +4,21 @@ import { validate, errors } from 'com';
 
 const { SystemError, MatchError } = errors
 
+//0-Validate params
+//1-Find username (not username error) and product (not product error)
+//2-Modify product
+
+
 function modifyProduct(userId, productId, images, title, description, brand, price, state, stock) {
     validate.id(userId, 'userId')
     validate.id(productId, 'product id')
     validate.images(images)
-    validate.string(title)
+    validate.string(title, 'title')
     validate.description(description)
-    validate.string(brand)
-    validate.number(price)
+    validate.string(brand, 'brand')
+    validate.number(price, 'price')
     validate.state(state)
-    validate.number(stock)
+    validate.number(stock, 'stock')
 
     return User.findById(userId)
         .catch(error => { throw new SystemError(error.message) })

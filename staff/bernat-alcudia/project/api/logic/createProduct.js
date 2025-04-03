@@ -4,13 +4,18 @@ import { validate, errors } from 'com';
 
 const { SystemError, MatchError } = errors
 
+//0-Validate params
+//1-Find user (not user error)
+//2-Create product
+
+
 function createProduct(userId, images, title, description, brand, price, state, stock) {
     validate.id(userId, 'userId')
     validate.images(images)
     validate.string(title, 'title')
     validate.description(description)
-    validate.string(brand)
-    validate.number(price)
+    validate.string(brand, 'brand')
+    validate.number(price, 'price')
     validate.state(state)
     validate.number(stock, 'stock')
 

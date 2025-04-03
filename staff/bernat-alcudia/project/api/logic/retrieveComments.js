@@ -27,15 +27,19 @@ function retrieveComments(userId, productId) {
 
                                     delete comment._id
                                 }
+
                                 if (comment.product) {
                                     comment.product = comment.product.toString()
                                 }
+
                                 if (comment.author._id) {
                                     comment.author.id = comment.author._id.toString()
 
                                     delete comment.author._id
                                 }
+                                comment.own = comment.author.id === userId
                             })
+
                             return comments.reverse()
                         })
                 })

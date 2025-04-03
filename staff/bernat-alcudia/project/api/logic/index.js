@@ -22,6 +22,7 @@ const logic = {
     retrieveUser,
     registerBuyer,
     registerSeller,
+
     retrieveProducts,
     retrieveProductDetails,
     createProduct,
@@ -31,6 +32,7 @@ const logic = {
     toggleSaveProduct,
     retrieveSavedProducts,
     searchProduct,
+
     createComment,
     modifyComment,
     removeComment,

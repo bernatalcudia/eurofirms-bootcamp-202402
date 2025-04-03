@@ -3,6 +3,10 @@ import { User } from '../data/index.js';
 
 const { MatchError, SystemError } = errors
 
+//0-Validate params
+//1-Find user (not user error)
+//2-Retrieve user
+
 function retrieveUser(userId, targetUserId) {
     validate.id(userId, 'userId')
     validate.id(targetUserId, 'targetUserId')

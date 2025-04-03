@@ -4,6 +4,10 @@ import { validate, errors } from 'com';
 
 const { SystemError, MatchError } = errors
 
+//0-Validate params
+//1-Find username (not user error)
+//2-Save product
+
 function toggleSaveProduct(userId, productId) {
     validate.id(userId, 'userId')
     validate.id(productId, 'productId')

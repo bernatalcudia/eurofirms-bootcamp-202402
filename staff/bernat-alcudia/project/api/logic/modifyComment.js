@@ -4,6 +4,10 @@ import { validate, errors } from 'com';
 
 const { MatchError, SystemError } = errors
 
+//0-Validate params
+//1-Find user (not user error) and comment (not comment error)
+//2-Modify comment
+
 function modifyComment(userId, commentId, text) {
     validate.id(userId, 'userId')
     validate.id(commentId, 'commentId')

@@ -4,6 +4,10 @@ import { validate, errors } from 'com';
 
 const { MatchError, SystemError } = errors
 
+//0-Validate params
+//1-Find user (not user error) and comment (not comment error)
+//2-Delete comment
+
 function removeComment(userId, commentId) {
     validate.id(userId, 'userId')
     validate.id(commentId, 'commentId')
@@ -13,10 +17,19 @@ function removeComment(userId, commentId) {
         .then(user => {
             if (!user) throw new MatchError('user not found')
 
-            return Comment.findByIdAndDelete(commentId)
+            return Comment.findById(commentId)
                 .catch(error => { throw new SystemError(error.message) })
-                .then(comment => { })
+
         })
+        .then(comment => {
+            if (!comment) throw new MatchError('comment not found')
+
+            if (comment.author.toString() !== userId) throw new MatchError('user not match')
+            return Comment.deleteOne({ _id: commentId })
+                .catch(error => { throw new SystemError(error.message) })
+        })
+
+        .then(() => { })
 }
 
 export default removeComment

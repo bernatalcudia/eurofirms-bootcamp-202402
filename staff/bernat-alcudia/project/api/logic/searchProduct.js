@@ -3,6 +3,10 @@ import { errors, validate } from 'com'
 
 const { SystemError, MatchError } = errors
 
+//0-Validate params
+//1-Find user (not user error) and product (not product error)
+//2-Search product
+
 function searchProduct(userId, searchQuery) {
     validate.id(userId, 'userId')
     validate.string(searchQuery, 'searchQuery')

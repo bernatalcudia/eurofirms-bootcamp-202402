@@ -65,6 +65,8 @@ function MyTabs() {
 
             <Tab.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} options={{ toBarLabel: 'Home', tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} /> }}></Tab.Screen>
         </Tab.Navigator >
+
+        //TODO add messages tab and profile tab
     );
 }
 

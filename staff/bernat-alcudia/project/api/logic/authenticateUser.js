@@ -4,6 +4,9 @@ import { User } from '../data/index.js';
 
 const { SystemError, MatchError } = errors
 
+//0-Validate params
+//1-Find username (not user error)
+
 function authenticateUser(username, password) {
     validate.username(username)
     validate.password(password)

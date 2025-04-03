@@ -4,6 +4,10 @@ import { validate, errors } from 'com';
 
 const { SystemError, MatchError } = errors
 
+//0-Validate params
+//1-Find username (not user error) and product (not product error)
+//2-Retrieve saved products
+
 function retrieveSavedProducts(userId) {
     validate.id(userId, 'userId')
 
