@@ -24,7 +24,7 @@ function createProduct(userId, images, title, description, brand, price, state, 
         .catch(error => { throw new SystemError(error.message) })
         .then(user => {
             if (!user) throw new MatchError('user not found')
-            if (user.role !== 'buyer') throw new MatchError('user is not buyer')
+            if (user.role !== 'seller') throw new MatchError('user is not seller')
 
 
             const date = new Date()

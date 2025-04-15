@@ -22,7 +22,7 @@ function removeProduct(userId, productId) {
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(product => {
-            if (!product) throw new MatchError('post not found')
+            if (!product) throw new MatchError('product not found')
 
             if (product.author.toString() !== userId) throw new MatchError('product does not belong user')
 

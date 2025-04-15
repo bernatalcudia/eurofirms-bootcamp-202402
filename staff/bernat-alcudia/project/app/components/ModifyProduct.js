@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, } from 'react';
 import logic from '../logic';
-import { View, Image, StyleSheet, ScrollView, Button, TextInput, Alert, Text, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -195,7 +195,7 @@ function ModifyProduct() {
             </TouchableOpacity>
             <View style={styles.galleryPreview} >
 
-                {images?.map((image, index) => (
+                {images?.map((image, index, images) => (
                     <>
                         <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.logo} onError={(error) => console.error('Error loading image:', error)} />
                         <TouchableOpacity onPress={() => handleDeleteImage(image)}>
