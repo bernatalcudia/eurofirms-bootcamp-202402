@@ -202,8 +202,6 @@ function ProductDetail() {
         </View>
 
     </ScrollView >
-
-
 };
 
 export default ProductDetail
