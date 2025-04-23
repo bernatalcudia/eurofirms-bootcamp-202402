@@ -7,104 +7,121 @@ import logic from '../logic';
 import Comment from './Comment';
 
 
+
+const DATA = [
+    {
+        id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+        title: 'First Item',
+    },
+    {
+        id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+        title: 'Second Item',
+    },
+    {
+        id: '58694a0f-3da1-471f-bd96-145571e29d72',
+        title: 'Third Item',
+    },
+];
+
+const Item = ({ title }) => (
+    <View >
+        <Text >{title}</Text>
+    </View>
+);
 const screenHeight = Dimensions.get('window').height || 600;
 
 function Comments({ visible, onClose, productId }) {
 
     const styles = StyleSheet.create({
 
-        slider: {
-            position: 'absolute',
-            height: screenHeight,
-            width: '100%',
-            backgroundColor: 'white',
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            paddingTop: 5,
-            bottom: 0,
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'column'
-        },
-        dragBar: {
-            width: 60,
-            height: 5,
-            backgroundColor: '#ccc',
-            borderRadius: 3,
-            alignSelf: 'center',
-            marginBottom: 10,
-        },
-
-        closeButton: {
-            padding: 5,
-        },
-        title: {
-            fontSize: 20,
-            fontWeight: 'bold',
-            marginLeft: 15,
-            flex: 1,
-        },
-        contentArea: {
-            flex: 1,
-            width: '100%'
-        },
-        commentsList: {
-            paddingHorizontal: 15,
-            paddingBottom: 10,
-        },
-        // commentItemContainer: {
-        //     paddingVertical: 10,
-        //     borderBottomWidth: 1,
-        //     borderBottomColor: '#f0f0f0'
+        // slider: {
+        //     position: 'absolute',
+        //     height: screenHeight,
+        //     width: '100%',
+        //     backgroundColor: 'white',
+        //     borderTopLeftRadius: 20,
+        //     borderTopRightRadius: 20,
+        //     paddingTop: 5,
+        //     bottom: 0,
+        //     zIndex: 1000,
+        //     display: 'flex',
+        //     flexDirection: 'column'
         // },
-        commentHeader: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 5.
-        },
+        // dragBar: {
+        //     width: 60,
+        //     height: 5,
+        //     backgroundColor: '#ccc',
+        //     borderRadius: 3,
+        //     alignSelf: 'center',
+        //     marginBottom: 10,
+        // },
+
+        // closeButton: {
+        //     padding: 5,
+        // },
+        // title: {
+        //     fontSize: 20,
+        //     fontWeight: 'bold',
+        //     marginLeft: 15,
+        //     flex: 1,
+        // },
+        // contentArea: {
+        //     flex: 1,
+        //     width: '100%'
+        // },
+        // commentsList: {
+        //     paddingHorizontal: 15,
+        //     paddingBottom: 10,
+        // },
+
+        // commentHeader: {
+        //     flexDirection: 'row',
+        //     justifyContent: 'space-between',
+        //     alignItems: 'center',
+        //     marginBottom: 5.
+        // },
 
 
 
-        inputContainer: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 10,
-            borderTopWidth: 1,
-            borderTopColor: '#eee',
-            backgroundColor: 'white'
-        },
-        input: {
-            flex: 1,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 20,
-            marginRight: 10,
-            fontSize: 16,
+        // inputContainer: {
+        //     flexDirection: 'row',
+        //     alignItems: 'center',
+        //     padding: 10,
+        //     borderTopWidth: 1,
+        //     borderTopColor: '#eee',
+        //     backgroundColor: 'white'
+        // },
+        // input: {
+        //     flex: 1,
+        //     paddingVertical: 10,
+        //     paddingHorizontal: 15,
+        //     borderWidth: 1,
+        //     borderColor: '#ccc',
+        //     borderRadius: 20,
+        //     marginRight: 10,
+        //     fontSize: 16,
 
-        },
+        // },
 
-        sendButton: {
-            padding: 10,
-        },
+        // sendButton: {
+        //     padding: 10,
+        // },
 
-        overlay: {
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor: 'black',
-            zIndex: 999,
-        },
+        // overlay: {
+        //     ...StyleSheet.absoluteFillObject,
+        //     backgroundColor: 'black',
+        //     zIndex: 999,
+        // },
 
-        emptyListContainer: {
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        emptyListText: {
-            fontSize: 16,
-            color: '#aaa'
-        },
+        // emptyListContainer: {
+        //     flex: 1,
+        //     justifyContent: 'center',
+        //     alignItems: 'center',
+        // },
+        // emptyListText: {
+        //     fontSize: 16,
+        //     color: '#aaa'
+        // },
 
     })
 
@@ -262,11 +279,17 @@ function Comments({ visible, onClose, productId }) {
 
                 {/* Content Scrollable */}
                 <View style={styles.contentArea}>
-                    <FlatList data={commentsList} renderItem={Comment} keyExtractor={(item) => item.id.toString()} contentContainerStyle={styles.commentsList} ListEmptyComponent={() => {
-                        <View style={styles.emptyListContainer}>
-                            <Text style={styles.emptyListText}>Add first comment!</Text>
-                        </View>
-                    }} />
+                    {/* <FlatList data={commentsList} renderItem={Comment} keyExtractor={(item) => item.id.toString()} contentContainerStyle={styles.commentsList} ListEmptyComponent={() => {
+                    <View style={styles.emptyListContainer}>
+                        <Text style={styles.emptyListText}>Add first comment!</Text>
+                    </View>
+                }} /> */}
+                    <Text>Hi world</Text>
+                    <FlatList
+                        data={DATA}
+                        renderItem={({ item }) => <Item title={item.title} />}
+                        keyExtractor={item => item.id}
+                    />
                 </View>
 
                 {/* <FlatList
@@ -308,7 +331,6 @@ function Comments({ visible, onClose, productId }) {
                             <MaterialCommunityIcons name='send' size={24} color={comment.trim() ? 'black' : '#ccc'}></MaterialCommunityIcons>
                         </TouchableOpacity>
                     </View>
-
                 </KeyboardAvoidingView>
             </Animated.View>
         </>

@@ -1,4 +1,5 @@
-import { StyleSheet, View, Text, TouchableOpacity, } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { useState } from 'react';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -6,7 +7,7 @@ import logic from '../logic'
 
 
 function Comment({ item: comment }) {
-
+    const [showEdit, setShowEdit] = useState(false)
     // const [comment, setComment] = useState('')
 
 
@@ -61,9 +62,9 @@ function Comment({ item: comment }) {
     }
 
 
-    const handleCommentTextChange = (text) => {
-        setComment(text)
-    }
+    // const handleCommentTextChange = (text) => {
+    //     setComment(text)
+    // }
 
 
     const handleModifiedComment = (commentId, text) => {
@@ -86,21 +87,36 @@ function Comment({ item: comment }) {
         }
     }
 
+    const handleShowEdit = () => {
+        setShowEdit(true)
+    }
+
     return (
         <>
-            <View style={styles.commentItemContainer}>
-                <View style={styles.commentHeader}>
+            <Text>Hi world</Text>
+            {/* <View style={styles.commentItemContainer}>
+                <View>
                     <Text style={styles.commentAuthor}>{comment.author?.username || 'User'}</Text>
                     {comment.own && <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteComment(comment.id)}>
                         <MaterialCommunityIcons name={'trash-can-outline'} size={20} color={'red'} />
                     </TouchableOpacity>}
 
-                    {comment.own && <TouchableOpacity onPress={() => { handleModifiedComment(comment.id, comment.text) }}>
+                    {comment.own && <TouchableOpacity onPress={handleShowEdit}>
                         <MaterialCommunityIcons name='pencil' size={20} color='blue' />
+                        {showEdit &&
+                            <>
+                                <TextInput value={comment.text} onChangeText={comment.text} placeholder='type new comment'></TextInput>
+                                <TouchableOpacity onPress={handleModifiedComment(comment.id,)}>
+                                    <MaterialCommunityIcons name='pencil' size={20} color='blue' />
+                                </TouchableOpacity>
+                            </>
+
+
+                        }
                     </TouchableOpacity>}
                 </View>
                 <Text style={styles.commentText}>{comment.text}</Text>
-            </View>
+            </View> */}
         </>
     )
 
