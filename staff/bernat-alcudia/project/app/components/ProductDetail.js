@@ -8,20 +8,37 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const screenWidth = Dimensions.get('window').width;
 
+const colors = {
+    primary: '#00b2bd',
+    background: '#ffffff',
+    textPrimary: '#1a1a1a',
+    textSecondary: '#5a5a5a',
+    border: '#e0e0e0',
+    danger: '#e74c3c',
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: colors.background,
     },
-    imageContainer: {
-        flexDirection: 'row'
-    },
-
     imageScrollView: {
         height: screenWidth,
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
     },
+    imageContainer: {
+        flexDirection: 'row'
+    },
+    infoSection: {
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    infoSectionLast: {
+        borderBottomWidth: 0,
+    },
+
     image: {
         width: screenWidth,
         height: screenWidth,
@@ -30,70 +47,69 @@ const styles = StyleSheet.create({
         borderRadius: 15,
     },
     infoContainer: {
-        padding: 16,
+        paddingHorizontal: 16,
+        paddingBottom: 24,
     },
     detailsRow: {
         marginBottom: 12,
     },
     price: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#111',
+        color: colors.textPrimary,
         marginBottom: 8,
     },
     detailItem: {
         fontSize: 16,
-        color: '#555',
+        color: colors.textSecondary,
         marginBottom: 4,
         lineHeight: 22,
     },
     title: {
         fontSize: 18,
         fontWeight: '500',
-        color: '#333',
-        marginBottom: 12,
+        color: colors.textPrimary,
+        marginBottom: 8,
     },
     description: {
         fontSize: 16,
-        color: '#555',
+        color: colors.textSecondary,
         lineHeight: 24,
-        marginBottom: 16,
+        marginTop: 8,
     },
     lastModified: {
-        fontSize: 14,
-        color: '#999',
-        marginBottom: 16,
-        textAlign: 'right',
+        fontSize: 13,
+        color: colors.textSecondary,
+        marginTop: 8,
+        textAlign: 'left',
     },
     actionButtonsContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        paddingTop: 10,
-        borderTopWidth: 1,
-        borderTopColor: '#f0f0f0',
-        marginTop: 10,
+        paddingTop: 16,
     },
     actionButton: {
         padding: 8,
-        marginLeft: 12,
+        marginLeft: 16,
     },
     modifyIcon: {
-        fontSize: 26,
-        color: '#09b1ba',
+        fontSize: 24,
+        color: colors.primary,
     },
     deleteIcon: {
         fontSize: 26,
-        color: '#e74c3c',
+        color: colors.danger,
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        backgroundColor: colors.background,
     },
     loadingText: {
         fontSize: 16,
-        color: '#888',
+        color: colors.textSecondary,
+        marginTop: 12,
     }
 });
 
@@ -161,7 +177,7 @@ function ProductDetail() {
 
     useEffect(() => {
         showProductDetails()
-    }, [])
+    }, [productId])
 
     if (!product) {
         return (
@@ -173,35 +189,46 @@ function ProductDetail() {
 
     const isAuthor = product.author.id === logic.getLoggedInUserId()
 
-    return <ScrollView style={styles.container}>
-        <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
-            <View style={styles.imageContainer} key={product.id} >
-                {product.images.map((image, index) => (
-                    <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
-                ))}
-            </View>
-        </ScrollView>
-        <View style={styles.infoContainer}>
-            <View style={styles.detailsRow}>
-                <Text style={styles.price}>Price: ${product.price}</Text>
-                <Text style={styles.lastModified}>Last Modified:{utils.formatDate(new Date(product.date))}</Text>
-                <Text style={styles.title}>Title: {product.title}</Text>
-                <Text style={styles.detailItem}>Brand: {product.brand}</Text>
-                <Text style={styles.detailItem}>State: {product.state}</Text>
-                <Text style={styles.detailItem}>Stock: {product.stock}</Text>
-                <Text style={styles.description}>Description: {product.description} </Text>
+    return (
+        <ScrollView style={styles.container}>
+
+            <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageScrollView}>
+
+                <View style={styles.imageContainer} key={product.id} >
+                    {product.images.map((image, index) => (
+                        <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
+                    ))}
+                </View>
+            </ScrollView>
+
+            <View style={styles.infoContainer}>
+
+                <View style={styles.infoSection}>
+                    <Text style={styles.price}>Price: ${product.price}</Text>
+                    <Text style={styles.lastModified}>Last Modified:{utils.formatDate(new Date(product.date))}</Text>
+                </View>
+                <View style={styles.infoSection}>
+                    <Text style={styles.title}>Title: {product.title}</Text>
+                    <Text style={styles.description}>Description: {product.description} </Text>
+                </View>
+
+                <View style={[styles.infoSection, styles.infoSectionLast]}>
+                    <Text style={styles.detailItem}>Brand: {product.brand}</Text>
+                    <Text style={styles.detailItem}>State: {product.state}</Text>
+                    <Text style={styles.detailItem}>Stock: {product.stock}</Text>
+                </View>
+
                 <View style={styles.actionButtonsContainer}>
                     <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail}>
-                        {isAuthor && <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' size={25} color={'black'} />}
+                        {isAuthor && <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' size={25} color={'blue'} />}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct}>
-                        {isAuthor && <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' size={25} color={'black'} />}
+                        {isAuthor && <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' size={25} color={'red'} />}
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
-
-    </ScrollView >
+        </ScrollView >
+    )
 };
 
 export default ProductDetail

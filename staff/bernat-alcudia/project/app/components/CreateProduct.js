@@ -307,7 +307,7 @@ function CreateProduct({ }) {
                 <Text style={styles.sectionTitle}>Photos</Text>
                 <View style={styles.photoActionsContainer}>
                     <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage}>
-                        <Text style={styles.buttonOutlineText} >Upload photo</Text>
+                        <Text style={styles.buttonOutlineText} >Upload photos</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture}>
                         <Text style={styles.buttonOutlineText} >Take Picture</Text>
