@@ -72,7 +72,7 @@ Version 0.1
 - likes (array of User.id)
 
 #### Comment
--  (auto)
+- id (auto)
 - product (Product.id,required)
 - author (User.id,required)
 - text (string,required)
