@@ -71,18 +71,18 @@ Version 0.1
 - date (Date)
 - likes (array of User.id)
 
-### Comment
--id (auto)
--product (Product.id,required)
--author (User.id,required)
--text (string,required)
--date (Date)
+#### Comment
+-  (auto)
+- product (Product.id,required)
+- author (User.id,required)
+- text (string,required)
+- date (Date)
 
 #### Message
--id (auto)
--from (user.id)
--to (user.id)
--text (string)
+- id (auto)
+- from (user.id)
+- to (user.id)
+- text (string)
 
 #### Chat
 - id (string)
