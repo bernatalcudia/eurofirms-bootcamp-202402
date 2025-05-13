@@ -93,8 +93,8 @@ function Comment({ item: comment }) {
 
     return (
         <>
-            <Text>Hi world</Text>
-            {/* <View style={styles.commentItemContainer}>
+            {/* <Text>Hi world</Text> */}
+            <View style={styles.commentItemContainer}>
                 <View>
                     <Text style={styles.commentAuthor}>{comment.author?.username || 'User'}</Text>
                     {comment.own && <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteComment(comment.id)}>
@@ -116,7 +116,7 @@ function Comment({ item: comment }) {
                     </TouchableOpacity>}
                 </View>
                 <Text style={styles.commentText}>{comment.text}</Text>
-            </View> */}
+            </View>
         </>
     )
 

@@ -7,11 +7,9 @@ const { ContentError } = errors
 
 function Home({ searchQuery }) {
 
-    return <ScrollView >
+    return <Products searchQuery={searchQuery} stamp={''} />
 
-        <Products searchQuery={searchQuery} stamp={''} />
 
-    </ScrollView>
 }
 
 export default Home
