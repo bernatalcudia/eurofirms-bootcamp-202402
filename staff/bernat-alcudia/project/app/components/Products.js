@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import logic from '../logic';
@@ -184,16 +184,19 @@ function Products({ searchQuery }) {
         buttonText: { fontSize: 18, textAlign: 'center', color: 'black' }
     });
 
-    return (<>
+    return (
+        <>
 
-        <View style={{ paddingLeft: 8, paddingRight: 8, width: '100%', height: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
-            <TouchableOpacity onPress={handleLogout}>
-                <MaterialCommunityIcons name='door' size={25} color={'black'} />
-            </TouchableOpacity>
-        </View>
+            <ScrollView>
+
+                <View style={{ paddingLeft: 8, paddingRight: 8, width: '100%', height: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <TouchableOpacity onPress={handleLogout}>
+                        <MaterialCommunityIcons name='door' size={25} color={'black'} />
+                    </TouchableOpacity>
+                </View>
 
 
-        {/* <FlatList data={products}
+                {/* <FlatList data={products}
             renderItem={({ item: product }) => {
                 <View style={styles.productContainer} key={product.id}>
                     <Image style={styles.image} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} />
@@ -229,58 +232,60 @@ function Products({ searchQuery }) {
             keyExtractor={product => { product.id.toString() }} >
 
         </FlatList> */}
-        {products.map(product => {
-            const isLiked = product.likes.includes(logic.getLoggedInUserId())
-            const isSaved = user?.saved.includes(product.id)
+                {products.map(product => {
+                    const isLiked = product.likes.includes(logic.getLoggedInUserId())
+                    const isSaved = user?.saved.includes(product.id)
 
-            return (
-                <View style={styles.productContainer} key={product.id} >
+                    return (
+                        <View style={styles.productContainer} key={product.id} >
 
-                    <Image style={styles.image} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} />
+                            <Image style={styles.image} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} />
 
-                    <View style={{ padding: 8 }}>
+                            <View style={{ padding: 8 }}>
 
-                        <TouchableOpacity style={{ paddingTop: 5 }} onPress={() => handleProductDetail(product.id)}>
-                            <Text >{product.title}</Text>
-                        </TouchableOpacity>
-                        <Text >{product.brand}</Text>
-                        <Text >Price: ${product.price}</Text>
-                        <Text>State: {product.state}</Text>
-                        <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>
-                            <Text>Comments</Text>
-                        </TouchableOpacity>
+                                <TouchableOpacity style={{ paddingTop: 5 }} onPress={() => handleProductDetail(product.id)}>
+                                    <Text >{product.title}</Text>
+                                </TouchableOpacity>
+                                <Text >{product.brand}</Text>
+                                <Text >Price: ${product.price}</Text>
+                                <Text>State: {product.state}</Text>
+                                <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>
+                                    <Text>Comments</Text>
+                                </TouchableOpacity>
 
 
-                    </View>
-                    {commentsProductId === product.id && <Comments productId={product.id} visible={viewComments} onClose={() => returnFromComments()}></Comments>}
-                    <View style={{ padding: 8, flexDirection: 'row', flex: 1, width: '100%', height: 40, justifyContent: 'space-between' }}>
-                        <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
-                            <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
-                                <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
-                            </TouchableOpacity>
-                            <Text style={{ fontSize: 20 }}  >{product.likes.length}</Text>
+                            </View>
+                            {commentsProductId === product.id && <Comments productId={product.id} visible={viewComments} onClose={() => returnFromComments()}></Comments>}
+                            <View style={{ padding: 8, flexDirection: 'row', flex: 1, width: '100%', height: 40, justifyContent: 'space-between' }}>
+                                <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
+                                        <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
+                                    </TouchableOpacity>
+                                    <Text style={{ fontSize: 20 }}  >{product.likes.length}</Text>
+                                </View>
+                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
+                                    <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
-                            <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )
-        })}
+                    )
+                })}
 
 
-        {/* OVERLAY */}
+                {/* OVERLAY */}
 
-        {commentsProductId === products.id && (
-            <Comments
-                productId={commentsProductId}
-                visible={viewComments}
-                onClose={() => returnFromComments()}
-            />
-        )}
+                {commentsProductId === products.id && (
+                    <Comments
+                        productId={commentsProductId}
+                        visible={viewComments}
+                        onClose={() => returnFromComments()}
+                    />
+                )}
+
+            </ScrollView>
 
 
-    </>
+        </>
     );
 };
 
