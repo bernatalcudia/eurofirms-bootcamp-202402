@@ -145,6 +145,10 @@ function Products({ searchQuery }) {
 
 
     const styles = StyleSheet.create({
+        mainContainer: {
+            flex: 1,
+            backgroundColor: '#f0f0f0',
+        },
         container: {
             flex: 1,
             backgroundColor: '#f0f0f0',
@@ -172,9 +176,10 @@ function Products({ searchQuery }) {
             alignSelf: 'center'
         },
         image: {
-            width: 350,
-            height: 350,
+            width: '100%',
+            aspectRatio: 1,
             borderRadius: 15,
+            alignSelf: 'center'
 
         },
         buttonPressIn: {
@@ -185,7 +190,7 @@ function Products({ searchQuery }) {
     });
 
     return (
-        <>
+        <View style={styles.mainContainer}>
 
             <ScrollView>
 
@@ -255,7 +260,7 @@ function Products({ searchQuery }) {
 
 
                             </View>
-                            {commentsProductId === product.id && <Comments productId={product.id} visible={viewComments} onClose={() => returnFromComments()}></Comments>}
+                            {/* {commentsProductId === product.id && <Comments productId={product.id} visible={viewComments} onClose={() => returnFromComments()}></Comments>} */}
                             <View style={{ padding: 8, flexDirection: 'row', flex: 1, width: '100%', height: 40, justifyContent: 'space-between' }}>
                                 <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
                                     <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
@@ -272,20 +277,20 @@ function Products({ searchQuery }) {
                 })}
 
 
-                {/* OVERLAY */}
-
-                {commentsProductId === products.id && (
-                    <Comments
-                        productId={commentsProductId}
-                        visible={viewComments}
-                        onClose={() => returnFromComments()}
-                    />
-                )}
 
             </ScrollView>
 
+            {/* OVERLAY */}
 
-        </>
+            {commentsProductId && commentsProductId && (
+                <Comments
+                    productId={commentsProductId}
+                    visible={viewComments}
+                    onClose={returnFromComments}
+                />
+            )}
+
+        </View>
     );
 };
 

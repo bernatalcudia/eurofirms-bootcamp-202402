@@ -307,9 +307,11 @@ function CreateProduct({ }) {
                 <Text style={styles.sectionTitle}>Photos</Text>
                 <View style={styles.photoActionsContainer}>
                     <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage}>
+                        <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon}></MaterialCommunityIcons>
                         <Text style={styles.buttonOutlineText} >Upload photos</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture}>
+                        <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon}></MaterialCommunityIcons>
                         <Text style={styles.buttonOutlineText} >Take Picture</Text>
                     </TouchableOpacity>
                 </View>

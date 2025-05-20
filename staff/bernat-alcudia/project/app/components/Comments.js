@@ -279,11 +279,12 @@ function Comments({ visible, onClose, productId }) {
 
                 {/* Content Scrollable */}
                 <View style={styles.contentArea}>
-                    <FlatList data={commentsList} renderItem={({ item }) => <Comment item={item} />} ListEmptyComponent={() => {
-                        <View style={styles.emptyListContainer}>
-                            <Text style={styles.emptyListText}>Add first comment!</Text>
-                        </View>
-                    }} />
+                    <FlatList data={commentsList} renderItem={({ item }) => <Comment item={item} />} keyExtractor={(item) => item.id.toString()}
+                        contentContainerStyle={styles.commentsList} ListEmptyComponent={() => (
+                            <View style={styles.emptyListContainer}>
+                                <Text style={styles.emptyListText}>Add first comment!</Text>
+                            </View>
+                        )} />
                     {/* <Text>Hi world</Text>
                     <FlatList
                         data={DATA}
