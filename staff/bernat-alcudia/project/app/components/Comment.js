@@ -46,7 +46,6 @@ function Comment({ item: comment }) {
             logic.removeComment(commentId)//Delete comment
                 .then(() => {
                     alert('deleted comment')
-                    setTimeStamp(Date.now())
                 })
                 .catch(error => {
                     console.error(error)
@@ -71,9 +70,8 @@ function Comment({ item: comment }) {
         try {
             logic.modifyComment(commentId, text)//Modified comment
                 .then(() => {
-                    handleCommentTextChange(text)
+                    setNewComment(text)
                     alert('modified comment')
-                    setTimeStamp(Date.now())
                 })
                 .catch(error => {
                     console.error(error)

@@ -126,7 +126,6 @@ function Comments({ visible, onClose, productId }) {
     })
 
     const panY = useRef(new Animated.Value(screenHeight)).current;
-    const [timestamp, setTimeStamp] = useState(null)
     const [commentsList, setCommentsList] = useState([])
     const [comment, setComment] = useState('')
     const [text, seText] = useState('')
@@ -201,7 +200,7 @@ function Comments({ visible, onClose, productId }) {
             setCommentsList([])
         }
 
-    }, [productId, timestamp])
+    }, [productId, commentsList])
 
     //TODO Improve styles,implement slider to comments with animation and add feat modified comments and response
 
@@ -213,7 +212,6 @@ function Comments({ visible, onClose, productId }) {
                 .then(() => {
                     alert('created comment')
                     setComment('')
-                    setTimeStamp(Date.now())
                 })
                 .catch(error => {
                     console.error(error)
