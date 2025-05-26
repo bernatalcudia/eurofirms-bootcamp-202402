@@ -22,7 +22,7 @@ function Comment({ item: comment }) {
             paddingVertical: 10,
             borderBottomWidth: 1,
             borderBottomColor: '#f0f0f0',
-            paddingHorizontal: 15,
+            paddingHorizontal: 5,
         },
         header: {
             flexDirection: 'row',

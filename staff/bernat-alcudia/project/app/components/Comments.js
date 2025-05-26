@@ -37,6 +37,7 @@ function Comments({ visible, onClose, productId }) {
         slider: {
             position: 'absolute',
             height: screenHeight,
+            height: '85%',
             width: '100%',
             backgroundColor: 'white',
             borderTopLeftRadius: 20,
@@ -72,6 +73,7 @@ function Comments({ visible, onClose, productId }) {
         commentsList: {
             paddingHorizontal: 15,
             paddingBottom: 10,
+            flexGrow: 1
         },
 
         commentHeader: {
@@ -117,6 +119,7 @@ function Comments({ visible, onClose, productId }) {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
+            marginTop: 50
         },
         emptyListText: {
             fontSize: 16,

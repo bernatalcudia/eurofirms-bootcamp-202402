@@ -254,9 +254,6 @@ function Products({ searchQuery }) {
                                 <Text >{product.brand}</Text>
                                 <Text >Price: ${product.price}</Text>
                                 <Text>State: {product.state}</Text>
-                                <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>
-                                    <Text>Comments</Text>
-                                </TouchableOpacity>
 
 
                             </View>
@@ -268,6 +265,9 @@ function Products({ searchQuery }) {
                                     </TouchableOpacity>
                                     <Text style={{ fontSize: 20 }}  >{product.likes.length}</Text>
                                 </View>
+                                <TouchableOpacity onPress={() => handleShowProductComments(product.id)} style={styles.commentsSection}>
+                                    <MaterialCommunityIcons name='comment-multiple-outline' size={20} color='#666' />
+                                </TouchableOpacity>
                                 <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
                                 </TouchableOpacity>
