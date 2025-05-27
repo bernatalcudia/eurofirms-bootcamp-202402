@@ -147,7 +147,7 @@ function Products({ searchQuery }) {
     const styles = StyleSheet.create({
         mainContainer: {
             flex: 1,
-            backgroundColor: '#f0f0f0',
+            backgroundColor: '#f4f6f8',
         },
         container: {
             flex: 1,
@@ -156,9 +156,9 @@ function Products({ searchQuery }) {
         },
         productContainer: {
             padding: 20,
-            margin: 10,
-            backgroundColor: '#fff',
-            borderRadius: 10,
+            marginBottom: 15,
+            backgroundColor: '#ffffff',
+            borderRadius: 12,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -175,12 +175,56 @@ function Products({ searchQuery }) {
             borderRadius: 5,
             alignSelf: 'center'
         },
-        image: {
+        productImage: {
             width: '100%',
             aspectRatio: 1,
-            borderRadius: 15,
-            alignSelf: 'center'
+            borderRadius: 10,
+            marginBottom: 12,
+            backgroundColor: '#e0e0e0'
 
+        },
+        productInfoContainer: {
+            marginBottom: 12,
+        },
+        productTitle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: '#333333',
+            marginBottom: 4,
+        },
+        productBrand: {
+            fontSize: 14,
+            color: '#555555',
+            marginBottom: 4,
+        },
+        productPrice: {
+            fontSize: 16,
+            fontWeight: '600',
+            color: '#00796b',
+            marginBottom: 4,
+        },
+        productState: {
+            fontSize: 14,
+            color: '#777777',
+            fontStyle: 'italic',
+        },
+        actionsContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingTop: 10,
+            borderTopWidth: 1,
+            borderTopColor: '#eeeeee',
+        },
+        likeContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+        },
+        likeCountText: {
+            fontSize: 16,
+            color: '#333333',
+            fontWeight: '500',
         },
         buttonPressIn: {
             transform: [{ scale: 1.00 }]
@@ -244,29 +288,28 @@ function Products({ searchQuery }) {
                     return (
                         <View style={styles.productContainer} key={product.id} >
 
-                            <Image style={styles.image} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} />
+                            <Image style={styles.productImage} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} />
 
-                            <View style={{ padding: 8 }}>
+                            <View style={styles.productInfoContainer} key={product.id}>
 
-                                <TouchableOpacity style={{ paddingTop: 5 }} onPress={() => handleProductDetail(product.id)}>
-                                    <Text >{product.title}</Text>
+                                <TouchableOpacity onPress={() => handleProductDetail(product.id)}>
+                                    <Text style={styles.productTitle} >{product.title}</Text>
                                 </TouchableOpacity>
-                                <Text >{product.brand}</Text>
-                                <Text >Price: ${product.price}</Text>
-                                <Text>State: {product.state}</Text>
+                                <Text style={styles.productBrand} >{product.brand}</Text>
+                                <Text style={styles.productPrice} >Price: ${product.price}</Text>
+                                <Text style={styles.productState}>State: {product.state}</Text>
 
 
                             </View>
-                            {/* {commentsProductId === product.id && <Comments productId={product.id} visible={viewComments} onClose={() => returnFromComments()}></Comments>} */}
-                            <View style={{ padding: 8, flexDirection: 'row', flex: 1, width: '100%', height: 40, justifyContent: 'space-between' }}>
-                                <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+                            <View style={styles.actionsContainer}>
+                                <View style={styles.likeContainer}>
                                     <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
                                         <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
                                     </TouchableOpacity>
-                                    <Text style={{ fontSize: 20 }}  >{product.likes.length}</Text>
+                                    <Text style={styles.likeCountText}  >{product.likes.length}</Text>
                                 </View>
                                 <TouchableOpacity onPress={() => handleShowProductComments(product.id)} style={styles.commentsSection}>
-                                    <MaterialCommunityIcons name='comment-multiple-outline' size={20} color='#666' />
+                                    <MaterialCommunityIcons name='comment-multiple-outline' size={20} color='#607d8b' />
                                 </TouchableOpacity>
                                 <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
@@ -275,22 +318,21 @@ function Products({ searchQuery }) {
                         </View>
                     )
                 })}
-
-
-
-            </ScrollView>
+            </ScrollView >
 
             {/* OVERLAY */}
 
-            {commentsProductId && commentsProductId && (
-                <Comments
-                    productId={commentsProductId}
-                    visible={viewComments}
-                    onClose={returnFromComments}
-                />
-            )}
+            {
+                commentsProductId && commentsProductId && (
+                    <Comments
+                        productId={commentsProductId}
+                        visible={viewComments}
+                        onClose={returnFromComments}
+                    />
+                )
+            }
 
-        </View>
+        </View >
     );
 };
 
