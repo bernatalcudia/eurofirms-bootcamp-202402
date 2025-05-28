@@ -40,11 +40,15 @@ const styles = StyleSheet.create({
     },
 
     image: {
-        width: screenWidth,
-        height: screenWidth,
+        width: 300,
+        height: 300,
+        borderRadius: 10,
         marginRight: 10,
-        resizeMode: 'cover',
-        borderRadius: 15,
+        // width: screenWidth,
+        // height: screenWidth,
+        // marginRight: 10,
+        // resizeMode: 'cover',
+        // borderRadius: 15,
     },
     infoContainer: {
         paddingHorizontal: 16,

@@ -176,11 +176,11 @@ function Products({ searchQuery }) {
             alignSelf: 'center'
         },
         productImage: {
-            width: '100%',
-            aspectRatio: 1,
+            width: 300,
+            height: 300,
             borderRadius: 10,
-            marginBottom: 12,
-            backgroundColor: '#e0e0e0'
+            marginLeft: 30,
+            // backgroundColor: '#e0e0e0'
 
         },
         productInfoContainer: {
