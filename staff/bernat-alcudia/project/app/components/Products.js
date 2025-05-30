@@ -145,15 +145,28 @@ function Products({ searchQuery }) {
 
 
     const styles = StyleSheet.create({
+
+        commentsContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+        },
+        commentsCountText: {
+            fontSize: 16,
+            color: '#333333',
+            fontWeight: '500',
+        },
         mainContainer: {
             flex: 1,
             backgroundColor: '#f4f6f8',
+            justifyContent: 'center',
+            alignItems: 'center'
         },
-        container: {
-            flex: 1,
-            backgroundColor: '#f0f0f0',
-            padding: 30
-        },
+        // container: {
+        //     flex: 1,
+        //     backgroundColor: '#f0f0f0',
+        //     padding: 30
+        // },
         productContainer: {
             padding: 20,
             marginBottom: 15,
@@ -164,6 +177,8 @@ function Products({ searchQuery }) {
             shadowOpacity: 0.1,
             shadowRadius: 5,
             elevation: 3,
+            flex: 1,
+
 
         },
         input: {
@@ -179,7 +194,7 @@ function Products({ searchQuery }) {
             width: 300,
             height: 300,
             borderRadius: 10,
-            marginLeft: 30,
+            // marginLeft: 30,
             // backgroundColor: '#e0e0e0'
 
         },
@@ -236,7 +251,7 @@ function Products({ searchQuery }) {
     return (
         <View style={styles.mainContainer}>
 
-            <ScrollView>
+            <ScrollView >
 
                 <View style={{ paddingLeft: 8, paddingRight: 8, width: '100%', height: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <TouchableOpacity onPress={handleLogout}>
@@ -296,7 +311,7 @@ function Products({ searchQuery }) {
                                     <Text style={styles.productTitle} >{product.title}</Text>
                                 </TouchableOpacity>
                                 <Text style={styles.productBrand} >{product.brand}</Text>
-                                <Text style={styles.productPrice} >Price: ${product.price}</Text>
+                                <Text style={styles.productPrice} >Price: {product.price}€</Text>
                                 <Text style={styles.productState}>State: {product.state}</Text>
 
 
@@ -308,9 +323,12 @@ function Products({ searchQuery }) {
                                     </TouchableOpacity>
                                     <Text style={styles.likeCountText}  >{product.likes.length}</Text>
                                 </View>
-                                <TouchableOpacity onPress={() => handleShowProductComments(product.id)} style={styles.commentsSection}>
-                                    <MaterialCommunityIcons name='comment-multiple-outline' size={20} color='#607d8b' />
-                                </TouchableOpacity>
+                                <View style={styles.commentsContainer}>
+                                    <TouchableOpacity onPress={() => handleShowProductComments(product.id)} style={styles.commentsSection}>
+                                        <MaterialCommunityIcons name='comment-multiple-outline' size={25} color='#607d8b' />
+                                    </TouchableOpacity>
+                                    <Text style={styles.commentsCountText} >{commentsProductId.length}</Text>
+                                </View>
                                 <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
                                 </TouchableOpacity>
@@ -323,7 +341,7 @@ function Products({ searchQuery }) {
             {/* OVERLAY */}
 
             {
-                commentsProductId && commentsProductId && (
+                commentsProductId && (
                     <Comments
                         productId={commentsProductId}
                         visible={viewComments}

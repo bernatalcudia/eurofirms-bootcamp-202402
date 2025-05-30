@@ -4,6 +4,7 @@ import { utils } from '../com'
 import { View, Text, Image, StyleSheet, ScrollView, Button } from 'react-native';
 
 const styles = StyleSheet.create({
+
     centeredContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -20,17 +21,20 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+
     },
 
     imagesScrollViewContainer: {
         marginBottom: 15,
     },
 
+
     image: {
         width: 300,
         height: 300,
         borderRadius: 10,
-        marginRight: 10,
+        marginLeft: 10,
+        alignSelf: 'center'
     },
     dateText: {
         fontSize: 12,
@@ -112,29 +116,33 @@ function RetrieveSavedProducts() {
 
     if (!products) return null
 
-    return <ScrollView >
-        {products.map(product => {
-            return <View style={styles.productContainer} >
-                <ScrollView horizontal style={styles.imagesScrollViewContainer}>
+    return (
+        <View>
+            <ScrollView >
+                {products.map(product => {
+                    return <View key={product.id} style={styles.productContainer} >
+                        <ScrollView horizontal style={styles.imagesScrollViewContainer}>
 
-                    {product.images.map((image, index) => (
-                        <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
-                    ))}
+                            {product.images.map((image, index) => (
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
+                            ))}
 
-                </ScrollView>
-                <View >
-                    <Text style={styles.dateText}>{utils.formatDate(new Date(product.date))}</Text>
-                    <Text style={styles.titleText}>{product.title}</Text>
-                    <Text style={styles.brandText}>{product.brand}</Text>
-                    <Text style={styles.priceText}>${product.price}</Text>
-                    <Text style={styles.stateText}>{product.state}</Text>
-                    <Text style={styles.stockText}>{product.stock}</Text>
-                    <Text style={styles.descriptionText}>{product.description}</Text>
-                </View>
-            </View>
+                        </ScrollView>
+                        <View >
+                            <Text style={styles.dateText}>{utils.formatDate(new Date(product.date))}</Text>
+                            <Text style={styles.titleText}>{product.title}</Text>
+                            <Text style={styles.brandText}>{product.brand}</Text>
+                            <Text style={styles.priceText}>{product.price}€</Text>
+                            <Text style={styles.stateText}>{product.state}</Text>
+                            <Text style={styles.stockText}>{product.stock}</Text>
+                            <Text style={styles.descriptionText}>{product.description}</Text>
+                        </View>
+                    </View>
 
-        })}
-    </ScrollView >
+                })}
+            </ScrollView >
+        </View>
+    )
 }
 
 export default RetrieveSavedProducts

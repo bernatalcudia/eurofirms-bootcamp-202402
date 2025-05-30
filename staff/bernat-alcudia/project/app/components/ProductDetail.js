@@ -8,112 +8,256 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const screenWidth = Dimensions.get('window').width;
 
-const colors = {
-    primary: '#00b2bd',
-    background: '#ffffff',
-    textPrimary: '#1a1a1a',
-    textSecondary: '#5a5a5a',
-    border: '#e0e0e0',
-    danger: '#e74c3c',
-}
-
 const styles = StyleSheet.create({
-    container: {
+    // mainContainer: {
+    //     flex: 1,
+    //     marginBottom: 20,
+    //     backgroundColor: '#f9f9f9',
+    //     borderRadius: 10,
+    //     padding: 15,
+    //     shadowColor: '#000',
+    //     shadowOffset: { width: 0, height: 2 },
+    //     shadowOpacity: 0.1,
+    //     shadowRadius: 4,
+    //     elevation: 3,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    // },
+    // imageScrollView: {
+    //     height: screenWidth,
+    // },
+    // imageContainer: {
+    //     flexDirection: 'row',
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    // },
+    // infoSection: {
+    //     paddingVertical: 16,
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center'
+    // },
+    // infoSectionLast: {
+    //     borderBottomWidth: 0,
+    // },
+
+    // image: {
+    //     width: 300,
+    //     height: 300,
+    //     borderRadius: 10,
+    //     marginRight: 10,
+    //     // width: screenWidth,
+    //     // height: screenWidth,
+    //     // marginRight: 10,
+    //     resizeMode: 'cover',
+    //     // borderRadius: 15,
+    // },
+    // infoContainer: {
+    //     paddingHorizontal: 16,
+    //     paddingBottom: 24,
+    // },
+    // detailsRow: {
+    //     marginBottom: 12,
+    // },
+    // dateText: {
+    //     fontSize: 12,
+    //     color: '#888',
+    //     marginBottom: 5,
+    // },
+    // titleText: {
+    //     fontSize: 20,
+    //     fontWeight: 'bold',
+    //     marginBottom: 5,
+    // },
+    // brandText: {
+    //     fontSize: 16,
+    //     color: '#555',
+    //     marginBottom: 5,
+    // },
+    // priceText: {
+    //     fontSize: 18,
+    //     fontWeight: 'bold',
+    //     color: 'green',
+    //     marginBottom: 5,
+    // },
+    // stateText: {
+    //     fontSize: 14,
+    //     fontStyle: 'italic',
+    //     color: '#666',
+    //     marginBottom: 3,
+    // },
+    // stockText: {
+    //     fontSize: 14,
+    //     color: '#666',
+    //     marginBottom: 3,
+    // },
+    // descriptionText: {
+    //     fontSize: 14,
+    //     color: '#333',
+    //     marginTop: 10,
+    // },
+    // actionButtonsContainer: {
+    //     flexDirection: 'row',
+    //     justifyContent: 'flex-end',
+    //     paddingTop: 16,
+    //     justifyContent: 'center',
+    //     alignItems: 'center'
+    // },
+    // actionButton: {
+    //     padding: 8,
+    //     marginLeft: 16,
+    // },
+    // modifyIcon: {
+    //     fontSize: 24,
+    // },
+    // deleteIcon: {
+    //     fontSize: 26,
+    // },
+    // loadingContainer: {
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    // },
+    // loadingText: {
+    //     fontSize: 16,
+    //     marginTop: 12,
+    // }
+    mainContainer: {
         flex: 1,
-        backgroundColor: colors.background,
+
+    },
+    productCard: {
+        margin: 15,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        padding: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     imageScrollView: {
         height: screenWidth,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        marginBottom: 15,
     },
     imageContainer: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    infoSection: {
-        paddingVertical: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-    },
-    infoSectionLast: {
-        borderBottomWidth: 0,
-    },
-
-    image: {
-        width: 300,
-        height: 300,
+    productImage: {
+        width: screenWidth - 30,
+        height: screenWidth - 30,
         borderRadius: 10,
-        marginRight: 10,
-        // width: screenWidth,
-        // height: screenWidth,
-        // marginRight: 10,
-        // resizeMode: 'cover',
-        // borderRadius: 15,
+        marginRight: 0,
+        resizeMode: 'cover',
     },
     infoContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 24,
+        paddingHorizontal: 5,
+        paddingBottom: 10,
     },
-    detailsRow: {
-        marginBottom: 12,
-    },
-    price: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colors.textPrimary,
-        marginBottom: 8,
-    },
-    detailItem: {
-        fontSize: 16,
-        color: colors.textSecondary,
-        marginBottom: 4,
-        lineHeight: 22,
-    },
-    title: {
+    sectionTitle: {
         fontSize: 18,
-        fontWeight: '500',
-        color: colors.textPrimary,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 10,
+    },
+    detailRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginBottom: 8,
+        paddingVertical: 2,
     },
-    description: {
+    detailLabel: {
+        fontSize: 15,
+        color: '#555',
+        fontWeight: '500',
+    },
+    detailValue: {
+        fontSize: 15,
+        color: '#333',
+        flexShrink: 1,
+        textAlign: 'right',
+    },
+    dateText: {
+        fontSize: 12,
+        color: '#888',
+        marginBottom: 5,
+    },
+    titleText: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#222',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    brandText: {
         fontSize: 16,
-        color: colors.textSecondary,
-        lineHeight: 24,
-        marginTop: 8,
+        color: '#666',
+        marginBottom: 8,
+        textAlign: 'center',
     },
-    lastModified: {
-        fontSize: 13,
-        color: colors.textSecondary,
-        marginTop: 8,
-        textAlign: 'left',
+    priceText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#28a745',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    stateText: {
+        fontSize: 14,
+        fontStyle: 'italic',
+        color: '#777',
+        marginBottom: 5,
+        textAlign: 'center',
+    },
+    stockText: {
+        fontSize: 14,
+        color: '#777',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    descriptionText: {
+        fontSize: 15,
+        color: '#444',
+        lineHeight: 22,
+        marginTop: 10,
+        textAlign: 'justify',
     },
     actionButtonsContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
-        paddingTop: 16,
+        justifyContent: 'space-around',
+        paddingTop: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+        marginTop: 15,
     },
     actionButton: {
-        padding: 8,
-        marginLeft: 16,
+        padding: 10,
+        borderRadius: 5,
+        backgroundColor: '#e9ecef',
+
     },
     modifyIcon: {
-        fontSize: 24,
-        color: colors.primary,
+        fontSize: 26,
+        color: '#007bff',
     },
     deleteIcon: {
         fontSize: 26,
-        color: colors.danger,
+        color: '#dc3545',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.background,
+        backgroundColor: '#FFFFFF',
     },
     loadingText: {
         fontSize: 16,
-        color: colors.textSecondary,
         marginTop: 12,
+        color: '#555',
     }
 });
 
@@ -194,44 +338,79 @@ function ProductDetail() {
     const isAuthor = product.author.id === logic.getLoggedInUserId()
 
     return (
-        <ScrollView style={styles.container}>
 
-            <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageScrollView}>
+        // <View style={styles.mainContainer}>
+        //     <ScrollView>
+        //         <View style={styles.productCard}>
+        //             <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageScrollView}>
 
-                <View style={styles.imageContainer} key={product.id} >
-                    {product.images.map((image, index) => (
-                        <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
-                    ))}
+        //                 <View style={styles.imageContainer} key={product.id} >
+        //                     {product.images.map((image, index) => (
+        //                         <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
+        //                     ))}
+        //                 </View>
+        //             </ScrollView>
+
+        //             <View style={styles.infoContainer}>
+        //                 <View style={styles.infoSection}>
+        //                     <Text style={styles.dateText}>Last Modified:{utils.formatDate(new Date(product.date))}</Text>
+        //                     <Text style={styles.titleText}>Title: {product.title}</Text>
+        //                     <Text style={styles.brandText}>Brand: {product.brand}</Text>
+        //                     <Text style={styles.priceText}>Price: {product.price}€</Text>
+        //                     <Text style={styles.stateText}>State: {product.state}</Text>
+        //                     <Text style={styles.stockText}>Stock: {product.stock}</Text>
+        //                     <Text style={styles.descriptionText}>Description: {product.description} </Text>
+        //                 </View>
+        //             </View>
+        //             <View style={styles.infoSection}>
+        //                 <View style={styles.actionButtonsContainer}>
+        //                     <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail}>
+        //                         {isAuthor && <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' size={25} color={'blue'} />}
+        //                     </TouchableOpacity>
+        //                     <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct}>
+        //                         {isAuthor && <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' size={25} color={'red'} />}
+        //                     </TouchableOpacity>
+        //                 </View>
+        //             </View>
+        //         </View>
+        //     </ScrollView >
+        // </View>
+        <View style={styles.mainContainer}>
+            <ScrollView>
+                <View style={styles.productCard}>
+                    <ScrollView horizontal pagingEnabled style={styles.imageScrollView}>
+
+                        <View style={styles.imageContainer} key={product.id} >
+                            {product.images.map((image, index) => (
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} onError={(error) => console.error('Error loading image:', error)} />
+                            ))}
+                        </View>
+                    </ScrollView>
+                    {console.log(product)}
+
+                    <View style={styles.infoContainer}>
+                        <Text style={styles.dateText}>Last Modified: {utils.formatDate(new Date(product.date))}</Text>
+                        <Text style={styles.titleText}>{product.title}</Text>
+                        <Text style={styles.brandText}>{product.brand}</Text>
+                        <Text style={styles.priceText}>{product.price}€</Text>
+                        <Text style={styles.stateText}>Condition: {product.state}</Text>
+                        <Text style={styles.stockText}>Availability: {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}</Text>
+                        <Text style={styles.descriptionText}>{product.description}</Text>
+                    </View>
+
+                    {isAuthor && (
+                        <View style={styles.actionButtonsContainer}>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail}>
+                                <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct}>
+                                <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
-            </ScrollView>
-
-            <View style={styles.infoContainer}>
-
-                <View style={styles.infoSection}>
-                    <Text style={styles.price}>Price: ${product.price}</Text>
-                    <Text style={styles.lastModified}>Last Modified:{utils.formatDate(new Date(product.date))}</Text>
-                </View>
-                <View style={styles.infoSection}>
-                    <Text style={styles.title}>Title: {product.title}</Text>
-                    <Text style={styles.description}>Description: {product.description} </Text>
-                </View>
-
-                <View style={[styles.infoSection, styles.infoSectionLast]}>
-                    <Text style={styles.detailItem}>Brand: {product.brand}</Text>
-                    <Text style={styles.detailItem}>State: {product.state}</Text>
-                    <Text style={styles.detailItem}>Stock: {product.stock}</Text>
-                </View>
-
-                <View style={styles.actionButtonsContainer}>
-                    <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail}>
-                        {isAuthor && <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' size={25} color={'blue'} />}
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct}>
-                        {isAuthor && <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' size={25} color={'red'} />}
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </ScrollView >
+            </ScrollView >
+        </View>
     )
 };
 
