@@ -299,7 +299,7 @@ function Products({ searchQuery }) {
                 {products.map(product => {
                     const isLiked = product.likes.includes(logic.getLoggedInUserId())
                     const isSaved = user?.saved.includes(product.id)
-
+                    console.log(product.commentCount)
                     return (
                         <View style={styles.productContainer} key={product.id} >
 
@@ -327,7 +327,7 @@ function Products({ searchQuery }) {
                                     <TouchableOpacity onPress={() => handleShowProductComments(product.id)} style={styles.commentsSection}>
                                         <MaterialCommunityIcons name='comment-multiple-outline' size={25} color='#607d8b' />
                                     </TouchableOpacity>
-                                    <Text style={styles.commentsCountText} >{commentsProductId.length}</Text>
+                                    <Text style={styles.commentsCountText} >{product.commentCount}</Text>
                                 </View>
                                 <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />

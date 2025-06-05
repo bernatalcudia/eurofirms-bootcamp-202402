@@ -117,7 +117,7 @@ function Comment({ item: comment }) {
     }
 
     const handleSaveModifiedComment = () => {
-        if (newComment.trim() === "") {
+        if (newComment.trim() === '') {
             showAlert('Validation Error', 'Comment cannot be empty.');
             return
         }

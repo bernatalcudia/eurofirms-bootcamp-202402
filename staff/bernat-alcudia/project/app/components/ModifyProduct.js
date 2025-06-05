@@ -329,7 +329,7 @@ function ModifyProduct() {
 
                         {images?.map((image, index, images) => (
                             <View key={index} style={styles.imageContainer}>
-                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.imageThumbnail} onError={(error) => console.error('Error loading image:', error)} />
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.imageThumbnail} onError={(error) => console.error('Error loading image:', error)} accessibilityHint='preview images to delete to modify product' />
                                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(image)}>
                                     <MaterialCommunityIcons name='close-circle' size={25} color={'black'} style={styles.deleteIconBackground} />
                                 </TouchableOpacity>
@@ -340,13 +340,13 @@ function ModifyProduct() {
                     <Text style={styles.sectionTitle}>Details</Text>
 
                     <Text style={styles.label}>Title</Text>
-                    <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='title' placeholderTextColor="#aaa" />
+                    <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='title' placeholderTextColor='#aaa' />
 
                     <Text style={styles.label} >Brand</Text>
-                    <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='brand' placeholderTextColor="#aaa" />
+                    <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='brand' placeholderTextColor='#aaa' />
 
                     <Text style={styles.label}>Price</Text>
-                    <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor="#aaa" />
+                    <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor='#aaa' />
 
                     <Text style={styles.label}>State</Text>
                     <RadioGroup labelStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} />

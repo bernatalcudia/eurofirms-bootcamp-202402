@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     imageScrollView: {
         height: screenWidth,
         marginBottom: 15,
+        // padding: 15
     },
     imageContainer: {
         flexDirection: 'row',
@@ -153,6 +154,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginRight: 0,
         resizeMode: 'cover',
+        marginLeft: 10,
     },
     infoContainer: {
         paddingHorizontal: 5,
@@ -386,7 +388,6 @@ function ProductDetail() {
                             ))}
                         </View>
                     </ScrollView>
-                    {console.log(product)}
 
                     <View style={styles.infoContainer}>
                         <Text style={styles.dateText}>Last Modified: {utils.formatDate(new Date(product.date))}</Text>

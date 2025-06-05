@@ -1,4 +1,4 @@
-import { User, Product } from '../data/index.js';
+import { User, Product, Comment } from '../data/index.js';
 
 import { validate, errors } from 'com';
 
@@ -19,6 +19,8 @@ function retrieveProducts(userId) {
             return Product.find().select('images title brand state likes price').populate('author', 'username').lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(products => {
+                    const countCommentsPromises = []
+
                     products.forEach(product => {
                         if (product._id) {
                             product.id = product._id.toString()
@@ -31,10 +33,22 @@ function retrieveProducts(userId) {
 
                             delete product.author._id
                         }
+
                         product.likes = product.likes.map(like => like.toString())
+
+                        const countCommentsPromise = Comment.countDocuments({ product: product.id })
+                        countCommentsPromises.push(countCommentsPromise)
                     })
 
-                    return products
+                    return Promise.all(countCommentsPromises)
+                        .catch(error => { throw new SystemError(error.message) })
+                        .then(commentCounts => {
+                            commentCounts.forEach((commentCount, index) => {
+                                products[index].commentCount = commentCount
+                            })
+
+                            return products
+                        })
                 })
         })
 }

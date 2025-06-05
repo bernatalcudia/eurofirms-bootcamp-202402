@@ -306,12 +306,12 @@ function CreateProduct({ }) {
 
                 <Text style={styles.sectionTitle}>Photos</Text>
                 <View style={styles.photoActionsContainer}>
-                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage}>
-                        <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon}></MaterialCommunityIcons>
-                        <Text style={styles.buttonOutlineText} >Upload photos</Text>
+                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityHint='button to insert images with phone storage' accessible={true} >
+                        <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityHint='icon insert images with storage phone' accessible={true} ></MaterialCommunityIcons>
+                        <Text style={styles.buttonOutlineText}  >Upload photos</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture}>
-                        <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon}></MaterialCommunityIcons>
+                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture} accessibilityHint='button to take pictures'>
+                        <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityHint='icon take pictures' accessible={true}></MaterialCommunityIcons>
                         <Text style={styles.buttonOutlineText} >Take Picture</Text>
                     </TouchableOpacity>
                 </View>
@@ -319,15 +319,15 @@ function CreateProduct({ }) {
                 <View style={styles.galleryPreview}>
                     {images.length > 0 ? images.map((image, index) => (
                         <View key={index} style={styles.imageContainer}>
-                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }}></Image>
-                            <TouchableOpacity onPress={() => handleDeleteImage(image)}>
-                                <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} />
+                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityHint='images preview' accessible={true} ></Image>
+                            <TouchableOpacity onPress={() => handleDeleteImage(image)} accessibilityHint='button to delete image' accessible={true}>
+                                <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityHint='icon close-circle' accessible={true} />
                             </TouchableOpacity>
                         </View>
                     ))
                         :
                         <View style={styles.placeholderContainer}>
-                            <Image style={styles.placeholderImage} source={{ uri: 'https://fakeimg.pl/200x200/cccccc/d61a1a?font=bebas' }}></Image>
+                            <Image style={styles.placeholderImage} source={{ uri: 'https://fakeimg.pl/200x200/cccccc/d61a1a?font=bebas' }} accessibilityHint='placeholder images' accessible={true}></Image>
                             <Text style={styles.placeholderText}>Add up to 10 photos</Text>
                         </View>
                     }
@@ -335,24 +335,24 @@ function CreateProduct({ }) {
 
 
                 <Text style={styles.label}>Title</Text>
-                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='Blue Summer Dress' placeholderTextColor={'#aaa'} />
+                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='Blue Summer Dress' placeholderTextColor={'#aaa'} accessibilityHint='input title' accessible={true} />
 
                 <Text style={styles.label}>Brand</Text>
-                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='Zara,H&M,None' placeholderTextColor={'#aaa'} />
+                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='Zara,H&M,None' placeholderTextColor={'#aaa'} accessibilityHint='input brand' accessible={true} />
 
                 <Text style={styles.label}>Price</Text>
-                <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor={'#aaa'} />
+                <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor={'#aaa'} accessibilityHint='input price' accessible={true} />
 
                 <Text style={styles.label}>State</Text>
-                <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} />
+                <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel='radio buttons states' accessible={true} />
 
                 <Text style={styles.label}>Stock</Text>
-                <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} />
+                <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} accessibilityHint='input stock' accessible={true} />
 
                 <Text style={styles.label}>Description</Text>
-                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} />
+                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} accessibilityHint='input description' accessible={true} />
 
-                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton]} onPress={handleCreateProduct}>
+                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton]} onPress={handleCreateProduct} accessibilityHint='create button' accessible={true}>
                     <Text style={styles.buttonPrimaryText}>Create</Text>
                 </TouchableOpacity>
             </View>

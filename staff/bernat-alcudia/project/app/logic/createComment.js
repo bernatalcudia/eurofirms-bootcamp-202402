@@ -1,5 +1,5 @@
-import { errors, utils, validate } from "../com";
-import SessionStorage from "react-native-session-storage";
+import { errors, utils, validate } from '../com';
+import SessionStorage from 'react-native-session-storage';
 
 const { SystemError } = errors
 
