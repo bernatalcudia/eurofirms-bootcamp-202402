@@ -6,7 +6,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import logic from '../logic'
 
 
-function Comment({ item: comment }) {
+function Comment({ item: comment, onCommentDeleted }) {
     const [showEdit, setShowEdit] = useState(false)
     const [newComment, setNewComment] = useState(comment.text)
 
@@ -98,6 +98,7 @@ function Comment({ item: comment }) {
             logic.removeComment(comment.id)//Delete comment
                 .then(() => {
                     showAlert('Success', 'Comment deleted successfully!')
+                    onCommentDeleted()
                 })
                 .catch(error => {
                     console.error('Error deleting comment:', error)

@@ -117,7 +117,6 @@ function ModifyProduct() {
         galleryPreview: {
             flexDirection: 'row',
             flexWrap: 'wrap',
-            justifyContent: 'space-between',
             marginBottom: 10,
         },
         imageContainer: {

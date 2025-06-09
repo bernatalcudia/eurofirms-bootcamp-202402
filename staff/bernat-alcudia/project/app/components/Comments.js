@@ -6,31 +6,9 @@ import logic from '../logic';
 
 import Comment from './Comment';
 
-
-
-const DATA = [
-    {
-        id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-        title: 'First Item',
-    },
-    {
-        id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-        title: 'Second Item',
-    },
-    {
-        id: '58694a0f-3da1-471f-bd96-145571e29d72',
-        title: 'Third Item',
-    },
-];
-
-const Item = ({ title }) => (
-    <View >
-        <Text >{title}</Text>
-    </View>
-);
 const screenHeight = Dimensions.get('window').height || 600;
 
-function Comments({ visible, onClose, productId }) {
+function Comments({ visible, onClose, productId, onCommentCreated, onCommentDeleted }) {
 
     const styles = StyleSheet.create({
 
@@ -205,7 +183,6 @@ function Comments({ visible, onClose, productId }) {
 
     }, [productId, commentsList])
 
-    //TODO Improve styles,implement slider to comments with animation and add feat modified comments and response
 
     const handleCreateComment = () => {
         if (!comment.trim()) return
@@ -214,6 +191,7 @@ function Comments({ visible, onClose, productId }) {
 
                 .then(() => {
                     alert('created comment')
+                    onCommentCreated()
                     setComment('')
                 })
                 .catch(error => {
@@ -280,7 +258,7 @@ function Comments({ visible, onClose, productId }) {
 
                 {/* Content Scrollable */}
                 <View style={styles.contentArea}>
-                    <FlatList data={commentsList} renderItem={({ item }) => <Comment item={item} />} keyExtractor={(item) => item.id.toString()}
+                    <FlatList data={commentsList} renderItem={({ item }) => <Comment item={item} onCommentDeleted={onCommentDeleted} />} keyExtractor={(item) => item.id.toString()}
                         contentContainerStyle={styles.commentsList} ListEmptyComponent={() => (
                             <View style={styles.emptyListContainer}>
                                 <Text style={styles.emptyListText}>Add first comment!</Text>

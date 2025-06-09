@@ -104,6 +104,14 @@ function Products({ searchQuery }) {
         }
     }
 
+    const handleCommentCreated = () => {
+        refreshProducts()
+    }
+
+    const handleCommentDeleted = () => {
+        refreshProducts()
+    }
+
     const searchProducts = searchQuery => {
         try {
             logic.searchProducts(searchQuery) //I return the products searched
@@ -162,11 +170,6 @@ function Products({ searchQuery }) {
             justifyContent: 'center',
             alignItems: 'center'
         },
-        // container: {
-        //     flex: 1,
-        //     backgroundColor: '#f0f0f0',
-        //     padding: 30
-        // },
         productContainer: {
             padding: 20,
             marginBottom: 15,
@@ -178,8 +181,6 @@ function Products({ searchQuery }) {
             shadowRadius: 5,
             elevation: 3,
             flex: 1,
-
-
         },
         input: {
             width: '80%',
@@ -299,7 +300,6 @@ function Products({ searchQuery }) {
                 {products.map(product => {
                     const isLiked = product.likes.includes(logic.getLoggedInUserId())
                     const isSaved = user?.saved.includes(product.id)
-                    console.log(product.commentCount)
                     return (
                         <View style={styles.productContainer} key={product.id} >
 
@@ -346,6 +346,8 @@ function Products({ searchQuery }) {
                         productId={commentsProductId}
                         visible={viewComments}
                         onClose={returnFromComments}
+                        onCommentCreated={handleCommentCreated}
+                        onCommentDeleted={handleCommentDeleted}
                     />
                 )
             }
