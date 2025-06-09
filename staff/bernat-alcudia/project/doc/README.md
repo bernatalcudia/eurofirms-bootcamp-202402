@@ -43,7 +43,7 @@ Version 0.1
 - JS
 - Mongodb
 - Express
-- Jason Web Token
+- Json Web Token
 - React Native
 
 ### Data Model
