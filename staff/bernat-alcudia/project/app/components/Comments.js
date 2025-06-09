@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList, Animated, PanResponder, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList, Animated, PanResponder, Dimensions, KeyboardAvoidingView, Platform, AccessibilityInfo } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -33,16 +33,25 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             borderRadius: 3,
             alignSelf: 'center',
             marginBottom: 10,
+            paddingVertical: 10,
+            paddingHorizontal: 20
         },
 
         closeButton: {
             padding: 5,
+            paddingRight: 15,
+            paddingVertical: 10
         },
         title: {
             fontSize: 20,
             fontWeight: 'bold',
             marginLeft: 15,
             flex: 1,
+        },
+        header: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10,
         },
         contentArea: {
             flex: 1,
@@ -60,9 +69,6 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             alignItems: 'center',
             marginBottom: 5.
         },
-
-
-
         inputContainer: {
             flexDirection: 'row',
             alignItems: 'center',
@@ -80,6 +86,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             borderRadius: 20,
             marginRight: 10,
             fontSize: 16,
+            color: '#333'
 
         },
 
@@ -110,6 +117,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
     const [commentsList, setCommentsList] = useState([])
     const [comment, setComment] = useState('')
     const [text, seText] = useState('')
+    const commentInputRef = useRef(null)
 
     useEffect(() => {
 
@@ -117,7 +125,11 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             toValue: visible ? 0 : screenHeight,
             duration: 300,
             useNativeDriver: true
-        }).start()
+        }).start(() => {
+            if (visible && commentInputRef.current) {
+                commentInputRef.current.focus()
+            }
+        })
     }, [visible]);
 
 
@@ -161,8 +173,11 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
 
                         if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
                             feedback = `${feedback}, please correct it`
-                        else
+                        else {
                             feedback = 'sorry,there was an error,please try again later'
+                        }
+                        AccessibilityInfo.announceForAccessibility(feedback)
+
                     })
 
             } catch (error) {
@@ -175,7 +190,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                 else
                     feedback = 'sorry,there was an error,please try again later'
 
-                alert(feedback)
+                AccessibilityInfo.announceForAccessibility(feedback)
             }
         } else {
             setCommentsList([])
@@ -185,12 +200,17 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
 
 
     const handleCreateComment = () => {
-        if (!comment.trim()) return
+        if (!comment.trim()) {
+            alert('Comment field is empty')
+            AccessibilityInfo.announceForAccessibility('Comment field is empty')
+            return
+        }
         try {
             logic.createComment(productId, comment)//Create comment
 
                 .then(() => {
-                    alert('created comment')
+                    alert('comment created')
+                    AccessibilityInfo.announceForAccessibility('comment created')
                     onCommentCreated()
                     setComment('')
                 })
@@ -206,9 +226,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
         }
     }
 
-
-
-    if (!visible && panY.gestureResponder.value === screenHeight) {
+    if (!visible && panY.__getValue() === screenHeight) {
         return null;
     }
 
@@ -223,11 +241,22 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                         {
                             opacity: panY.interpolate({
                                 inputRange: [0, screenHeight * 0.8],
-                                outputRange: [1, 0],
-                                extrapolate: 'clamp'
-                            })
-                        }
+                                outputRange: [0.5, 0],
+                                extrapolate: 'clamp',
+                            }),
+                        },
                     ]}
+                    accessible={true}
+                    accessibilityLabel='Tap to close comments'
+                    accessibilityRole='button'
+                    onStartShouldSetResponder={() => {
+                        Animated.timing(panY, {
+                            toValue: screenHeight,
+                            duration: 300,
+                            useNativeDriver: true,
+                        }).start(() => onClose());
+                        return true;
+                    }}
                 />
             )}
 
@@ -238,9 +267,23 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     { transform: [{ translateY: panY }] }
                 ]}
                 {...PanResponders.panHandlers}
+                accessible={true}
+                accessibilityLabel={'Comments section,drag down to close'}
+                accessibilityRole={'menu'}
             >
                 {/* Drag bar */}
-                <View style={styles.dragBar} />
+                <TouchableOpacity
+                    style={styles.dragBar}
+                    onPress={() => {
+                        Animated.timing(panY, {
+                            toValue: screenHeight,
+                            duration: 300,
+                            useNativeDriver: true,
+                        }).start(() => onClose());
+                    }}
+                    accessibilityLabel='Drag bar. Tap to close comments.'
+                    accessibilityRole='button'
+                />
 
                 {/* Header */}
                 <View style={styles.header}>
@@ -250,10 +293,10 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                             duration: 300,
                             useNativeDriver: true
                         }).start(() => onClose())
-                    }} style={styles.closeButton}>
+                    }} style={styles.closeButton} accessibilityLabel='Close comments' accessibilityRole='button'>
                         <MaterialCommunityIcons name='chevron-down' size={30} color='black' />
                     </TouchableOpacity>
-                    <Text style={styles.title}>Comments</Text>
+                    <Text style={styles.title} accessibilityRole='header'>Comments</Text>
                 </View>
 
                 {/* Content Scrollable */}
@@ -261,53 +304,18 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     <FlatList data={commentsList} renderItem={({ item }) => <Comment item={item} onCommentDeleted={onCommentDeleted} />} keyExtractor={(item) => item.id.toString()}
                         contentContainerStyle={styles.commentsList} ListEmptyComponent={() => (
                             <View style={styles.emptyListContainer}>
-                                <Text style={styles.emptyListText}>Add first comment!</Text>
+                                <Text style={styles.emptyListText} accessibilityLiveRegion='polite'>Add first comment!</Text>
                             </View>
-                        )} />
-                    {/* <Text>Hi world</Text>
-                    <FlatList
-                        data={DATA}
-                        renderItem={({ item }) => <Item title={item.title} />}
-                        keyExtractor={item => item.id}
-                    /> */}
+                        )} accessibilityLabel='List of comments' />
                 </View>
 
-                {/* <FlatList
-                    data={commentsList}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id}
-                    contentContainerStyle={styles.list}
-                    style={styles.commentsContainer}
-                /> */}
-                {/* {commentsList.map((item) => (
-                    <View key={item.id} style={styles.list}>
-                        <Text style={styles.text}>{item.author.username}</Text>
-                        {item.own && <TouchableOpacity style={styles.button} onPress={() => handleDeleteComment(item.id)}>
-                            <MaterialCommunityIcons name={'trash-can-outline'} size={25} color={'red'} />
-                        </TouchableOpacity>}
-                        <Text style={styles.text}>{item.text}</Text>
-                    </View>
-                ))} */}
-
-
-                {/* <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Add comment'
-                        value={comment}
-                        onChangeText={setComment}
-                    />
-                    <TouchableOpacity style={styles.sendButton} onPress={handleCreateComment}>
-                        <MaterialCommunityIcons name='send' size={24} color='black' />
-                    </TouchableOpacity>
-                </View> */}
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
                 >
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} placeholder='Add a comment' value={comment} onChangeText={setComment} multiline />
-                        <TouchableOpacity style={styles.sendButton} onPress={handleCreateComment} disabled={!comment.trim()}>
+                        <TextInput ref={commentInputRef} style={styles.input} placeholder='Add a comment' value={comment} onChangeText={setComment} multiline accessibilityLabel='Comment input field' accessibilityHint='Type your comment here' returnKeyType='send' onSubmitEditing={handleCreateComment} />
+                        <TouchableOpacity style={styles.sendButton} onPress={handleCreateComment} disabled={!comment.trim()} accessibilityLabel={comment.trim() ? 'Send comment' : 'Send comment button,disabled'} >
                             <MaterialCommunityIcons name='send' size={24} color={comment.trim() ? 'black' : '#ccc'}></MaterialCommunityIcons>
                         </TouchableOpacity>
                     </View>
