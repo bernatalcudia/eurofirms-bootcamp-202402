@@ -164,17 +164,16 @@ function Comment({ item: comment, onCommentDeleted }) {
 
     return (
         <>
-            {/* <Text>Hi world</Text> */}
-            <View style={styles.commentItemContainer}>
+            <View style={styles.commentItemContainer} accessible={true} accessibilityLabel={`Comment by ${comment?.author.username || 'User'}`}>
                 <View style={styles.header}>
                     <View style={styles.actionButtonsContainer}>
-                        <Text style={styles.commentAuthor}>{comment?.author.username || 'User'}</Text>
+                        <Text style={styles.commentAuthor} accessibilityRole='header' aria-level={'3'}>{comment?.author.username || 'User'}</Text>
                         {comment?.own && !showEdit && (
                             <View style={styles.actionButtonsContainer}>
-                                <TouchableOpacity style={styles.actionButton} onPress={handleShowEdit}>
+                                <TouchableOpacity style={styles.actionButton} onPress={handleShowEdit} accessibilityLabel='Edit comment' accessibilityHint='Activates to edit mode for the comment' accessibilityRole='button'>
                                     <MaterialCommunityIcons name='pencil' size={20} color='#007bff' />
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.actionButton} onPress={handleDeleteComment}>
+                                <TouchableOpacity style={styles.actionButton} onPress={handleDeleteComment} accessibilityLabel='Delete comment' accessibilityHint='Deletes this comment permanently' accessibilityRole='button'>
                                     <MaterialCommunityIcons name={'trash-can-outline'} size={20} color={'#dc3545'} />
                                 </TouchableOpacity>
                             </View>
@@ -183,18 +182,15 @@ function Comment({ item: comment, onCommentDeleted }) {
 
                     {showEdit ? (
                         <View style={styles.editContainer}>
-                            <TextInput style={styles.textInput} value={newComment} onChangeText={handleCommentTextChange} placeholder='Type new comment' multiline={true} numberOfLines={3}></TextInput>
+                            <TextInput style={styles.textInput} value={newComment} onChangeText={handleCommentTextChange} placeholder='Type new comment' multiline={true} numberOfLines={3} accessibilityLabel='Edit comment text' accessibilityHint='Enter you updated comment here'></TextInput>
                             <View style={styles.editActions}>
-                                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancelEdit}>
+                                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancelEdit} accessibilityLabel='Cancel editing comment' accessibilityRole='button'>
                                     <Text style={styles.buttonText}>Cancel</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveModifiedComment}>
+                                <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveModifiedComment} accessibilityLabel='Save modified comment' accessibilityRole='button'>
                                     <Text style={styles.buttonText}>Save</Text>
                                 </TouchableOpacity>
                             </View>
-                            {/* <TouchableOpacity onPress={handleModifiedComment(comment?.id, newComment)}>
-                                    <MaterialCommunityIcons name='pencil' size={20} color='blue' />
-                                </TouchableOpacity> */}
                         </View>
 
                     ) : (

@@ -176,6 +176,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                         else {
                             feedback = 'sorry,there was an error,please try again later'
                         }
+                        alert(feedback)
                         AccessibilityInfo.announceForAccessibility(feedback)
 
                     })
