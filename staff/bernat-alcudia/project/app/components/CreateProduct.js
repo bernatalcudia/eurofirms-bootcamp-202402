@@ -1,13 +1,12 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import logic from '../logic';
-import { View, Image, StyleSheet, ScrollView, Button, TextInput, Alert, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import RadioGroup from 'react-native-radio-buttons-group';
 import * as ImagePicker from 'expo-image-picker';
 
 
-const { width } = Dimensions.get('window')
 
 const styles = StyleSheet.create({
     scrollView: {
@@ -158,49 +157,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 0,
         width: '100%'
     },
-    // view: {
-    //     display: 'flex',
-    //     flexDirection: 'column',
-    //     gap: 5,
-    //     alignItems: 'center',
-    // },
-    // input: {
-    //     width: '80%',
-    //     padding: 10,
-    //     borderWidth: 1,
-    //     borderColor: '#ccc',
-    //     borderRadius: 5,
-    // },
-    // button: {
-    //     width: '80%',
-    //     padding: 15,
-    //     backgroundColor: 'black',
-    //     borderRadius: 5,
-    // },
-    // buttonText: {
-    //     color: '#fff',
-    //     fontSize: 16,
-    //     alignSelf: 'center'
-    // },
-    // logo: {
-    //     width: 66,
-    //     height: 58,
-    // },
-    // radioButtons: {
-    //     padding: 10
-    // },
-    // galleryPreview: {
-    //     display: 'flex',
-    //     flexDirection: 'row',
-    //     justifyContent: 'flex-start',
-    //     alignItems: 'flex-start',
-    //     maxWidth: '70%',
-    //     flexWrap: 'wrap'
-    // },
-    // text: {
-    //     alignSelf: 'flex-start',
-    //     paddingLeft: 40
-    // }
 })
 
 function CreateProduct({ }) {
@@ -221,13 +177,15 @@ function CreateProduct({ }) {
             id: '1',
             label: 'new',
             value: 'new',
-            selected: true
+            selected: true,
+            accessibilityLabel: 'New Condition'
         },
         {
             id: '2',
             label: 'used',
             value: 'used',
-            selected: false
+            selected: false,
+            accessibilityLabel: 'Used condition'
         }
     ]), []);
 
@@ -277,18 +235,18 @@ function CreateProduct({ }) {
         try {
             logic.createProduct(images, title, description, brand, +price, selectedRadioButton.value, +stock)
                 .then(() => {
-                    alert('created product')
+                    Alert.alert('Success', 'Product created successfully!')
                     navigation.navigate('tabs')
                 })
                 .catch(error => {
                     console.error(error)
 
-                    alert(error.message)
+                    Alert.alert('Error', error.message)
                 })
         } catch (error) {
             console.error(error)
 
-            alert(error.message)
+            Alert.alert('Error', error.message)
         }
     }
 
@@ -304,55 +262,55 @@ function CreateProduct({ }) {
             <View style={styles.container}>
 
 
-                <Text style={styles.sectionTitle}>Photos</Text>
+                <Text style={styles.sectionTitle} accessibilityRole='header'>Photos</Text>
                 <View style={styles.photoActionsContainer}>
-                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityHint='button to insert images with phone storage' accessible={true} >
-                        <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityHint='icon insert images with storage phone' accessible={true} ></MaterialCommunityIcons>
+                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityHint='Button to insert images with phone storage' accessibilityLabel='Upload photos from gallery' accessible={true} >
+                        <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} aria-hidden='true' ></MaterialCommunityIcons>
                         <Text style={styles.buttonOutlineText}  >Upload photos</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture} accessibilityHint='button to take pictures'>
-                        <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityHint='icon take pictures' accessible={true}></MaterialCommunityIcons>
+                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture} accessibilityLabel='Take a new photo' accessibilityHint='Opens your phones camera to take a picture' accessible={true}>
+                        <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} aria-hidden='true'></MaterialCommunityIcons>
                         <Text style={styles.buttonOutlineText} >Take Picture</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.galleryPreview}>
+                <View style={styles.galleryPreview} accessibilityLabel='Selected images preview'>
                     {images.length > 0 ? images.map((image, index) => (
-                        <View key={index} style={styles.imageContainer}>
-                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityHint='images preview' accessible={true} ></Image>
-                            <TouchableOpacity onPress={() => handleDeleteImage(image)} accessibilityHint='button to delete image' accessible={true}>
+                        <View key={index} style={styles.imageContainer} accessible={true} accessibilityLabel={`Product image ${index + 1}`}>
+                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityLabel={`Thumbnail of product image ${index + 1}`} ></Image>
+                            <TouchableOpacity onPress={() => handleDeleteImage(image)} accessibilityLabel={`Remove image ${index + 1}`} accessibilityHint='Deletes this product image' accessible={true}>
                                 <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityHint='icon close-circle' accessible={true} />
                             </TouchableOpacity>
                         </View>
                     ))
                         :
-                        <View style={styles.placeholderContainer}>
-                            <Image style={styles.placeholderImage} source={{ uri: 'https://fakeimg.pl/200x200/cccccc/d61a1a?font=bebas' }} accessibilityHint='placeholder images' accessible={true}></Image>
+                        <View style={styles.placeholderContainer} accessibilityLabel='No images selected yet'>
+                            <Image style={styles.placeholderImage} source={{ uri: 'https://fakeimg.pl/200x200/cccccc/d61a1a?font=bebas' }} accessibilityLabel='Placeholder image for product photos'></Image>
                             <Text style={styles.placeholderText}>Add up to 10 photos</Text>
                         </View>
                     }
                 </View>
 
 
-                <Text style={styles.label}>Title</Text>
-                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='Blue Summer Dress' placeholderTextColor={'#aaa'} accessibilityHint='input title' accessible={true} />
+                <Text style={styles.label} nativeID='titleLabel'>Title</Text>
+                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='Blue Summer Dress' placeholderTextColor={'#aaa'} accessibilityLabel='Product title input' accessibilityHint='Enter the title of your product' />
 
                 <Text style={styles.label}>Brand</Text>
-                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='Zara,H&M,None' placeholderTextColor={'#aaa'} accessibilityHint='input brand' accessible={true} />
+                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='Zara,H&M,Celio' placeholderTextColor={'#aaa'} accessibilityLabel='Product brand input' accessibilityHint='Enter the brand of your product.  For example, Zara or H&M.' />
 
                 <Text style={styles.label}>Price</Text>
-                <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor={'#aaa'} accessibilityHint='input price' accessible={true} />
+                <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor={'#aaa'} accessibilityLabel='Product price input' accessibilityHint='Enter the price of your product in numbers' />
 
                 <Text style={styles.label}>State</Text>
-                <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel='radio buttons states' accessible={true} />
+                <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel='Product condition radio buttons' accessibilityHint='Select whether the product is new or used' />
 
                 <Text style={styles.label}>Stock</Text>
-                <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} accessibilityHint='input stock' accessible={true} />
+                <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='3' placeholderTextColor={'#aaa'} accessibilityLabel='Product stock input' accessibilityHint='Enter the number of items available in stock' />
 
                 <Text style={styles.label}>Description</Text>
-                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} accessibilityHint='input description' accessible={true} />
+                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} accessibilityLabel='Product description input' accessibilityHint='Provide a detailed description of your product, including features, condition, and any relevant information.' />
 
-                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton]} onPress={handleCreateProduct} accessibilityHint='create button' accessible={true}>
+                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton]} onPress={handleCreateProduct} accessibilityLabel='Create product button' accessibilityHint='Tap to save and create your product listing' accessible={true}>
                     <Text style={styles.buttonPrimaryText}>Create</Text>
                 </TouchableOpacity>
             </View>
