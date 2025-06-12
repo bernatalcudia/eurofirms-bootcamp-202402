@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, } from 'react';
 import logic from '../logic';
-import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -8,7 +8,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 
 
-const width = Dimensions.get('window')
 
 
 
@@ -117,7 +116,6 @@ function ModifyProduct() {
         galleryPreview: {
             flexDirection: 'row',
             flexWrap: 'wrap',
-            // justifyContent: 'space-between',
             marginBottom: 10,
         },
         imageContainer: {
@@ -175,42 +173,6 @@ function ModifyProduct() {
             fontSize: 16,
             color: '#333'
         },
-        // view: {
-        //     display: 'flex',
-        //     flexDirection: 'column',
-        //     gap: 5,
-        //     alignItems: 'center',
-        // },
-        // input: {
-        //     width: '80%',
-        //     padding: 10,
-        //     borderWidth: 1,
-        //     borderColor: '#ccc',
-        //     borderRadius: 5,
-        // },
-        // button: {
-        //     width: '80%',
-        //     padding: 15,
-        //     backgroundColor: 'black',
-        //     borderRadius: 5,
-        // },
-        // buttonText: {
-        //     color: '#fff',
-        //     fontSize: 16,
-        //     alignSelf: 'center'
-        // },
-        // logo: {
-        //     width: 66,
-        //     height: 58,
-        // },
-        // radioButtons: {
-        //     padding: 10
-        // },
-
-        // text: {
-        //     alignSelf: 'flex-start',
-        //     paddingLeft: 40
-        // }
     })
 
     useEffect(() => {
@@ -286,7 +248,7 @@ function ModifyProduct() {
         try {
             logic.modifyProduct(productId, images, title, description, brand, +price, selectedRadioButton.value, +stock)
                 .then(() => {
-                    alert('modified product')
+                    alert('Product modified successfully!')
                     navigation.navigate('tabs')
                 })
                 .catch(error => {
@@ -308,59 +270,59 @@ function ModifyProduct() {
 
     return (
         <>
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-                <View style={styles.container}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel='Modify Product Scroll View' accessible={true}>
+                <View style={styles.container} accessibilityRole='header'>
 
                     <Text style={styles.sectionTitle}>Photos</Text>
                     <View style={styles.photoActionsContainer}>
-                        <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage}>
-                            <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon}></MaterialCommunityIcons>
-                            <Text style={styles.buttonOutlineText} >Add from Gallery</Text>
+                        <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityLabel='Add photos from gallery' accessibilityHint='Tap to open your photo gallery and select images to add'>
+                            <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityElementsHidden={true}></MaterialCommunityIcons>
+                            <Text style={styles.buttonOutlineText} accessibilityRole='button' >Add from Gallery</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture}>
-                            <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon}></MaterialCommunityIcons>
-                            <Text style={styles.buttonOutlineText} >Take Picture</Text>
+                        <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture} accessibilityLabel='Take a new picture' accessibilityHint='Tap to open your camera and take a new photo'>
+                            <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityElementsHidden={true} ></MaterialCommunityIcons>
+                            <Text style={styles.buttonOutlineText} accessibilityRole='button' >Take Picture</Text>
                         </TouchableOpacity>
                     </View>
 
 
 
-                    <View style={styles.galleryPreview} >
+                    <View style={styles.galleryPreview} accessibilityLabel='Product images preview' >
 
                         {images?.map((image, index, images) => (
                             <View key={index} style={styles.imageContainer}>
-                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.imageThumbnail} onError={(error) => console.error('Error loading image:', error)} accessibilityHint='preview images to delete to modify product' />
-                                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(image)}>
-                                    <MaterialCommunityIcons name='close-circle' size={25} color={'black'} style={styles.deleteIconBackground} />
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.imageThumbnail} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={`Product image ${index + 1}`} accessibilityHint='Displays a preview of an image for the product.' />
+                                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(image)} accessibilityLabel={`Delete image ${index + 1}`} accessibilityHint='Tap to remove this image from the product.'>
+                                    <MaterialCommunityIcons name='close-circle' size={25} color={'black'} style={styles.deleteIconBackground} accessibilityElementsHidden={true} />
                                 </TouchableOpacity>
                             </View>
                         ))}
                     </View>
 
-                    <Text style={styles.sectionTitle}>Details</Text>
+                    <Text style={styles.sectionTitle} accessibilityRole='header'>Details</Text>
 
-                    <Text style={styles.label}>Title</Text>
-                    <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='title' placeholderTextColor='#aaa' />
+                    <Text style={styles.label} accessibilityLabel='Product title'>Title</Text>
+                    <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='title' placeholderTextColor='#aaa' accessibilityLabel='Product title input' accessibilityHint='Enter the title of your product' />
 
-                    <Text style={styles.label} >Brand</Text>
-                    <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='brand' placeholderTextColor='#aaa' />
+                    <Text style={styles.label} accessibilityLabel='Product brand' >Brand</Text>
+                    <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='brand' placeholderTextColor='#aaa' accessibilityLabel='Product brand input' accessibilityHint='Enter the brand of your product' />
 
-                    <Text style={styles.label}>Price</Text>
-                    <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor='#aaa' />
+                    <Text style={styles.label} accessibilityLabel='Product price'>Price</Text>
+                    <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor='#aaa' accessibilityLabel='Product price input' accessibilityHint='Enter the price of your product' />
 
-                    <Text style={styles.label}>State</Text>
-                    <RadioGroup labelStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} />
+                    <Text style={styles.label} accessibilityLabel='Product state'>State</Text>
+                    <RadioGroup labelStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel='Product state selection' accessibilityHint='Choose whether the product is new or used' />
 
-                    <Text style={styles.label}>Stock</Text>
-                    <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} />
+                    <Text style={styles.label} accessibilityLabel='Product stock'>Stock</Text>
+                    <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} accessibilityLabel='Product stock input' accessibilityHint='Enter the available stock quantity' />
 
-                    <Text style={styles.label}>Description</Text>
-                    <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} />
+                    <Text style={styles.label} accessibilityLabel='Product description'>Description</Text>
+                    <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} accessibilityLabel='Product description input' accessibilityHint='Provide a detailed description of your product' />
 
 
-                    <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={handleModifyProduct}>
-                        <MaterialCommunityIcons name='content-save-edit-outline' size={20} color={styles.buttonPrimaryText.color} />
-                        <Text style={styles.buttonPrimaryText}>Save Changes</Text>
+                    <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={handleModifyProduct} accessibilityLabel='Save product changes' accessibilityHint='Tap to save all modification to the product details'>
+                        <MaterialCommunityIcons name='content-save-edit-outline' size={20} color={styles.buttonPrimaryText.color} accessibilityElementsHidden={true} />
+                        <Text style={styles.buttonPrimaryText} accessibilityRole='button'>Save Changes</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView >
