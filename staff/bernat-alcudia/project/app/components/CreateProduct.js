@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import logic from '../logic';
-import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import RadioGroup from 'react-native-radio-buttons-group';

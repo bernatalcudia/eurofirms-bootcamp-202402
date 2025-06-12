@@ -52,13 +52,13 @@ function MyTabs() {
 
     return (
         <Tab.Navigator
-            screenOptions={{ tabBarActiveTintColor: 'black', tabBarInactiveTintColor: 'grey', tabBarShowLabel: false }} // headerShown: false
+            screenOptions={{ tabBarActiveTintColor: 'black', tabBarInactiveTintColor: 'grey', tabBarShowLabel: false, animation: 'shift' }} // headerShown: false
         >
             <Tab.Screen name='Home' children={() => <Home searchQuery={searchQuery} />}
                 options={{
                     headerStyle: {
-                        height: 80, // Specify the height of your custom header
-                    }, headerTitleAlign: 'center', // Center the header title
+                        height: 100,
+                    }, headerTitleAlign: 'center',
                     headerTitle: () => <SearchProduct onSearch={handleSearch} />, toBarLabel: 'Home', tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name='home' color={color} size={size} />
                 }}></Tab.Screen>
             {logic.getLoggedInUserRole() === 'seller' && <Tab.Screen name='CreateProduct' component={CreateProduct} options={{ toBarLabel: 'Home', tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} /> }}></Tab.Screen>}

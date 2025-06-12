@@ -15,21 +15,22 @@ function SearchProduct({ onSearch }) {
     const styles = StyleSheet.create({
         input: {
             width: '200%',
-            padding: 10,
-            marginVertical: 10,
+            paddingHorizontal: 10,
+            paddingVertical: 0,
             borderWidth: 1,
             borderColor: '#ccc',
             borderRadius: 5,
-            alignSelf: 'center'
+            alignSelf: 'center',
+            height: 40
         },
         view: {
             width: '100%',
             flex: 1,
-            justifyContent: 'center'
+            justifyContent: 'center',
         }
     })
 
-    return (<View style={styles.view}><TextInput onChangeText={newText => handlerNewText(newText)} style={styles.input} placeholder='search products' defaultValue='' /></View>)
+    return (<View style={styles.view}><TextInput onChangeText={newText => handlerNewText(newText)} style={styles.input} placeholder='Search products' defaultValue='' /></View>)
 }
 
 export default SearchProduct
