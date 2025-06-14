@@ -236,7 +236,14 @@ function CreateProduct({ }) {
             logic.createProduct(images, title, description, brand, +price, selectedRadioButton.value, +stock)
                 .then(() => {
                     Alert.alert('Success', 'Product created successfully!')
-                    navigation.navigate('tabs')
+                    setImages('')
+                    setTitle('')
+                    setDescription('')
+                    setBrand('')
+                    setPrice('')
+                    setSelectedId('1')
+                    setStock('')
+                    navigation.navigate('Home')
                 })
                 .catch(error => {
                     console.error(error)

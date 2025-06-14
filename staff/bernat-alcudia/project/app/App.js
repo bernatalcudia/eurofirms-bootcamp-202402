@@ -24,6 +24,7 @@ export default function App() {
         <Stack.Screen name='LoginUser' component={LoginUser} />
         <Stack.Screen name='RegisterSeller' component={RegisterSeller} />
         <Stack.Screen name='RegisterBuyer' component={RegisterBuyer} />
+        <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='tabs' component={MyTabs} options={{
           headerShown: false, headerLeft: null
         }}
