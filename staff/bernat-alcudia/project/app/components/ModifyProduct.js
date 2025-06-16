@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, } from 'react';
 import logic from '../logic';
-import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform, Linking } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -176,16 +176,42 @@ function ModifyProduct() {
     })
 
     useEffect(() => {
-        (async () => {
-            if (Platform.OS !== 'web') {
-                const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-                const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
-                    Alert.alert('Insufficient permissions', 'Permissions are required to access the camera and photo gallery.');
+        const requestPermissions = async () => {
+            try {
+                if (Platform.OS !== 'web') {
+                    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync()
+
+                    const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+                    if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
+                        Alert.alert(
+                            'Permissions Required',
+                            'To use this feature, please grant access to your camera and photo library.',
+                            [
+                                {
+                                    text: 'Cancel',
+                                    style: 'cancel'
+                                },
+                                {
+                                    text: 'Open Settings',
+                                    onPress: () => Linking.openSettings()
+                                }
+                            ],
+                            { cancelable: false }
+                        )
+                    }
                 }
+            } catch (error) {
+                console.error('Error requesting permissions:', error)
+                Alert.alert(
+                    'Error',
+                    'Failed to request necessary permissions. Please try again later.'
+                )
             }
-        })();
-    }, []);
+        }
+
+        requestPermissions()
+    }, [])
 
     const showProductDetails = () => {
         try {
@@ -219,30 +245,70 @@ function ModifyProduct() {
     }, [])
 
     const selectImage = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status === 'granted') {
-            const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, mediaTypes: ImagePicker.MediaTypeOptions.Images, base64: true });
-            if (!result.canceled) {
-                const base64Images = result.assets.map(asset => asset.base64)
-                const newImages = images.slice()
-                base64Images.forEach(image => newImages.push(image))
-                setImages(newImages);
+        try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+            if (status !== 'granted') {
+                Alert.alert('Permission Denied', 'Please grant access to you media library to select image')
+                return
             }
+
+            const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, mediaTypes: ImagePicker.MediaTypeOptions.Images, base64: true })
+            if (result.canceled) {
+                console.log('Image selection cancelled')
+
+            }
+            if (result.assets && result.assets.length > 0) {
+                const base64Images = result.assets.map(asset => asset.base64)
+                setImages(prevImages => [...prevImages, ...base64Images])
+            } else {
+                Alert.alert('No Images Selected', 'It seems no images were picked. Please try again.')
+            }
+        } catch (error) {
+            console.error('Error selecting image', error)
+            Alert.alert('Error', 'Failed to select images.Please try again later')
         }
-    };
+    }
+
 
     const takePicture = async () => {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status === 'granted') {
-            const result = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, base64: true });
-            if (!result.canceled) {
-                const base64Images = result.assets.map(asset => asset.base64)
-                const newImages = images.slice()
-                base64Images.forEach(image => newImages.push(image))
-                setImages(newImages);
+        try {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync()
+
+            if (status !== 'granted') {
+                Alert.alert(
+                    'Permission Denied',
+                    'Please grant camera access to take pictures.'
+                )
+                return
             }
+
+            const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                base64: true,
+            })
+
+            if (result.canceled) {
+                console.log('Camera operation cancelled.')
+                return
+            }
+
+            if (result.assets && result.assets.length > 0) {
+                const base64Images = result.assets.map(asset => asset.base64)
+                setImages(prevImages => [...prevImages, ...base64Images])
+            } else {
+                Alert.alert('No Picture Taken', 'It seems no picture was taken. Please try again.')
+            }
+
+        } catch (error) {
+            console.error('Error taking picture:', error)
+            Alert.alert(
+                'Error',
+                'Failed to take a picture. Please try again later.'
+            )
         }
-    };
+    }
+
 
     const handleModifyProduct = () => {
         try {

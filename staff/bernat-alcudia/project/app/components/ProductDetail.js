@@ -340,47 +340,10 @@ function ProductDetail() {
     const isAuthor = product.author.id === logic.getLoggedInUserId()
 
     return (
-
-        // <View style={styles.mainContainer}>
-        //     <ScrollView>
-        //         <View style={styles.productCard}>
-        //             <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageScrollView}>
-
-        //                 <View style={styles.imageContainer} key={product.id} >
-        //                     {product.images.map((image, index) => (
-        //                         <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} />
-        //                     ))}
-        //                 </View>
-        //             </ScrollView>
-
-        //             <View style={styles.infoContainer}>
-        //                 <View style={styles.infoSection}>
-        //                     <Text style={styles.dateText}>Last Modified:{utils.formatDate(new Date(product.date))}</Text>
-        //                     <Text style={styles.titleText}>Title: {product.title}</Text>
-        //                     <Text style={styles.brandText}>Brand: {product.brand}</Text>
-        //                     <Text style={styles.priceText}>Price: {product.price}€</Text>
-        //                     <Text style={styles.stateText}>State: {product.state}</Text>
-        //                     <Text style={styles.stockText}>Stock: {product.stock}</Text>
-        //                     <Text style={styles.descriptionText}>Description: {product.description} </Text>
-        //                 </View>
-        //             </View>
-        //             <View style={styles.infoSection}>
-        //                 <View style={styles.actionButtonsContainer}>
-        //                     <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail}>
-        //                         {isAuthor && <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' size={25} color={'blue'} />}
-        //                     </TouchableOpacity>
-        //                     <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct}>
-        //                         {isAuthor && <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' size={25} color={'red'} />}
-        //                     </TouchableOpacity>
-        //                 </View>
-        //             </View>
-        //         </View>
-        //     </ScrollView >
-        // </View>
         <View style={styles.mainContainer}>
             <ScrollView>
                 <View style={styles.productCard}>
-                    <ScrollView horizontal pagingEnabled style={styles.imageScrollView}>
+                    <ScrollView horizontal style={styles.imageScrollView}>
 
                         <View style={styles.imageContainer} key={product.id} >
                             {product.images.map((image, index) => (
