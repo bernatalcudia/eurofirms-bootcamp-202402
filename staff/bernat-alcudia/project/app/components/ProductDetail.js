@@ -9,120 +9,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
-    // mainContainer: {
-    //     flex: 1,
-    //     marginBottom: 20,
-    //     backgroundColor: '#f9f9f9',
-    //     borderRadius: 10,
-    //     padding: 15,
-    //     shadowColor: '#000',
-    //     shadowOffset: { width: 0, height: 2 },
-    //     shadowOpacity: 0.1,
-    //     shadowRadius: 4,
-    //     elevation: 3,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    // },
-    // imageScrollView: {
-    //     height: screenWidth,
-    // },
-    // imageContainer: {
-    //     flexDirection: 'row',
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    // },
-    // infoSection: {
-    //     paddingVertical: 16,
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center'
-    // },
-    // infoSectionLast: {
-    //     borderBottomWidth: 0,
-    // },
 
-    // image: {
-    //     width: 300,
-    //     height: 300,
-    //     borderRadius: 10,
-    //     marginRight: 10,
-    //     // width: screenWidth,
-    //     // height: screenWidth,
-    //     // marginRight: 10,
-    //     resizeMode: 'cover',
-    //     // borderRadius: 15,
-    // },
-    // infoContainer: {
-    //     paddingHorizontal: 16,
-    //     paddingBottom: 24,
-    // },
-    // detailsRow: {
-    //     marginBottom: 12,
-    // },
-    // dateText: {
-    //     fontSize: 12,
-    //     color: '#888',
-    //     marginBottom: 5,
-    // },
-    // titleText: {
-    //     fontSize: 20,
-    //     fontWeight: 'bold',
-    //     marginBottom: 5,
-    // },
-    // brandText: {
-    //     fontSize: 16,
-    //     color: '#555',
-    //     marginBottom: 5,
-    // },
-    // priceText: {
-    //     fontSize: 18,
-    //     fontWeight: 'bold',
-    //     color: 'green',
-    //     marginBottom: 5,
-    // },
-    // stateText: {
-    //     fontSize: 14,
-    //     fontStyle: 'italic',
-    //     color: '#666',
-    //     marginBottom: 3,
-    // },
-    // stockText: {
-    //     fontSize: 14,
-    //     color: '#666',
-    //     marginBottom: 3,
-    // },
-    // descriptionText: {
-    //     fontSize: 14,
-    //     color: '#333',
-    //     marginTop: 10,
-    // },
-    // actionButtonsContainer: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'flex-end',
-    //     paddingTop: 16,
-    //     justifyContent: 'center',
-    //     alignItems: 'center'
-    // },
-    // actionButton: {
-    //     padding: 8,
-    //     marginLeft: 16,
-    // },
-    // modifyIcon: {
-    //     fontSize: 24,
-    // },
-    // deleteIcon: {
-    //     fontSize: 26,
-    // },
-    // loadingContainer: {
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    // },
-    // loadingText: {
-    //     fontSize: 16,
-    //     marginTop: 12,
-    // }
     mainContainer: {
         flex: 1,
 
@@ -279,6 +166,8 @@ function ProductDetail() {
             {
                 text: 'Cancel',
                 style: 'cancel',
+                accessibilityLabel: 'Cancel deletion',
+                accessibilityHint: 'Cancels the product deletion process and returns to product details'
             },
             {
                 text: 'Delete',
@@ -298,6 +187,8 @@ function ProductDetail() {
                     }
                 },
                 style: 'destructive',
+                accessibilityLabel: 'Confirm delete product',
+                accessibilityHint: 'Deletes the product permanently and navigates back to the main screen.',
             },
         ])
     }
@@ -331,7 +222,7 @@ function ProductDetail() {
 
     if (!product) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={styles.loadingContainer} accessible={true} accessibilityLabel='Loading product details' accessibilityRole='alert' >
                 <Text style={styles.loadingText}>Loading details product...</Text>
             </View>
         );
@@ -340,34 +231,34 @@ function ProductDetail() {
     const isAuthor = product.author.id === logic.getLoggedInUserId()
 
     return (
-        <View style={styles.mainContainer}>
-            <ScrollView>
+        <View style={styles.mainContainer} accessible={true}>
+            <ScrollView accessibilityLabel='Product details scroll view' accessibilityHint='Scrolls to view more product information.'>
                 <View style={styles.productCard}>
-                    <ScrollView horizontal style={styles.imageScrollView}>
+                    <ScrollView horizontal style={styles.imageScrollView} accessibilityLabel='Product images' accessibilityHint={`Scrolls horizontally to view ${product.images.length} product images.`} accessibilityRole='imageCollection' >
 
-                        <View style={styles.imageContainer} key={product.id} >
+                        <View style={styles.imageContainer} key={product.id} accessible={true} accessibilityLabel='Product image gallery' >
                             {product.images.map((image, index) => (
-                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} onError={(error) => console.error('Error loading image:', error)} />
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} onError={(error) => console.error('Error loading image:', error)} accessible={true} accessibilityLabel={`${product.title} image ${index + 1} of ${product.images.length}`} accessibilityRole='image' />
                             ))}
                         </View>
                     </ScrollView>
 
                     <View style={styles.infoContainer}>
-                        <Text style={styles.dateText}>Last Modified: {utils.formatDate(new Date(product.date))}</Text>
-                        <Text style={styles.titleText}>{product.title}</Text>
-                        <Text style={styles.brandText}>{product.brand}</Text>
-                        <Text style={styles.priceText}>{product.price}€</Text>
-                        <Text style={styles.stateText}>Condition: {product.state}</Text>
-                        <Text style={styles.stockText}>Availability: {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}</Text>
-                        <Text style={styles.descriptionText}>{product.description}</Text>
+                        <Text style={styles.dateText} accessibilityLabel={`Last modified on ${utils.formatDate(new Date(product.date))}`}>Last Modified: {utils.formatDate(new Date(product.date))}</Text>
+                        <Text style={styles.titleText} accessible={true} accessibilityRole='header' accessibilityLabel={`Product name: ${product.title}`}>{product.title}</Text>
+                        <Text style={styles.brandText} accessible={true} accessibilityLabel={`Brand: ${product.brand}`} >{product.brand}</Text>
+                        <Text style={styles.priceText} accessible={true} accessibilityLabel={`Price: ${product.price} euros`} accessibilityValue={{ text: `${product.price} euros` }}>{product.price}€</Text>
+                        <Text style={styles.stateText} accessible={true} accessibilityLabel={`Condition: ${product.state}`}>Condition: {product.state}</Text>
+                        <Text style={styles.stockText} accessible={true} accessibilityLabel={product.stock > 0 ? `Availability: ${product.stock} in stock` : 'Availability: Out of Stock'} accessibilityValue={{ text: product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock' }}>Availability: {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}</Text>
+                        <Text style={styles.descriptionText} accessible={true} accessibilityLabel={`Product description: ${product.description}`}>{product.description}</Text>
                     </View>
 
                     {isAuthor && (
                         <View style={styles.actionButtonsContainer}>
-                            <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail}>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail} accessible={true} accessibilityLabel='Modify product' accessibilityHint='Activates to edit product details.' accessibilityRole='button'>
                                 <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct}>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct} accessible={true} accessibilityLabel='Delete product' accessibilityHint='Activates to remove this product.' accessibilityRole='button'>
                                 <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' />
                             </TouchableOpacity>
                         </View>
