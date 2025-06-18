@@ -234,7 +234,7 @@ function ProductDetail() {
         <View style={styles.mainContainer} accessible={true}>
             <ScrollView accessibilityLabel='Product details scroll view' accessibilityHint='Scrolls to view more product information.'>
                 <View style={styles.productCard}>
-                    <ScrollView horizontal style={styles.imageScrollView} accessibilityLabel='Product images' accessibilityHint={`Scrolls horizontally to view ${product.images.length} product images.`} accessibilityRole='imageCollection' >
+                    <ScrollView horizontal style={styles.imageScrollView} accessibilityLabel='Product images' accessibilityHint={`Scrolls horizontally to view ${product.images.length} product images.`}  >
 
                         <View style={styles.imageContainer} key={product.id} accessible={true} accessibilityLabel='Product image gallery' >
                             {product.images.map((image, index) => (
@@ -244,7 +244,7 @@ function ProductDetail() {
                     </ScrollView>
 
                     <View style={styles.infoContainer}>
-                        <Text style={styles.dateText} accessibilityLabel={`Last modified on ${utils.formatDate(new Date(product.date))}`}>Last Modified: {utils.formatDate(new Date(product.date))}</Text>
+                        <Text style={styles.dateText} accessible={true} accessibilityLabel={`Last modified on ${utils.formatDate(new Date(product.date))}`}>Last Modified: {utils.formatDate(new Date(product.date))}</Text>
                         <Text style={styles.titleText} accessible={true} accessibilityRole='header' accessibilityLabel={`Product name: ${product.title}`}>{product.title}</Text>
                         <Text style={styles.brandText} accessible={true} accessibilityLabel={`Brand: ${product.brand}`} >{product.brand}</Text>
                         <Text style={styles.priceText} accessible={true} accessibilityLabel={`Price: ${product.price} euros`} accessibilityValue={{ text: `${product.price} euros` }}>{product.price}€</Text>

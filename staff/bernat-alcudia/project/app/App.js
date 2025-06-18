@@ -1,4 +1,4 @@
-import React, { Text } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';

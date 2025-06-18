@@ -1,6 +1,9 @@
 import { View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList, Animated, PanResponder, Dimensions, KeyboardAvoidingView, Platform, AccessibilityInfo } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect, useRef } from 'react';
+import { ContentError } from '../com/errors.js'
+
+
 
 import logic from '../logic';
 
