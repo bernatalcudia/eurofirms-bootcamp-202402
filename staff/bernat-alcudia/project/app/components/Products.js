@@ -169,7 +169,8 @@ function Products({ searchQuery }) {
             flex: 1,
             backgroundColor: '#f4f6f8',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            paddingTop: 20,
         },
         productContainer: {
             padding: 20,
@@ -193,11 +194,11 @@ function Products({ searchQuery }) {
             alignSelf: 'center'
         },
         productImage: {
-            width: 300,
+            width: '100%',
             height: 300,
             borderRadius: 10,
-            // marginLeft: 30,
-            // backgroundColor: '#e0e0e0'
+            backgroundColor: '#e0e0e0',
+            resizeMode: 'cover',
 
         },
         productInfoContainer: {
@@ -244,9 +245,13 @@ function Products({ searchQuery }) {
             fontWeight: '500',
         },
         buttonPressIn: {
-            transform: [{ scale: 1.00 }]
+            transform: [{ scale: 0.95 }]
         },
-        button: { justifyContent: 'center' },
+        button: {
+            justifyContent: 'center',
+            padding: 5
+        },
+
         buttonText: { fontSize: 18, textAlign: 'center', color: 'black' }
     });
 
@@ -256,7 +261,7 @@ function Products({ searchQuery }) {
             <ScrollView >
 
                 <View style={{ paddingLeft: 8, paddingRight: 8, width: '100%', height: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleLogout}>
+                    <TouchableOpacity onPress={handleLogout} accessibilityLabel='Log out' accessibilityRole='button'  >
                         <MaterialCommunityIcons name='door' size={25} color={'black'} />
                     </TouchableOpacity>
                 </View>
@@ -264,36 +269,37 @@ function Products({ searchQuery }) {
                 {products.map(product => {
                     const isLiked = product.likes.includes(logic.getLoggedInUserId())
                     const isSaved = user?.saved.includes(product.id)
+                    const accessibilityImageLabel = product.images[0] ? `Product image: ${product.title}` : 'No image available for this product.'
+
                     return (
                         <View style={styles.productContainer} key={product.id} >
 
-                            <Image style={styles.productImage} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} />
+                            <Image style={styles.productImage} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={accessibilityImageLabel} />
 
                             <View style={styles.productInfoContainer} key={product.id}>
 
-                                <TouchableOpacity onPress={() => handleProductDetail(product.id)}>
+                                <TouchableOpacity onPress={() => handleProductDetail(product.id)} accessibilityLabel={`View details for product ${product.title}`} accessibilityRole='button'>
                                     <Text style={styles.productTitle} >{product.title}</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.productBrand} >{product.brand}</Text>
-                                <Text style={styles.productPrice} >Price: {product.price}€</Text>
-                                <Text style={styles.productState}>State: {product.state}</Text>
-
+                                <Text style={styles.productBrand} accessibilityLabel={`Brand: ${product.brand}`} >{product.brand}</Text>
+                                <Text style={styles.productPrice} accessibilityLabel={`Price: ${product.price} euros`}>Price: {product.price}€</Text>
+                                <Text style={styles.productState} accessibilityLabel={`Condition: ${product.state}`}>State: {product.state}</Text>
 
                             </View>
                             <View style={styles.actionsContainer}>
                                 <View style={styles.likeContainer}>
-                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} >
+                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} accessibilityLabel={isLiked ? `Unlike ${product.title}. Currently has ${product.likes.length} likes.` : `Like ${product.title}. Currently has ${product.likes.length} likes.`} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
                                         <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
                                     </TouchableOpacity>
-                                    <Text style={styles.likeCountText}  >{product.likes.length}</Text>
+                                    <Text style={styles.likeCountText} accessibilityLabel={`${product.likes.length} likes`} >{product.likes.length}</Text>
                                 </View>
-                                <View style={styles.commentsContainer}>
+                                <View style={styles.commentsContainer} accessibilityLabel={`View comments for product ${product.title}. Has ${product.commentCount} comments.`} accessibilityRole='button'>
                                     <TouchableOpacity onPress={() => handleShowProductComments(product.id)} style={styles.commentsSection}>
                                         <MaterialCommunityIcons name='comment-multiple-outline' size={25} color='#607d8b' />
                                     </TouchableOpacity>
-                                    <Text style={styles.commentsCountText} >{product.commentCount}</Text>
+                                    <Text style={styles.commentsCountText} accessibilityLabel={`${product.commentCount} comments`} >{product.commentCount} </Text>
                                 </View>
-                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} >
+                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} accessibilityLabel={isSaved ? `Unsave ${product.title}` : `Save ${product.title}`} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
                                 </TouchableOpacity>
                             </View>
@@ -312,6 +318,7 @@ function Products({ searchQuery }) {
                         onClose={returnFromComments}
                         onCommentCreated={handleCommentCreated}
                         onCommentDeleted={handleCommentDeleted}
+                        accessibilityLabel='Product comments section'
                     />
                 )
             }
