@@ -2,6 +2,7 @@ import authenticateUser from './authenticateUser.js'
 import retrieveUser from './retrieveUser.js'
 import registerBuyer from './registerBuyer.js'
 import registerSeller from './registerSeller.js'
+import userChangePassword from './userChangePassword.js'
 import createProduct from './createProduct.js'
 import retrieveProductDetails from './retrieveProductDetails.js'
 import retrieveProducts from './retrieveProducts.js'
@@ -22,6 +23,7 @@ const logic = {
     retrieveUser,
     registerBuyer,
     registerSeller,
+    userChangePassword,
 
     retrieveProducts,
     retrieveProductDetails,

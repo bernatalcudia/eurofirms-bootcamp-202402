@@ -9,7 +9,7 @@ const { SystemError, MatchError } = errors
 //1-Find user
 //2-Change password
 
-function changePassword(userId, currentPassword, newPassword, newPasswordRepeat) {
+function userChangePassword(userId, currentPassword, newPassword, newPasswordRepeat) {
     validate.id(userId, 'userId')
     validate.password(currentPassword)
     validate.password(newPassword)
@@ -31,4 +31,4 @@ function changePassword(userId, currentPassword, newPassword, newPasswordRepeat)
 }
 
 
-export default changePassword
+export default userChangePassword
