@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import userChangePassword from './userChangePassword.js'
+import userChangePassword from './changeUserPassword.js'
 
 mongoose.connect('mongodb://localhost:27017/project')
 try {

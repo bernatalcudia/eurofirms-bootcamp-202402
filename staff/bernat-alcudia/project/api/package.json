@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "inspect": "node --inspect-brk .",
-    "start": "node .",
+    "inspect": "deno --allow-env --allow-read --allow-sys --allow-net --inspect-brk index.js",
+    "start": "deno --allow-env --allow-read --allow-sys --allow-net index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
