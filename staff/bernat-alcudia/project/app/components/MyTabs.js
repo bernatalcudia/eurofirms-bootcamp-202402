@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import CreateProduct from './CreateProduct';
 import RetrieveSavedProducts from './RetrieveSavedProducts';
 import SearchProduct from './SearchProducts';
+import Profile from './Profile.js';
 import React, { useState, useEffect } from 'react';
 import logic from '../logic';
 
@@ -82,6 +83,19 @@ function MyTabs() {
             <Tab.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} options={{
                 toBarLabel: 'Home', tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: 'Saved Products tab, view your saved items',
             }}></Tab.Screen>
+
+            <Tab.Screen
+                name='Profile'
+                component={Profile}
+                options={{
+                    tabBarLabel: 'Profile',
+                    tabBarAccessibilityLabel: 'Profile tab, access your account settings and logout',
+                    headerTitle: 'My Profile',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name='account-circle' color={color} size={size} />
+                    ),
+                }}
+            />
         </Tab.Navigator >
 
         //TODO add messages tab and profile tab

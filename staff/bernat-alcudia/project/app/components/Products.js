@@ -63,12 +63,6 @@ function Products({ searchQuery }) {
         setViewComments(false)
     }
 
-    const handleLogout = () => {
-        logic.logoutUser()
-
-        navigation.navigate('LoginUser')
-    }
-
     const handleProductDetail = id => {
         navigation.navigate('ProductDetail', { id: id })
     }
@@ -260,11 +254,6 @@ function Products({ searchQuery }) {
 
             <ScrollView >
 
-                <View style={{ paddingLeft: 8, paddingRight: 8, width: '100%', height: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleLogout} accessibilityLabel='Log out' accessibilityRole='button'  >
-                        <MaterialCommunityIcons name='door' size={25} color={'black'} />
-                    </TouchableOpacity>
-                </View>
 
                 {products.map(product => {
                     const isLiked = product.likes.includes(logic.getLoggedInUserId())

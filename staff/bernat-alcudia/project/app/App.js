@@ -12,6 +12,7 @@ import ModifyProduct from './components/ModifyProduct.js';
 import CreateProduct from './components/CreateProduct.js';
 import RetrieveSavedProducts from './components/RetrieveSavedProducts.js';
 import MyTabs from './components/MyTabs.js';
+import ChangePassword from './components/ChangePassword.js';
 
 const Stack = createStackNavigator()
 
@@ -25,6 +26,7 @@ export default function App() {
         <Stack.Screen name='RegisterSeller' component={RegisterSeller} />
         <Stack.Screen name='RegisterBuyer' component={RegisterBuyer} />
         <Stack.Screen name='Home' component={Home} />
+        <Stack.Screen name='ChangePassword' component={ChangePassword} />
         <Stack.Screen name='tabs' component={MyTabs} options={{
           headerShown: false, headerLeft: null
         }}

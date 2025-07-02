@@ -138,7 +138,6 @@ mongoose.connect(MONGO_URL)
         })
 
         // ---------------------------------Change Password---------------------------------
-
         server.patch('/users/password', jsonBodyParser, (req, res) => {
             try {
                 const { authorization } = req.headers

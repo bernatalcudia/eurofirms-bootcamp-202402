@@ -6,6 +6,7 @@ import logoutUser from './logoutUser.js';
 import getLoggedInUserId from './getLoggedInUserId.js';
 import getLoggedInUserRole from './getLoggedInUserRole.js';
 import isUserLoggedIn from './isUserLoggedIn.js';
+import changeUserPassword from './changeUserPassword.js';
 
 import createProduct from './createProduct.js';
 import retrieveProducts from './retrieveProducts.js';
@@ -32,6 +33,7 @@ const logic = {
     getLoggedInUserId,
     getLoggedInUserRole,
     isUserLoggedIn,
+    changeUserPassword,
 
     createProduct,
     retrieveProducts,
