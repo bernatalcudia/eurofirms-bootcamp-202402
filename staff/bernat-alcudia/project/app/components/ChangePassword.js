@@ -19,10 +19,10 @@ function ChangePassword() {
             logic.changeUserPassword(currentPassword, newPassword, newPasswordRepeat)
                 .then(() => {
                     alert('change password')
-                    navigation.navigate('tabs')
                     setCurrentPassword('')
                     setNewPassword('')
                     setNewPasswordRepeat('')
+                    navigation.navigate('tabs')
                 })
                 .catch(error => {
                     console.error(error.message)

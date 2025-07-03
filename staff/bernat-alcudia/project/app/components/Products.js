@@ -19,13 +19,13 @@ function Products({ searchQuery }) {
 
 
 
+    if (!logic.isUserLoggedIn()) {
+        navigation.navigate('LoginUser')
+        return
+    }
 
     useEffect(() => {
         try {
-            if (!logic.isUserLoggedIn()) {
-                navigation.navigate('LoginUser')
-                return
-            }
             logic.retrieveUser() //Return Users
                 .then(user => setUser(user))
                 .catch(error => {
@@ -51,7 +51,7 @@ function Products({ searchQuery }) {
 
             alert(feedback)
         }
-    }, [products])
+    }, [])
 
     const handleShowProductComments = (productId) => {
         setCommentsProductId(productId)
