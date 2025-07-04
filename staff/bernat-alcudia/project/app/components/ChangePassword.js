@@ -1,4 +1,4 @@
-import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, AccessibilityInfo, Alert } from 'react-native'
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import logic from '../logic'
@@ -23,6 +23,7 @@ function ChangePassword() {
                     setNewPassword('')
                     setNewPasswordRepeat('')
                     navigation.navigate('tabs')
+                    AccessibilityInfo.announceForAccessibility('Password changed successfully')
                 })
                 .catch(error => {
                     console.error(error.message)
@@ -35,7 +36,8 @@ function ChangePassword() {
                     else
                         feedback = 'sorry, there was an error,please try again later'
 
-                    alert(feedback)
+                    Alert.alert('Error', feedback)
+                    AccessibilityInfo.announceForAccessibility(feedback)
                 })
         } catch (error) {
             console.error(error.message)
@@ -60,6 +62,7 @@ function ChangePassword() {
             flexDirection: 'column',
             gap: 20,
             alignItems: 'center',
+            flex: 1
         },
         input: {
             width: '80%',
@@ -74,6 +77,7 @@ function ChangePassword() {
             padding: 15,
             backgroundColor: 'black',
             borderRadius: 5,
+            marginTop: 20
         },
         buttonText: {
             color: '#fff',
@@ -85,15 +89,17 @@ function ChangePassword() {
     return (
         <View style={styles.view}>
             <TextInput style={styles.input}
-                secureTextEntry={true} placeholder='current password' value={currentPassword} onChangeText={setCurrentPassword} />
+                importantForAccessibility="yes"
+                secureTextEntry={true} placeholder='Current Password' value={currentPassword}
+                accessibilityLabel='Current Password' textContentType='password' autoCapitalize='none' returnKeyType='next' onChangeText={setCurrentPassword} />
 
             <TextInput style={styles.input}
-                secureTextEntry={true} placeholder='new password' value={newPassword} onChangeText={setNewPassword} />
+                secureTextEntry={true} placeholder='New password' accessibilityLabel='New Password' importantForAccessibility='yes' textContentType='newPassword' autoCapitalize='none' returnKeyType='next' value={newPassword} onChangeText={setNewPassword} />
 
             <TextInput style={styles.input}
-                secureTextEntry={true} placeholder='repeat new password' value={newPasswordRepeat} onChangeText={setNewPasswordRepeat} />
+                secureTextEntry={true} placeholder='Repeat new password' accessibilityLabel='Repeat New Password' importantForAccessibility='yes' textContentType='newPassword' autoCapitalize='none' returnKeyType='done' value={newPasswordRepeat} onChangeText={setNewPasswordRepeat} />
 
-            <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
+            <TouchableOpacity style={styles.button} onPress={handleChangePassword} accessibilityLabel='Save New Password' accessibilityHint='Saves the new password' role='button'>
                 <Text style={styles.buttonText}>Save New Password</Text>
             </TouchableOpacity>
 
