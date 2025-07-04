@@ -91,10 +91,10 @@ function Profile() {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.logoutSection}>
+            <View style={styles.actionButtonContainer}>
                 <TouchableOpacity
                     onPress={handleLogout}
-                    style={styles.logoutButton}
+                    style={[styles.actionButton, styles.logoutButton]}
                     accessibilityLabel='Log out of your account'
                     accessibilityRole='button'
                 >
