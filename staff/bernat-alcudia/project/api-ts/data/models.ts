@@ -29,6 +29,15 @@ type ProductDocType = {
     __v: number
 }
 
+type CommentDocType = {
+    _id: Types.ObjectId
+    product: Types.ObjectId
+    author: Types.ObjectId
+    text: string
+    date: Date
+    __v: number
+}
+
 const userSchema = new Schema<UserDocType>({
     name: {
         type: String,
@@ -110,16 +119,41 @@ const productSchema = new Schema<ProductDocType>({
     }]
 })
 
+const commentSchema = new Schema<CommentDocType>({
+    product: {
+        type: ObjectId,
+        required: true,
+        ref: "Product"
+    },
+    author: {
+        type: ObjectId,
+        required: true,
+        ref: "User"
+    },
+    text: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+})
+
 
 
 const User = model<UserDocType>("User", userSchema)
 const Product = model<ProductDocType>("Product", productSchema)
+const Comment = model<CommentDocType>("Comment", commentSchema)
 
 export {
     UserDocType,
     ProductDocType,
+    CommentDocType,
 
     User,
-    Product
+    Product,
+    Comment
 }
 
