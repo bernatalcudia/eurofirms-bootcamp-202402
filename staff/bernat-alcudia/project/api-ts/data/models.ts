@@ -79,7 +79,7 @@ const productSchema = new Schema<ProductDocType>({
         ref: "User"
     },
     images: {
-        type: [String],
+        type: [{ type: String }],
         required: true
     },
     title: {
@@ -147,7 +147,7 @@ const User = model<UserDocType>("User", userSchema)
 const Product = model<ProductDocType>("Product", productSchema)
 const Comment = model<CommentDocType>("Comment", commentSchema)
 
-export {
+export type {
     UserDocType,
     ProductDocType,
     CommentDocType,
