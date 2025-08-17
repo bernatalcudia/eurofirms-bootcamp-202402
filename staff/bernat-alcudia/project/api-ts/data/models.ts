@@ -26,6 +26,7 @@ type ProductDocType = {
     stock: number
     date: Date
     likes: Types.ObjectId[]
+    owner: boolean
     __v: number
 }
 
@@ -35,6 +36,7 @@ type CommentDocType = {
     author: Types.ObjectId
     text: string
     date: Date
+    owner: boolean
     __v: number
 }
 
@@ -63,8 +65,9 @@ const userSchema = new Schema<UserDocType>({
     },
     role: {
         type: String,
-        enum: ["buyer", "seller"],
-        required: true
+        enum: ["admin", "regular"],
+        required: true,
+        default: "regular"
     },
     saved: [{
         type: ObjectId,
@@ -116,7 +119,12 @@ const productSchema = new Schema<ProductDocType>({
     likes: [{
         type: ObjectId,
         ref: "User"
-    }]
+    }],
+    owner: {
+        type: Boolean,
+        required: true,
+        default: true
+    }
 })
 
 const commentSchema = new Schema<CommentDocType>({
@@ -138,6 +146,11 @@ const commentSchema = new Schema<CommentDocType>({
         type: Date,
         required: true,
         default: Date.now
+    },
+    owner: {
+        type: Boolean,
+        required: true,
+        default: true
     }
 })
 
