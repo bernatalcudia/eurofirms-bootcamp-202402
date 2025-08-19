@@ -21,7 +21,7 @@ type ProductType = {
     stock: number,
     date: Date,
     likes: string[]
-    owner: boolean
+    own: boolean
 
 }
 
@@ -31,7 +31,7 @@ type CommentType = {
     author: string
     text: string
     date: Date
-    owner: boolean
+    own: boolean
 }
 
 
