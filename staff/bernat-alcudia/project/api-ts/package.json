@@ -1,5 +1,5 @@
 {
-  "name": "api-ts",
+  "name": "api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "start-watch": "npx tsx watch --env-file=.env   index.js",
     "inspect": "npx tsx  --env-file=.env  --inspect-brk index.js --",
     "compile": "npx tsc",
-    "compile-watch": " bash -c 'npx tsc --watch'",
+    "compile-watch": "npx tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

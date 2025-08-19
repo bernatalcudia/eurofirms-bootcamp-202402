@@ -39,33 +39,33 @@ type RegisterUser = (name: string, birthdate: Date, email: string, username: str
 
 type AuthenticateUser = (username: string, password: string) => Promise<{ id: string, role: string }>
 
-type ChangeUserPassword = (id: string, oldPassword: string, newPassword: string) => Promise<void>
+type ChangeUserPassword = (userId: string, oldPassword: string, newPassword: string) => Promise<void>
 
-type RetrieveUser = (id: string) => Promise<UserType>
+type RetrieveUser = (userId: string) => Promise<UserType>
 
-type CreateProduct = (author: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number, date: Date, likes: string[], owner: boolean) => Promise<void>
+type CreateProduct = (author: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number, date: Date, likes: string[]) => Promise<void>
 
-type RemoveProduct = (id: string) => Promise<void>
+type RemoveProduct = (userId: string) => Promise<void>
 
-type RetrieveProductDetails = (id: string) => Promise<ProductType>
+type RetrieveProductDetails = (userId: string) => Promise<ProductType>
 
-type RetrieveProducts = (id: string) => Promise<ProductType[]>
+type RetrieveProducts = (userId: string) => Promise<ProductType[]>
 
-type retrieveSavedProducts = (id: string) => Promise<ProductType[]>
+type retrieveSavedProducts = (userId: string) => Promise<ProductType[]>
 
-type SearchProduct = (id: string, searchQuery: string) => Promise<ProductType[]>
+type SearchProduct = (userId: string, searchQuery: string) => Promise<ProductType[]>
 
-type toggleLikeProduct = (id: string, productId: string) => Promise<void>
+type toggleLikeProduct = (userId: string, productId: string) => Promise<void>
 
-type toggleSaveProduct = (id: string, productId: string) => Promise<void>
+type toggleSaveProduct = (userId: string, productId: string) => Promise<void>
 
 type CreateComment = (productId: string, author: string, text: string) => Promise<void>
 
-type ModifyComment = (id: string, text: string) => Promise<void>
+type ModifyComment = (userId: string, text: string) => Promise<void>
 
-type RemoveComment = (id: string) => Promise<void>
+type RemoveComment = (userId: string) => Promise<void>
 
-type RetrieveComments = (id: string) => Promise<CommentType[]>
+type RetrieveComments = (userId: string) => Promise<CommentType[]>
 
 type Logic = {
     registerUser: RegisterUser,

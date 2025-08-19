@@ -1,44 +1,6 @@
-import { Schema, model, Types } from "mongoose"
-
-const { ObjectId } = Types
-
-type UserDocType = {
-    _id: Types.ObjectId
-    name: string
-    birthdate: Date
-    email: string
-    username: string
-    password: string
-    role: string
-    saved: Types.ObjectId[]
-    __v: number
-}
-
-type ProductDocType = {
-    _id: Types.ObjectId
-    author: Types.ObjectId
-    images: string[]
-    title: string
-    description: string
-    brand: string
-    price: number
-    state: string
-    stock: number
-    date: Date
-    likes: Types.ObjectId[]
-    __v: number
-}
-
-type CommentDocType = {
-    _id: Types.ObjectId
-    product: Types.ObjectId
-    author: Types.ObjectId
-    text: string
-    date: Date
-    __v: number
-}
-
-const userSchema = new Schema<UserDocType>({
+import { Schema, model, Types } from "mongoose";
+const { ObjectId } = Types;
+const userSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -68,12 +30,11 @@ const userSchema = new Schema<UserDocType>({
         default: "regular"
     },
     saved: [{
-        type: ObjectId,
-        ref: "Product"
-    }]
-})
-
-const productSchema = new Schema<ProductDocType>({
+            type: ObjectId,
+            ref: "Product"
+        }]
+});
+const productSchema = new Schema({
     author: {
         type: ObjectId,
         required: true,
@@ -115,12 +76,11 @@ const productSchema = new Schema<ProductDocType>({
         default: Date.now
     },
     likes: [{
-        type: ObjectId,
-        ref: "User"
-    }]
-})
-
-const commentSchema = new Schema<CommentDocType>({
+            type: ObjectId,
+            ref: "User"
+        }]
+});
+const commentSchema = new Schema({
     product: {
         type: ObjectId,
         required: true,
@@ -140,21 +100,8 @@ const commentSchema = new Schema<CommentDocType>({
         required: true,
         default: Date.now
     }
-})
-
-
-
-const User = model<UserDocType>("User", userSchema)
-const Product = model<ProductDocType>("Product", productSchema)
-const Comment = model<CommentDocType>("Comment", commentSchema)
-
-export type {
-    UserDocType,
-    ProductDocType,
-    CommentDocType,
-
-    User,
-    Product,
-    Comment
-}
-
+});
+const User = model("User", userSchema);
+const Product = model("Product", productSchema);
+const Comment = model("Comment", commentSchema);
+//# sourceMappingURL=models.js.map
