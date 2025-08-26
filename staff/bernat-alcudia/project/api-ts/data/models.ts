@@ -1,6 +1,7 @@
 import { Schema, model, Types } from "mongoose"
 
-const { ObjectId } = Types
+const { Types: { ObjectId } } = Schema
+
 
 type UserDocType = {
     _id: Types.ObjectId
@@ -68,7 +69,7 @@ const userSchema = new Schema<UserDocType>({
         default: "regular"
     },
     saved: [{
-        type: ObjectId,
+        type: Types.ObjectId,
         ref: "Product"
     }]
 })
@@ -115,7 +116,7 @@ const productSchema = new Schema<ProductDocType>({
         default: Date.now
     },
     likes: [{
-        type: ObjectId,
+        type: Types.ObjectId,
         ref: "User"
     }]
 })
@@ -148,7 +149,7 @@ const User = model<UserDocType>("User", userSchema)
 const Product = model<ProductDocType>("Product", productSchema)
 const Comment = model<CommentDocType>("Comment", commentSchema)
 
-export type {
+export {
     UserDocType,
     ProductDocType,
     CommentDocType,

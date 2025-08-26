@@ -1,9 +1,8 @@
-import { z } from "zod"
-import type { ZodSchema } from "zod"
+import { z, ZodType } from "zod"
 import { ValidationError } from "./errors.js"
 import utils from "./utils.js"
 
-function validatenWithSchema<T>(schema: ZodSchema<T>, data: unknown, explain = "data"): void {
+function validatenWithSchema<T>(schema: ZodType<T>, data: unknown, explain = "data"): void {
     const result = schema.safeParse(data)
     if (result.success)
         return
@@ -16,16 +15,8 @@ const ID_REGEX = /^[0-9a-fA-F]{24}$/
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
 
 const nameSchema = z.string().min(1, { message: "name is empty" })
-const birthdateSchema = z.string().length(24, { message: "birthdate does not have 24 characters" })
-    .refine(val => !val.includes(" "), { message: "birthdate has a space character" })
-    .refine(val => val.indexOf("-") === 4 && val.lastIndexOf("-") === 7, { message: "birthdate dashes are not in correct position" })
-    .refine(val => {
-        const birthdateDate = new Date(val)
-        const todayDate = new Date()
-        const diffTime = Math.abs(todayDate.getTime() - birthdateDate.getTime())
-        const age = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
-        return age >= 18
-    }, { message: "age is lower than 18" })
+
+const birthdateSchema = z.date().min(18, { message: "age is lower than 18" })
 
 const usernameSchema = z.string().min(3, { message: "username is lower than 3 characters" }).refine(val => !val.includes(" "), { message: "username has a space character" })
 const emailSchema = z.string().regex(EMAIL_REGEX, { message: "wrong email format" })
@@ -56,7 +47,7 @@ export const validate = {
     name(name: string, explain = "name") {
         validatenWithSchema(nameSchema, name, explain)
     },
-    birthdate(birthdate: string, explain = "birthdate") {
+    birthdate(birthdate: Date, explain = "birthdate") {
         validatenWithSchema(birthdateSchema, birthdate, explain)
     },
     username(username: string, explain = "username") {

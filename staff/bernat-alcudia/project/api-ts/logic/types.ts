@@ -88,7 +88,7 @@ type Logic = {
     retrieveComments: RetrieveComments
 }
 
-export type {
+export {
     UserType,
     ProductType,
     CommentType,
