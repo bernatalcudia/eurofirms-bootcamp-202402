@@ -19,8 +19,6 @@ function retrieveProducts(userId) {
             return Product.find().select('images title brand state likes price').populate('author', 'username').lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(products => {
-                    const countCommentsPromises = []
-
                     products.forEach(product => {
                         if (product._id) {
                             product.id = product._id.toString()
@@ -35,20 +33,9 @@ function retrieveProducts(userId) {
                         }
 
                         product.likes = product.likes.map(like => like.toString())
-
-                        const countCommentsPromise = Comment.countDocuments({ product: product.id })
-                        countCommentsPromises.push(countCommentsPromise)
                     })
 
-                    return Promise.all(countCommentsPromises)
-                        .catch(error => { throw new SystemError(error.message) })
-                        .then(commentCounts => {
-                            commentCounts.forEach((commentCount, index) => {
-                                products[index].commentCount = commentCount
-                            })
-
-                            return products
-                        })
+                    return products
                 })
         })
 }

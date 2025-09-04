@@ -40,6 +40,7 @@ const tokenSchema = z.string().min(1, { message: "token is empty" }).refine(valu
     const now = Date.now() / 1000
     return now < exp
 }, { message: "token expired" })
+const roleSchema = z.enum(["regular", "admin"], { message: "invalid role" })
 const searchQuerySchema = z.string().min(1, { message: "search query is empty" })
 
 
@@ -91,6 +92,9 @@ export const validate = {
     },
     token(token: string, explain = "token") {
         validatenWithSchema(tokenSchema, token, explain)
+    },
+    role(role: string, explain = "role") {
+        validatenWithSchema(roleSchema, role, explain)
     },
     searchQuery(searchQuery: string, explain = "search query") {
         validatenWithSchema(searchQuerySchema, searchQuery, explain)

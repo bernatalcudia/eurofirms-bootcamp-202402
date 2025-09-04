@@ -18,7 +18,7 @@ function createComment(userId, productId, text) {
         .then(user => {
             if (!user) throw new MatchError('user not found')
 
-            return Product.findById(productId).lean()
+            return Product.findById(productId)
                 .catch(error => { throw new SystemError(error.message) })
                 .then(product => {
                     if (!product) throw new MatchError('product not found')
@@ -31,9 +31,12 @@ function createComment(userId, productId, text) {
                         text,
                         date
                     }
-                    return Comment.create(comment)
+
+                    product.commentCount++
+
+                    return Promise.all([product.save(), Comment.create(comment)])
                         .catch(error => { throw new SystemError(error.message) })
-                        .then(comment => { })
+                        .then(() => { })
                 })
         })
 }

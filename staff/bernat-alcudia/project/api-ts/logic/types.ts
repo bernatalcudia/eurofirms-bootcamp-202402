@@ -1,12 +1,8 @@
 type UserType = {
     id: string,
     name: string,
-    birthdate: Date,
     email: string,
-    username: string,
-    password: string,
-    role: string,
-    saved: string[]
+    username: string
 }
 
 type ProductType = {
@@ -20,9 +16,10 @@ type ProductType = {
     state: string,
     stock: number,
     date: Date,
-    likes: string[]
+    commentCount: number,
+    likeCount: number,
+    liked: boolean,
     own: boolean
-
 }
 
 type CommentType = {
@@ -39,15 +36,15 @@ type RegisterUser = (name: string, birthdate: Date, email: string, username: str
 
 type AuthenticateUser = (username: string, password: string) => Promise<{ id: string, role: string }>
 
-type ChangeUserPassword = (userId: string, oldPassword: string, newPassword: string) => Promise<void>
+type ChangeUserPassword = (userId: string, oldPassword: string, newPassword: string, newPasswordRepeat: string) => Promise<void>
 
-type RetrieveUser = (userId: string) => Promise<UserType>
+type RetrieveUser = (userId: string, targetUserId: string) => Promise<UserType>
 
-type CreateProduct = (author: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number, date: Date, likes: string[]) => Promise<void>
+type CreateProduct = (userId: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number) => Promise<void>
 
-type RemoveProduct = (userId: string) => Promise<void>
+type RemoveProduct = (userId: string, productId: string) => Promise<void>
 
-type RetrieveProductDetails = (userId: string) => Promise<ProductType>
+type RetrieveProductDetails = (userId: string, productId: string) => Promise<ProductType>
 
 type RetrieveProducts = (userId: string) => Promise<ProductType[]>
 
@@ -55,9 +52,9 @@ type retrieveSavedProducts = (userId: string) => Promise<ProductType[]>
 
 type SearchProduct = (userId: string, searchQuery: string) => Promise<ProductType[]>
 
-type toggleLikeProduct = (userId: string, productId: string) => Promise<void>
+type ToggleLikeProduct = (userId: string, productId: string) => Promise<void>
 
-type toggleSaveProduct = (userId: string, productId: string) => Promise<void>
+type ToggleSaveProduct = (userId: string, productId: string) => Promise<void>
 
 type CreateComment = (productId: string, author: string, text: string) => Promise<void>
 
@@ -79,8 +76,8 @@ type Logic = {
     retrieveProducts: RetrieveProducts,
     retrieveSavedProducts: retrieveSavedProducts,
     searchProduct: SearchProduct,
-    toggleLikeProduct: toggleLikeProduct,
-    toggleSaveProduct: toggleSaveProduct,
+    toggleLikeProduct: ToggleLikeProduct,
+    toggleSaveProduct: ToggleSaveProduct,
 
     createComment: CreateComment,
     modifyComment: ModifyComment,
@@ -104,8 +101,8 @@ export {
     RetrieveProducts,
     retrieveSavedProducts,
     SearchProduct,
-    toggleLikeProduct,
-    toggleSaveProduct,
+    ToggleLikeProduct,
+    ToggleSaveProduct,
 
     CreateComment,
     ModifyComment,

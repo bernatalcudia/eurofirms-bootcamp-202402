@@ -8,8 +8,7 @@
     "start-watch": "npx tsx watch --env-file=.env   index.js",
     "inspect": "npx tsx  --env-file=.env  --inspect-brk index.js --",
     "compile": "npx tsc",
-    "compile-watch": "npx tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile-watch": "npx tsc --watch"
   },
   "keywords": [],
   "author": "",
@@ -26,11 +25,9 @@
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.3.0",
     "bcrypt": "^6.0.0",
-    "jest": "^30.0.5",
     "typescript": "^5.9.2"
   }
 }

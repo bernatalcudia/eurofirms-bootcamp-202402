@@ -82,6 +82,12 @@ const product = new Schema({
     },
     likes: {
         type: [{ type: ObjectId, ref: 'User' }],
+    },
+    commentCount: {
+        type: Number,
+        default: 0,
+        min: 0,
+        required: true
     }
 })
 

@@ -22,6 +22,7 @@ type ProductDocType = {
     stock: number;
     date: Date;
     likes: Types.ObjectId[];
+    commentCount: number;
     __v: number;
 };
 type CommentDocType = {
@@ -41,5 +42,5 @@ declare const Product: import("mongoose").Model<ProductDocType, {}, {}, {}, impo
 declare const Comment: import("mongoose").Model<CommentDocType, {}, {}, {}, import("mongoose").Document<unknown, {}, CommentDocType, {}, {}> & CommentDocType & Required<{
     _id: Types.ObjectId;
 }>, any>;
-export type { UserDocType, ProductDocType, CommentDocType, User, Product, Comment };
+export { UserDocType, ProductDocType, CommentDocType, User, Product, Comment };
 //# sourceMappingURL=models.d.ts.map

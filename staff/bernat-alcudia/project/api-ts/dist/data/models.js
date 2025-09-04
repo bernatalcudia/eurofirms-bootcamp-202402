@@ -1,5 +1,5 @@
 import { Schema, model, Types } from "mongoose";
-const { ObjectId } = Types;
+const { Types: { ObjectId } } = Schema;
 const userSchema = new Schema({
     name: {
         type: String,
@@ -30,7 +30,7 @@ const userSchema = new Schema({
         default: "regular"
     },
     saved: [{
-            type: ObjectId,
+            type: Types.ObjectId,
             ref: "Product"
         }]
 });
@@ -76,9 +76,15 @@ const productSchema = new Schema({
         default: Date.now
     },
     likes: [{
-            type: ObjectId,
+            type: Types.ObjectId,
             ref: "User"
-        }]
+        }],
+    commentCount: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 0
+    }
 });
 const commentSchema = new Schema({
     product: {
@@ -104,4 +110,5 @@ const commentSchema = new Schema({
 const User = model("User", userSchema);
 const Product = model("Product", productSchema);
 const Comment = model("Comment", commentSchema);
+export { User, Product, Comment };
 //# sourceMappingURL=models.js.map
