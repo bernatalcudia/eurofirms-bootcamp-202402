@@ -48,7 +48,7 @@ type RetrieveProductDetails = (userId: string, productId: string) => Promise<Pro
 
 type RetrieveProducts = (userId: string) => Promise<ProductType[]>
 
-type retrieveSavedProducts = (userId: string) => Promise<ProductType[]>
+type RetrieveSavedProducts = (userId: string) => Promise<ProductType[]>
 
 type SearchProduct = (userId: string, searchQuery: string) => Promise<ProductType[]>
 
@@ -58,11 +58,11 @@ type ToggleSaveProduct = (userId: string, productId: string) => Promise<void>
 
 type CreateComment = (productId: string, author: string, text: string) => Promise<void>
 
-type ModifyComment = (userId: string, text: string) => Promise<void>
+type ModifyComment = (userId: string, productId: string, commentId: string, text: string) => Promise<void>
 
-type RemoveComment = (userId: string) => Promise<void>
+type RemoveComment = (userId: string, productId: string, commentId: string) => Promise<void>
 
-type RetrieveComments = (userId: string) => Promise<CommentType[]>
+type RetrieveComments = (userId: string, productId: string) => Promise<CommentType[]>
 
 type Logic = {
     registerUser: RegisterUser,
@@ -74,7 +74,7 @@ type Logic = {
     removeProduct: RemoveProduct,
     retrieveProductDetails: RetrieveProductDetails,
     retrieveProducts: RetrieveProducts,
-    retrieveSavedProducts: retrieveSavedProducts,
+    retrieveSavedProducts: RetrieveSavedProducts,
     searchProduct: SearchProduct,
     toggleLikeProduct: ToggleLikeProduct,
     toggleSaveProduct: ToggleSaveProduct,
@@ -99,7 +99,7 @@ export {
     RemoveProduct,
     RetrieveProductDetails,
     RetrieveProducts,
-    retrieveSavedProducts,
+    RetrieveSavedProducts,
     SearchProduct,
     ToggleLikeProduct,
     ToggleSaveProduct,
