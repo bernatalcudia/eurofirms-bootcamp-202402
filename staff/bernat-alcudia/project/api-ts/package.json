@@ -8,7 +8,8 @@
     "start-watch": "npx tsx watch --env-file=.env   index.js",
     "inspect": "npx tsx  --env-file=.env  --inspect-brk index.js --",
     "compile": "npx tsc",
-    "compile-watch": "npx tsc --watch"
+    "compile-watch": "npx tsc --watch",
+    "test": "tsx --env-file=.env logic/modifyProduct.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.3.0",
     "bcrypt": "^6.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
 }

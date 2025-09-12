@@ -24,10 +24,27 @@ const passwordSchema = z.string().min(8)
 const idSchema = z.string().regex(ID_REGEX, { message: "wrong id format; not a 24 character hexadecimal string" })
 const urlSchema = z.string().regex(URL_REGEX, { message: "wrong url format" })
 const textSchema = z.string().min(1)
-const imagesSchema = z.array(z.string()
-    .min(1, { message: "at least 1 image" })
-    .refine(val => val.length % 4 === 0, { message: "It is not a multiple of 4" })
-    .refine(val => /^[A-Za-z0-9+/]*={0,2}$/.test(val), { message: "wrong format" }))
+
+const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
+
+// const imagesSchema = z.array(z.string()
+//     .min(1, { message: "at least 1 image" })
+//     .refine(val => val.length % 4 === 0, { message: "It is not a multiple of 4" })
+//     .refine(val => /^[A-Za-z0-9+/]*={0,2}$/.test(val), { message: "wrong format" }))
+
+
+const singleImageUrlSchema = z.string().min(1, { message: "images are empty" }).url().refine(
+    (url) => {
+        const urlWithoutParams = url.split("?")[0]
+
+        const lowercasedUrl = urlWithoutParams!.toLowerCase()
+
+        return imageExtensions.some(ext => lowercasedUrl.endsWith(ext))
+    }, { message: "Url is not valid format" })
+
+const imagesArraySchema = z
+    .array(singleImageUrlSchema)
+    .min(1, 'at least 1 image')
 const descriptionSchema = z.string({ message: "description is not a string" })
 const titleSchema = z.string().min(1, { message: "title is empty" })
 const brandSchema = z.string().min(1, { message: "brand is empty" })
@@ -70,7 +87,7 @@ export const validate = {
         validatenWithSchema(textSchema, text, explain)
     },
     images(images: string[], explain = "images") {
-        validatenWithSchema(imagesSchema, images, explain)
+        validatenWithSchema(imagesArraySchema, images, explain)
     },
     description(description: string, explain = "description") {
         validatenWithSchema(descriptionSchema, description, explain)

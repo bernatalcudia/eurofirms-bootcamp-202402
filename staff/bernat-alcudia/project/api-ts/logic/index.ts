@@ -5,6 +5,7 @@ import { authenticateUser } from "./authenticateUser.js"
 import { changeUserPassword } from "./changeUserPassword.js"
 import { retrieveUser } from "./retrieveUser.js"
 import { createProduct } from "./createProduct.js"
+import { modifyProduct } from "./modifyProduct.js"
 import { removeProduct } from "./removeProduct.js"
 import { retrieveProductDetails } from "./retrieveProductDetails.js"
 import { retrieveProducts } from "./retrieveProducts.js"
@@ -21,7 +22,7 @@ import { retrieveComments } from "./retrieveComments.js"
 
 export const logic: Logic = {
     registerUser, authenticateUser, changeUserPassword, retrieveUser,
-    createProduct, removeProduct, retrieveProductDetails, retrieveProducts, retrieveSavedProducts, searchProduct, toggleLikeProduct, toggleSaveProduct,
+    createProduct, modifyProduct, removeProduct, retrieveProductDetails, retrieveProducts, retrieveSavedProducts, searchProduct, toggleLikeProduct, toggleSaveProduct,
     createComment, modifyComment, removeComment, retrieveComments
 }
 

@@ -6,18 +6,18 @@ import { Types } from "mongoose"
 const { SystemError, NotFoundError } = errors
 
 export const toggleLikeProduct: ToggleLikeProduct = (userId: string, productId: string) => {
-    validate.id(userId, 'userId')
-    validate.id(productId, 'productId')
+    validate.id(userId, "userId")
+    validate.id(productId, "productId")
 
     return User.findById(userId)
         .catch(error => { throw new SystemError(error.message) })
         .then(user => {
-            if (!user) throw new NotFoundError('user not found')
+            if (!user) throw new NotFoundError("user not found")
             return Product.findById(productId)
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(product => {
-            if (!product) throw new NotFoundError('product not found')
+            if (!product) throw new NotFoundError("product not found")
 
             const index = product.likes.findIndex(userId2 => userId2.toString() === userId)
 

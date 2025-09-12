@@ -32,7 +32,7 @@ type CommentType = {
 }
 
 
-type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string, role: string, saved: string[]) => Promise<void>
+type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string) => Promise<void>
 
 type AuthenticateUser = (username: string, password: string) => Promise<{ id: string, role: string }>
 
@@ -41,6 +41,8 @@ type ChangeUserPassword = (userId: string, oldPassword: string, newPassword: str
 type RetrieveUser = (userId: string, targetUserId: string) => Promise<UserType>
 
 type CreateProduct = (userId: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number) => Promise<void>
+
+type ModifyProduct = (userId: string, productId: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number) => Promise<void>
 
 type RemoveProduct = (userId: string, productId: string) => Promise<void>
 
@@ -71,6 +73,7 @@ type Logic = {
     retrieveUser: RetrieveUser,
 
     createProduct: CreateProduct,
+    modifyProduct: ModifyProduct,
     removeProduct: RemoveProduct,
     retrieveProductDetails: RetrieveProductDetails,
     retrieveProducts: RetrieveProducts,
@@ -96,6 +99,7 @@ export {
     RetrieveUser,
 
     CreateProduct,
+    ModifyProduct,
     RemoveProduct,
     RetrieveProductDetails,
     RetrieveProducts,

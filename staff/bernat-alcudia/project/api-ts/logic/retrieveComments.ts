@@ -18,7 +18,7 @@ export const retrieveComments: RetrieveComments = (userId: string, productId: st
         .then(product => {
             if (!product) throw new NotFoundError("product not found")
 
-            return Comment.find({ product: productId }).select('-__v').populate('author', 'username').sort("-date").lean()
+            return Comment.find({ product: productId }).select("-__v").populate("author", "username").sort("-date").lean()
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(comments => {
