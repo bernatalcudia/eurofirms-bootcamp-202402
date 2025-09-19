@@ -1,11 +1,11 @@
 import mongoose from "mongoose"
-import { retrieveSavedProducts } from "./retrieveSavedProducts.js"
+import { removeComment } from "./removeComment.js"
 
 mongoose.connect(process.env.MONGO_URL_TEST!)
     .then(() => {
         try {
-            retrieveSavedProducts("68c2dcd0529dcb4096f726c3")
-                .then(products => console.log("products retrieved", products))
+            removeComment("68c2e427cbfeb33bb36e1e85", "68cd57cd19df9862698fc3b4", "68cd5aa7b738a4b9d04816df")
+                .then(() => console.log("comment deleted"))
                 .catch(error => console.error(error))
         } catch (error) {
             console.error(error)

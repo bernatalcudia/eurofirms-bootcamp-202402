@@ -13,7 +13,7 @@ export const retrieveSavedProducts: RetrieveSavedProducts = (userId: string) => 
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.find({ _id: { $in: user.saved } }).select("-__v -likes -author").lean()
+            return Product.find({ _id: { $in: user.saved } }).select("-__v").lean()
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(products => {
@@ -23,6 +23,7 @@ export const retrieveSavedProducts: RetrieveSavedProducts = (userId: string) => 
                 const productAuthorId = product.author._id.toString()
                 const liked = product.likes.some(like => like.toString() === userId)
                 const own = productAuthorId === userId
+                const likeCount = product.likes.length
 
                 return {
                     id: product._id.toString(),
@@ -35,11 +36,10 @@ export const retrieveSavedProducts: RetrieveSavedProducts = (userId: string) => 
                     state: product.state,
                     stock: product.stock,
                     date: product.date,
-                    likes: product.likes.map(like => like.toString()),
-                    likeCount: product.likes.length,
                     commentCount: product.commentCount,
-                    own: own,
-                    liked: liked
+                    likeCount,
+                    liked,
+                    own
                 }
             })
         })

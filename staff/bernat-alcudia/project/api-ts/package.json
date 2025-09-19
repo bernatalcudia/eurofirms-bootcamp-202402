@@ -2,14 +2,15 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "npx tsx  --env-file=.env  index.js",
     "start-watch": "npx tsx watch --env-file=.env   index.js",
     "inspect": "npx tsx  --env-file=.env  --inspect-brk index.js --",
     "compile": "npx tsc",
     "compile-watch": "npx tsc --watch",
-    "test": "tsx --env-file=.env logic/modifyProduct.test.ts"
+    "test": "tsx --env-file=.env logic/retrieveComments.test.ts",
+    "test-inspect": "tsx --inspect-brk --env-file=.env logic/retrieveSavedProducts.test.ts --watch"
   },
   "keywords": [],
   "author": "",

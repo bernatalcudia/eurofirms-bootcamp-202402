@@ -9,7 +9,7 @@ export const retrieveUser: RetrieveUser = (userId: string, targetUserId: string)
     validate.id(userId, "userId")
     validate.id(targetUserId, "targetUserId")
 
-    return User.findById(userId).select("-_id name username saved").lean()
+    return User.findById(userId).select("name username saved").lean()
         .catch(error => { throw new SystemError(error.message) })
         .then(targetUser => {
             if (!targetUser) throw new NotFoundError("user not found")

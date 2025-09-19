@@ -12,7 +12,7 @@ export const retrieveProducts: RetrieveProducts = (userId: string) => {
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.find().select("images title brand state likes price").populate("author", "username").sort("-date").lean()
+            return Product.find().select("-__v").populate("author", "username").sort("-date").lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(products => {
                     if (!products) throw new NotFoundError("products not found")
@@ -22,6 +22,7 @@ export const retrieveProducts: RetrieveProducts = (userId: string) => {
                         const productAuthorId = product.author._id.toString()
                         const liked = product.likes.some(like => like.toString() === userId)
                         const own = productAuthorId === userId
+                        const likeCount = product.likes.length
 
                         return {
                             id: product._id.toString(),
@@ -34,11 +35,10 @@ export const retrieveProducts: RetrieveProducts = (userId: string) => {
                             state: product.state,
                             stock: product.stock,
                             date: product.date,
-                            likes: product.likes.map(like => like.toString()),
-                            likeCount: product.likes.length,
                             commentCount: product.commentCount,
-                            own: own,
-                            liked: liked
+                            likeCount,
+                            own,
+                            liked
                         }
                     })
                 })

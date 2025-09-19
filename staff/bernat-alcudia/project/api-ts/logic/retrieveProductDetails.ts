@@ -13,7 +13,7 @@ export const retrieveProductDetails: RetrieveProductDetails = (userId: string, p
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.findById(productId).select("images date  title state price stock brand description").populate("author", "username").lean()
+            return Product.findById(productId).select("images date  title state price stock brand description likes").populate("author", "username").lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(product => {
                     if (!product) throw new NotFoundError("product not found")

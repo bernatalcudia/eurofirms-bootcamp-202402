@@ -58,7 +58,7 @@ type ToggleLikeProduct = (userId: string, productId: string) => Promise<void>
 
 type ToggleSaveProduct = (userId: string, productId: string) => Promise<void>
 
-type CreateComment = (productId: string, author: string, text: string) => Promise<void>
+type CreateComment = (userId: string, productId: string, text: string) => Promise<void>
 
 type ModifyComment = (userId: string, productId: string, commentId: string, text: string) => Promise<void>
 
