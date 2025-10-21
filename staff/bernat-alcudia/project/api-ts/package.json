@@ -2,15 +2,17 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "start": "npx tsx  --env-file=.env  index.js",
     "start-watch": "npx tsx watch --env-file=.env   index.js",
     "inspect": "npx tsx  --env-file=.env  --inspect-brk index.js --",
     "compile": "npx tsc",
     "compile-watch": "npx tsc --watch",
-    "test": "tsx --env-file=.env logic/retrieveComments.test.ts",
-    "test-inspect": "tsx --inspect-brk --env-file=.env logic/retrieveSavedProducts.test.ts --watch"
+    "test": "tsx --env-file=.env logic/registerUser.test.ts",
+    "test-mocha": " bash -c 'mocha --node-option env-file=.env --node-option import=tsx logic/*.spec.ts'",
+    "test-inspect": " bash -c 'mocha --node-option 'inspect-brk' --node-option 'env-file=.env' --node-option 'import=tsx' logic/*.spec.ts'",
+    "test-watch": " bash -c 'mocha --node-option env-file=.env --node-option import=tsx --node-option watch logic/*.spec.ts'"
   },
   "keywords": [],
   "author": "",
@@ -25,11 +27,15 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/chai": "^5.2.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.0",
     "bcrypt": "^6.0.0",
+    "chai": "^6.0.1",
+    "mocha": "^11.7.2",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

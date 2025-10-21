@@ -3,23 +3,23 @@
   "compilerOptions": {
     // File Layout
     // "rootDir": "./src",
-    "outDir": "./dist",
+    // "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
+    "module": "commonjs",
     "target": "esnext",
-    "types": [],
+    // "types": [],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
     // Other Outputs
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    // "declaration": true,
+    // "declarationMap": true,
     // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    // "noUncheckedIndexedAccess": true,
+    // "exactOptionalPropertyTypes": true,
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
@@ -29,12 +29,21 @@
     // "noPropertyAccessFromIndexSignature": true,
     // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": false,
-    "isolatedModules": false,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
+    // "jsx": "react-jsx",
+    // "verbatimModuleSyntax": false,
+    // "isolatedModules": false,
+    // "noUncheckedSideEffectImports": true,
+    // "moduleDetection": "force",
     "skipLibCheck": true,
-    "noEmitOnError": true
+    // "noEmitOnError": true,
+    // "target": "es2016", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    // "lib": [
+    //   "es2015",
+    //   "dom"
+    // ],
+    // "module": "commonjs", /* Specify what module code is generated. */
+    "noEmit": true, /* Disable emitting files from a compilation. */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
   }
 }
