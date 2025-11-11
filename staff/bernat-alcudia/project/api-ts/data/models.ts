@@ -119,13 +119,8 @@ const productSchema = new Schema<ProductDocType>({
     likes: [{
         type: Types.ObjectId,
         ref: "User"
-    }],
-    commentCount: {
-        type: Number,
-        required: true,
-        min: 0,
-        default: 0
-    }
+    }]
+
 })
 
 const commentSchema = new Schema<CommentDocType>({

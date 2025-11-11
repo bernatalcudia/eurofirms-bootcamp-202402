@@ -1,4 +1,4 @@
-import { User, Product } from "../data/models.js"
+import { User, Product, Comment } from "../data/models.js"
 import { RetrieveProductDetails } from "./types.js"
 import { validate, errors } from "com"
 
@@ -22,22 +22,27 @@ export const retrieveProductDetails: RetrieveProductDetails = (userId: string, p
                     const liked = product.likes.some(like => like.toString() === userId)
                     const own = productAuthorId === userId
 
-                    return {
-                        id: product._id.toString(),
-                        author: product.author.toString(),
-                        images: product.images,
-                        date: product.date,
-                        title: product.title,
-                        state: product.state,
-                        price: product.price,
-                        stock: product.stock,
-                        brand: product.brand,
-                        description: product.description,
-                        commentCount: product.commentCount,
-                        likeCount: product.likes.length,
-                        own: own,
-                        liked: liked
-                    }
+                    return Comment.countDocuments({ product: product._id })
+                        .catch(error => { throw new SystemError(error.message) })
+                        .then(commentCount => {
+
+                            return {
+                                id: product._id.toString(),
+                                author: productAuthorId,
+                                images: product.images,
+                                date: product.date,
+                                title: product.title,
+                                state: product.state,
+                                price: product.price,
+                                stock: product.stock,
+                                brand: product.brand,
+                                description: product.description,
+                                commentCount,
+                                likeCount: product.likes.length,
+                                own,
+                                liked
+                            }
+                        })
                 })
         })
 }

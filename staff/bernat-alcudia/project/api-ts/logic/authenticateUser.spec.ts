@@ -15,8 +15,8 @@ describe("authenticateUser", () => {
 
     it("authenticates a user", () => {
         let user: UserDocType | null, userId: { id: string; role: string }
-        const testDate = new Date("1970-05-07")
-        return User.create({ name: "pepito", birthdate: testDate, email: "pepito@gmail.com", username: "pepito", password: bcrypt.hashSync("123123123", 10) })
+
+        return User.create({ name: "pepito", birthdate: new Date("1970-05-07"), email: "pepito@gmail.com", username: "pepito", password: bcrypt.hashSync("123123123", 10) })
             .then(_user => (user = _user))
             .then(() => authenticateUser("pepito", "123123123"))
             .then((_userId) => { userId = _userId })
@@ -38,8 +38,8 @@ describe("authenticateUser", () => {
     it("wrong credentials", () => {
         let error: Error
         let user: UserDocType | null
-        const testDate = new Date("1970-05-07")
-        return User.create({ name: "pepito", birthdate: testDate, email: "pepito@gmail.com", username: "pepito", password: bcrypt.hashSync("123123123", 10) })
+
+        return User.create({ name: "pepito", birthdate: new Date("1970-05-07"), email: "pepito@gmail.com", username: "pepito", password: bcrypt.hashSync("123123123", 10) })
             .then(_user => (user = _user))
             .then(() => authenticateUser("pepito", "1231231235959"))
             .catch(_error => (error = _error))

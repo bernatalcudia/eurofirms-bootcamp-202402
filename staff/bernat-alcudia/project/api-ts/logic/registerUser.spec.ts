@@ -15,12 +15,12 @@ describe("registerUser", () => {
 
     it("register a new user", () => {
         let value: void, user: UserDocType | null
-        const testDate = new Date("1970-05-07")
+
         const testPassword = "123123123"
         return bcrypt.hash(testPassword, 10)
             .catch(error => { throw new Error(error.message) })
             .then(hashedPassword => {
-                const newUser = { name: "pepito", birthdate: testDate, email: "pepito@gmail.com", username: "pepito", password: hashedPassword }
+                const newUser = { name: "pepito", birthdate: new Date("1970-05-07"), email: "pepito@gmail.com", username: "pepito", password: hashedPassword }
                 return bcrypt.compare(testPassword, hashedPassword)
                     .catch(error => { throw new Error(error.message) })
                     .then(matchPassword => {
@@ -35,7 +35,7 @@ describe("registerUser", () => {
                                 expect(user?.name).to.equal("pepito")
                                 expect(user?.email).to.equal("pepito@gmail.com")
                                 expect(user?.username).to.equal("pepito")
-                                expect(user?.birthdate.toISOString()).to.equal(testDate.toISOString())
+                                expect(user?.birthdate.toISOString()).to.equal(newUser.birthdate.toISOString())
                             })
                     })
             })
@@ -43,9 +43,9 @@ describe("registerUser", () => {
 
     it("user already exists", () => {
         let error: Error
-        const testDate = new Date("1970-05-07")
-        return registerUser("pepito", testDate, "pepito@gmail.com", "pepito", "123123123")
-            .then(() => registerUser("pepito", testDate, "pepito@gmail.com", "pepito", "123123123"))
+
+        return registerUser("pepito", new Date("1970-05-07"), "pepito@gmail.com", "pepito", "123123123")
+            .then(() => registerUser("pepito", new Date("1970-05-07"), "pepito@gmail.com", "pepito", "123123123"))
             .catch(_error => (error = _error))
             .finally(() => {
                 expect(error).to.be.an.instanceOf(DuplicityError)

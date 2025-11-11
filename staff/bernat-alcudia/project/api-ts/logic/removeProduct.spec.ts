@@ -2,17 +2,17 @@ import mongoose from "mongoose"
 import { expect } from "chai"
 import bcrypt from "bcrypt"
 import { User, UserDocType, ProductDocType, Product } from "../data/models"
-import { modifyProduct } from "./modifyProduct"
+import { removeProduct } from "./removeProduct"
 import { errors } from "com"
 
 const { NotFoundError, OwnershipError } = errors
 
-describe("modifyProduct", () => {
+describe("removeProduct", () => {
     before(() => mongoose.connect(process.env.MONGO_URL_TEST!))
 
     beforeEach(() => Promise.all([User.deleteMany({}), Product.deleteMany({})]))
 
-    it("modifies a product", () => {
+    it("remove a product", () => {
         let value: void, user: UserDocType | null, product: ProductDocType | null
 
         const images = ["https://content.nationalgeographic.com.es/medio/2022/08/07/el-sol_e26b22b0_1200x720.jpg", "https://static.nationalgeographic.es/files/styles/image_3200/public/goes-r_suvi_december_15_2019_levels-1.png?w=1600&h=900"]
@@ -39,7 +39,7 @@ describe("modifyProduct", () => {
             })
 
             .then(_product => (product = _product!))
-            .then(() => modifyProduct(user!._id.toString(), product!._id.toString(), images, "suns", "suns galaxy", "galaxy", 525252512565156, "new", 5))
+            .then(() => removeProduct(user!._id.toString(), product!._id.toString()))
             .then(_value => (value = _value))
             .finally(() => {
                 expect(value).to.be.undefined
@@ -57,7 +57,7 @@ describe("modifyProduct", () => {
 
     it("user not found", () => {
         let error: Error
-        return modifyProduct("663ccaeac792d77a1492d494", "68c2e427cbfeb33bb36e1e85", ["https://content.nationalgeographic.com.es/medio/2022/08/07/el-sol_e26b22b0_1200x720.jpg", "https://static.nationalgeographic.es/files/styles/image_3200/public/goes-r_suvi_december_15_2019_levels-1.png?w=1600&h=900"], "suns", "suns galaxy", "galaxy", 525252512565156, "new", 5)
+        return removeProduct("663ccaeac792d77a1492d494", "68c2e427cbfeb33bb36e1e85")
             .catch(_error => (error = _error))
             .finally(() => {
                 expect(error).to.be.an.instanceOf(NotFoundError)
@@ -92,7 +92,7 @@ describe("modifyProduct", () => {
             })
 
             .then(_product => (product = _product!))
-            .then(() => modifyProduct(user!._id.toString(), "68c2e427cbfeb33bb36e1e85", images, "suns", "suns galaxy", "galaxy", 525252512565156, "new", 5))
+            .then(() => removeProduct(user!._id.toString(), "68c2e427cbfeb33bb36e1e85"))
             .catch(_error => (error = _error))
             .finally(() => {
                 expect(error).to.be.an.instanceOf(NotFoundError)
@@ -137,7 +137,7 @@ describe("modifyProduct", () => {
                     })
 
                     .then(_product => (product = _product!))
-                    .then(() => modifyProduct(user2!._id.toString(), product!._id.toString(), images, "suns", "suns galaxy", "galaxy", 525252512565156, "new", 5))
+                    .then(() => removeProduct(user2!._id.toString(), product!._id.toString()))
                     .catch(_error => (error = _error))
                     .finally(() => {
                         expect(error).to.be.an.instanceOf(OwnershipError)

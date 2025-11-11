@@ -26,7 +26,7 @@ export const retrieveProducts: RetrieveProducts = (userId: string) => {
 
                         return {
                             id: product._id.toString(),
-                            author: product.author.toString(),
+                            author: productAuthorId,
                             images: product.images,
                             title: product.title,
                             description: product.description,

@@ -17,12 +17,12 @@ describe("changeUserPassword", () => {
 
     it("changes password", () => {
         let user: UserDocType | null
-        const testDate = new Date("1970-05-07")
+
         const testPassword = "123123123"
         return bcrypt.hash(testPassword, 10)
             .catch(error => { throw new Error(error.message) })
             .then(hashedPassword => {
-                const newUser = { name: "pepito", birthdate: testDate, email: "pepito@gmail.com", username: "pepito", password: hashedPassword }
+                const newUser = { name: "pepito", birthdate: new Date("1970-05-07"), email: "pepito@gmail.com", username: "pepito", password: hashedPassword }
                 return bcrypt.compare(testPassword, hashedPassword)
                     .catch(error => { throw new Error(error.message) })
                     .then(matchPassword => {
@@ -55,12 +55,12 @@ describe("changeUserPassword", () => {
     it("wrong credentials", () => {
         let error: Error
         let user: UserDocType | null
-        const testDate = new Date("1970-05-07")
+
         const testPassword = "123123123"
         return bcrypt.hash(testPassword, 10)
             .catch(error => { throw new Error(error.message) })
             .then(hashedPassword => {
-                const newUser = { name: "pepito", birthdate: testDate, email: "pepito@mail.com", username: "pepito", password: hashedPassword }
+                const newUser = { name: "pepito", birthdate: new Date("1970-05-07"), email: "pepito@mail.com", username: "pepito", password: hashedPassword }
                 return bcrypt.compare(testPassword, hashedPassword)
                     .catch(error => { throw new Error(error.message) })
                     .then(matchPassword => {
@@ -79,8 +79,8 @@ describe("changeUserPassword", () => {
     it("new password does not match password repeat", () => {
         let error: Error
         let user: UserDocType | null
-        const testDate = new Date("1970-05-07")
-        return User.create({ name: "pepito", birthdate: testDate, email: "pepito@gmail.com", username: "pepito", password: bcrypt.hashSync("123123123", 10) })
+
+        return User.create({ name: "pepito", birthdate: new Date("1970-05-07"), email: "pepito@gmail.com", username: "pepito", password: bcrypt.hashSync("123123123", 10) })
             .then(_user => (user = _user))
             .then(() => changeUserPassword(user?._id?.toString() as string, "123123123", "234234234", "234234235"))
             .catch(_error => (error = _error))
