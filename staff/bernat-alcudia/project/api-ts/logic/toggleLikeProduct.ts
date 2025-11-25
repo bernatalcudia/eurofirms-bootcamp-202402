@@ -28,7 +28,6 @@ export const toggleLikeProduct: ToggleLikeProduct = (userId: string, productId: 
 
             return product.save()
                 .catch(error => { throw new SystemError(error.message) })
+                .then(result => { })
         })
-        .catch(error => { throw new SystemError(error.message) })
-        .then(result => { })
 }

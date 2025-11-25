@@ -25,7 +25,7 @@ export const registerUser: RegisterUser = (name: string, birthdate: Date, email:
 
                     return User.create(newUser)
                         .catch(error => { throw new SystemError(error.message) })
+                        .then(user => { })
                 })
         })
-        .then(user => { })
 }

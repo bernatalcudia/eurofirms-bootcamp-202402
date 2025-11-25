@@ -31,7 +31,6 @@ export const createProduct: CreateProduct = (userId: string, images: string[], t
             }
             return Product.create(product)
                 .catch(error => { throw new SystemError(error.message) })
-
+                .then(product => { })
         })
-        .then(product => { })
 }

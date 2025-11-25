@@ -30,7 +30,7 @@ export const modifyComment: ModifyComment = (userId: string, productId: string, 
 
             return comment.save()
                 .catch(error => { throw new SystemError(error.message) })
+                .then(result => { })
         })
-        .then(result => { })
 }
 

@@ -35,8 +35,8 @@ export const removeComment: RemoveComment = (userId: string, productId: string, 
 
                     return Promise.all([product.save(), Comment.deleteOne({ _id: commentId })])
                         .catch(error => { throw new SystemError(error.message) })
+                        .then(() => { })
                 })
         })
-        .then(() => { })
 }
 

@@ -31,10 +31,10 @@ export const changeUserPassword: ChangeUserPassword = (userId: string, currentPa
 
                             return user.save()
                                 .catch(error => { throw new SystemError(error.message) })
+                                .then(user => { })
                         })
 
                 })
         })
-        .then(user => { })
 
 }

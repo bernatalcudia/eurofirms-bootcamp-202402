@@ -38,6 +38,6 @@ export const modifyProduct: ModifyProduct = (userId: string, productId: string, 
 
             return product.save()
                 .catch(error => { throw new SystemError(error.message) })
+                .then(result => { })
         })
-        .then(result => { })
 }

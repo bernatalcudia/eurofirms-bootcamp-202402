@@ -28,6 +28,6 @@ export const removeProduct: RemoveProduct = (userId: string, productId: string) 
         .then(() => {
             return User.updateMany({ saved: productId }, { $pull: { saved: productId } })
                 .catch(error => { throw new SystemError(error.message) })
+                .then(result => { })
         })
-        .then(result => { })
 }

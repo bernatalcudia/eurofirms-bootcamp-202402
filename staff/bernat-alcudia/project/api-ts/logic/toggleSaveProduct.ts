@@ -25,9 +25,8 @@ export const toggleSaveProduct: ToggleSaveProduct = (userId: string, productId: 
                         user.saved.splice(index, 1)
                     return user.save()
                         .catch(error => { throw new SystemError(error.message) })
+                        .then(result => { })
                 })
-                .catch(error => { throw new SystemError(error.message) })
-                .then(result => { })
 
         })
 
