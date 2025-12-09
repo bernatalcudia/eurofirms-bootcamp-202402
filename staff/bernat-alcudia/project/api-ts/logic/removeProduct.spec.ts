@@ -100,7 +100,7 @@ describe("removeProduct", () => {
             })
     })
 
-    it("ownership error", () => {
+    it("product does not belongs to user", () => {
         let error: Error, user: UserDocType | null, product: ProductDocType | null, user2: UserDocType | null
 
         const images = ["https://content.nationalgeographic.com.es/medio/2022/08/07/el-sol_e26b22b0_1200x720.jpg", "https://static.nationalgeographic.es/files/styles/image_3200/public/goes-r_suvi_december_15_2019_levels-1.png?w=1600&h=900"]
