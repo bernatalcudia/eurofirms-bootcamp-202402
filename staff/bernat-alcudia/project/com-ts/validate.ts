@@ -16,7 +16,15 @@ const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9(
 
 const nameSchema = z.string().min(1, { message: "name is empty" })
 
-const birthdateSchema = z.date().min(18, { message: "age is lower than 18" })
+// Corregido: espera un string, luego lo transforma a Date, y después aplica la validación
+const birthdateSchema = z.string().transform((str) => new Date(str))
+    .pipe(z.date().refine((date) => {
+        // Lógica de validación de edad
+        const ageDifMs = Date.now() - date.getTime()
+        const ageDate = new Date(ageDifMs)
+        const age = Math.abs(ageDate.getUTCFullYear() - 1970)
+        return age >= 18
+    }, { message: "age is lower than 18" }))
 
 const usernameSchema = z.string().min(3, { message: "username is lower than 3 characters" }).refine(val => !val.includes(" "), { message: "username has a space character" })
 const emailSchema = z.string().regex(EMAIL_REGEX, { message: "wrong email format" })

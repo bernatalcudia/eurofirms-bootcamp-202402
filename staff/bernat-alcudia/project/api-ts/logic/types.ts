@@ -89,29 +89,11 @@ type Logic = {
 }
 
 export {
-    UserType,
-    ProductType,
-    CommentType,
-
-    RegisterUser,
     AuthenticateUser,
-    ChangeUserPassword,
-    RetrieveUser,
-
-    CreateProduct,
-    ModifyProduct,
-    RemoveProduct,
-    RetrieveProductDetails,
+    ChangeUserPassword, CommentType, CreateComment, CreateProduct, Logic, ModifyComment, ModifyProduct, ProductType, RegisterUser, RemoveComment, RemoveProduct, RetrieveComments, RetrieveProductDetails,
     RetrieveProducts,
-    RetrieveSavedProducts,
-    SearchProduct,
+    RetrieveSavedProducts, RetrieveUser, SearchProduct,
     ToggleLikeProduct,
-    ToggleSaveProduct,
-
-    CreateComment,
-    ModifyComment,
-    RemoveComment,
-    RetrieveComments,
-
-    Logic
+    ToggleSaveProduct, UserType
 }
+

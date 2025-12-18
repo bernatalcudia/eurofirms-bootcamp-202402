@@ -1,7 +1,7 @@
-import { User } from "../data/models.js"
 import bcrypt from "bcrypt"
-import { AuthenticateUser } from "./types.js"
 import { errors, validate } from "com"
+import { User } from "../data/models.js"
+import { AuthenticateUser } from "./types.js"
 
 const { SystemError, NotFoundError, CredentialsError } = errors
 
