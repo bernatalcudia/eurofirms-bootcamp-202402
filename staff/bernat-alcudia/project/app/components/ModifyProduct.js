@@ -1,10 +1,10 @@
-import { useMemo, useState, useEffect, } from 'react';
-import logic from '../logic';
-import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform, Linking } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { useEffect, useMemo, useState, } from 'react';
+import { Alert, Image, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import logic from '../logic';
 
 
 
@@ -18,7 +18,7 @@ function ModifyProduct() {
     const [description, setDescription] = useState('')
     const [brand, setBrand] = useState('')
     const [state, setState] = useState(null)
-    const [price, setPrice] = useState(0)
+    const [price, setPrice] = useState('')
     const [stock, setStock] = useState('')
 
     const [selectedId, setSelectedId] = useState('');

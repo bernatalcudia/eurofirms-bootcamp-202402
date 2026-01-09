@@ -49,19 +49,16 @@ commentsRouter.patch("/:commentId", jsonBodyParser, async (req, res, next) => {
     }
 })
 
-commentsRouter.delete("/:commentId", async (req, res, next) => {
+commentsRouter.delete("/:productId/:commentId", async (req, res, next) => {
 
     try {
         const { authorization } = req.headers
 
         const token = authorization!.slice(7)
 
-        const { sub: userId } = jwt.verify
-            (token, JWT_SECRET!)
+        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
 
-        const { productId } = req.body
-
-        const { commentId } = req.params
+        const { productId, commentId } = req.params
 
         await logic.removeComment(userId as string, productId, commentId)
 
