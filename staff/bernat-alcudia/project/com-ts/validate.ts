@@ -16,10 +16,8 @@ const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9(
 
 const nameSchema = z.string().min(1, { message: "name is empty" })
 
-// Corregido: espera un string, luego lo transforma a Date, y después aplica la validación
 const birthdateSchema = z.string().transform((str) => new Date(str))
     .pipe(z.date().refine((date) => {
-        // Lógica de validación de edad
         const ageDifMs = Date.now() - date.getTime()
         const ageDate = new Date(ageDifMs)
         const age = Math.abs(ageDate.getUTCFullYear() - 1970)
@@ -33,7 +31,6 @@ const idSchema = z.string().regex(ID_REGEX, { message: "wrong id format; not a 2
 const urlSchema = z.string().regex(URL_REGEX, { message: "wrong url format" })
 const textSchema = z.string().min(1)
 
-const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
 
 // const imagesSchema = z.array(z.string()
 //     .min(1, { message: "at least 1 image" })
@@ -41,14 +38,7 @@ const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
 //     .refine(val => /^[A-Za-z0-9+/]*={0,2}$/.test(val), { message: "wrong format" }))
 
 
-const singleImageUrlSchema = z.string().min(1, { message: "images are empty" }).url().refine(
-    (url) => {
-        const urlWithoutParams = url.split("?")[0]
-
-        const lowercasedUrl = urlWithoutParams!.toLowerCase()
-
-        return imageExtensions.some(ext => lowercasedUrl.endsWith(ext))
-    }, { message: "Url is not valid format" })
+const singleImageUrlSchema = z.string().min(1, { message: "images are empty" })
 
 const imagesArraySchema = z
     .array(singleImageUrlSchema)

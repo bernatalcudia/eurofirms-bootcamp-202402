@@ -16,9 +16,9 @@ productsRouter.post("/create", jsonBodyParser, async (req, res, next) => {
 
         const { sub: userId } = jwt.verify(token, JWT_SECRET!)
 
-        const { images, title, description, brand, prices, state, stock } = req.body
+        const { images, title, description, brand, price, state, stock } = req.body
 
-        await logic.createProduct(userId as string, images, title, description, brand, prices, state, stock)
+        await logic.createProduct(userId as string, images, title, description, brand, price, state, stock)
 
         res.status(201).send()
     } catch (error) {
@@ -110,9 +110,9 @@ productsRouter.patch("/:productId", jsonBodyParser, async (req, res, next) => {
 
         const { productId } = req.params
 
-        const { images, title, description, brand, prices, state, stock } = req.body
+        const { images, title, description, brand, price, state, stock } = req.body
 
-        await logic.modifyProduct(userId as string, productId, images, title, description, brand, prices, state, stock)
+        await logic.modifyProduct(userId as string, productId, images, title, description, brand, price, state, stock)
 
         res.status(204).send()
     } catch (error) {
@@ -153,6 +153,23 @@ productsRouter.put("/:productId/saved", async (req, res, next) => {
         await logic.toggleSaveProduct(userId as string, productId)
 
         res.status(204).send()
+    } catch (error) {
+        next(error)
+    }
+})
+
+productsRouter.get("/:userId/saved", async (req, res, next) => {
+
+    try {
+        const { authorization } = req.headers
+
+        const token = authorization!.slice(7)
+
+        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+
+        const saved = await logic.retrieveSavedProducts(userId as string)
+
+        res.status(200).json(saved)
     } catch (error) {
         next(error)
     }
