@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Button, Alert, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Button, Alert, Platform, TouchableOpacity, Dimensions } from 'react-native';
 import logic from '../logic';
 import { utils } from 'com'
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -163,6 +163,30 @@ function ProductDetail() {
     const { id: productId } = route.params
 
     const handleDeleteProduct = () => {
+        const deleteProduct = () => {
+            try {
+                logic.removeProduct(productId)
+                    .then(() => navigation.navigate('tabs'))
+                    .catch(error => {
+                        console.error(error)
+
+                        alert(error instanceof Error ? error.message : 'Unexpected error')
+                    })
+            } catch (error) {
+                console.error(error)
+
+                alert(error instanceof Error ? error.message : 'Unexpected error')
+            }
+        }
+
+        if (Platform.OS === 'web') {
+            if (globalThis.confirm('Are you sure you want to delete this product?')) {
+                deleteProduct()
+            }
+
+            return
+        }
+
         Alert.alert('Confirm delete product', 'Are you sure you want to delete this product?', [
             {
                 text: 'Cancel',
@@ -170,21 +194,7 @@ function ProductDetail() {
             },
             {
                 text: 'Delete',
-                onPress: () => {
-                    try {
-                        logic.removeProduct(productId)
-                            .then(() => navigation.navigate('tabs'))
-                            .catch(error => {
-                                console.error(error)
-
-                                alert(error instanceof Error ? error.message : 'Unexpected error')
-                            })
-                    } catch (error) {
-                        console.error(error)
-
-                        alert(error instanceof Error ? error.message : 'Unexpected error')
-                    }
-                },
+                onPress: deleteProduct,
                 style: 'destructive',
             },
         ])
