@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import logic from '../logic';
-import { errors, utils } from '../com';
+import { errors, utils } from 'com';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import type { DateTimePickerEvent } from '@react-native-community/datetimepicker'
@@ -10,7 +10,7 @@ import type { RootNavigation } from '../types/navigation'
 
 
 
-const { ContentError, DuplicityError } = errors
+const { ValidationError, DuplicityError } = errors
 
 function RegisterBuyer({ }) {
     const [name, setName] = useState('')
@@ -51,7 +51,7 @@ function RegisterBuyer({ }) {
 
                     let feedback = error.message
 
-                    if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+                    if (error instanceof ValidationError)
                         feedback = `${feedback}, please correct it`
                     else if (error instanceof DuplicityError)
                         feedback = `${feedback},please try with another user`
@@ -64,7 +64,7 @@ function RegisterBuyer({ }) {
             console.error(error)
             let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-            if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+            if (error instanceof ValidationError)
                 feedback = `${feedback}, please correct it`
             else if (error instanceof DuplicityError)
                 feedback = `${feedback}, please try with another user`

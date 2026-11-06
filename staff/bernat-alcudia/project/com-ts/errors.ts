@@ -46,11 +46,27 @@ class ValidationError extends Error {
     }
 }
 
+class ContentError extends ValidationError {
+    constructor(message: string) {
+        super(message)
+        this.name = ContentError.name
+    }
+}
+
+class MatchError extends ValidationError {
+    constructor(message: string) {
+        super(message)
+        this.name = MatchError.name
+    }
+}
+
 export {
     DuplicityError,
     CredentialsError,
     NotFoundError,
     SystemError,
     OwnershipError,
-    ValidationError
+    ValidationError,
+    ContentError,
+    MatchError
 }

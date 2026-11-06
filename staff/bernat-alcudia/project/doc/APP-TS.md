@@ -1,6 +1,7 @@
 # Cliente móvil TypeScript
 
 `app-ts/` es el cliente Expo en TypeScript. `app/` sigue siendo el cliente JavaScript original y se conserva para comparar los flujos durante la migración.
+El cliente consume el paquete compartido local `com-ts/` para validaciones, utilidades y errores.
 
 ## Desarrollo
 

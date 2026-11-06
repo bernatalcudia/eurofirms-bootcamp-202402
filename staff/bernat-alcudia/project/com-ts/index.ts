@@ -1,6 +1,6 @@
-import *  as errors from "./errors.js"
-import { validate } from "./validate.js"
-import utils from "./utils.js"
+import * as errors from "./errors"
+import { validate } from "./validate"
+import utils from "./utils"
 
 export {
     errors,

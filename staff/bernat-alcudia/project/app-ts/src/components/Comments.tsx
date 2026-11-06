@@ -1,7 +1,7 @@
 import { View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList, Animated, PanResponder, Dimensions, KeyboardAvoidingView, Platform, AccessibilityInfo } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect, useRef } from 'react';
-import { ContentError } from '../com/errors'
+import { errors } from 'com'
 
 
 
@@ -181,7 +181,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                         console.error(error)
                         let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-                        if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+                        if (error instanceof errors.ValidationError)
                             feedback = `${feedback}, please correct it`
                         else {
                             feedback = 'sorry,there was an error,please try again later'
@@ -195,7 +195,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                 console.error(error)
                 let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-                if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+                if (error instanceof errors.ValidationError)
                     feedback = `${feedback}, please correct it`
                 else
                     feedback = 'sorry,there was an error,please try again later'

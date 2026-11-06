@@ -2,10 +2,10 @@ import { View, TextInput, TouchableOpacity, StyleSheet, Text, AccessibilityInfo,
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import logic from '../logic'
-import { errors } from '../com'
+import { errors } from 'com'
 import type { RootNavigation } from '../types/navigation'
 
-const { ContentError } = errors
+const { ValidationError } = errors
 
 
 function ChangePassword() {
@@ -31,7 +31,7 @@ function ChangePassword() {
 
                     let feedback = error.message
 
-                    if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+                    if (error instanceof ValidationError)
                         feedback = `${feedback}, please correct it`
 
                     else
@@ -45,7 +45,7 @@ function ChangePassword() {
             let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
 
-            if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+            if (error instanceof ValidationError)
                 feedback = `${feedback}, please correct it`
 
             else

@@ -1,5 +1,5 @@
 import SessionStorage from "react-native-session-storage"
-import { errors, validate, utils } from "../com"
+import { errors, validate, utils } from "com"
 import type { Comment, Product, ProductState, User, UserRole } from "../types/models"
 
 interface ApiErrorBody {
@@ -21,12 +21,14 @@ function apiUrl(path: string): string {
 
 function authorizationHeader(): string {
   const token: unknown = SessionStorage.getItem("token")
-  if (typeof token !== "string") throw new errors.TypeError("token is not a string")
+  if (typeof token !== "string") throw new TypeError("token is not a string")
   validate.token(token)
   return `Bearer ${token}`
 }
 
 function getError(message: string, name?: string): Error {
+  if (name === "TypeError") return new TypeError(message)
+  if (name === "RangeError") return new RangeError(message)
   if (name && Object.prototype.hasOwnProperty.call(errors, name)) {
     const ErrorConstructor = errors[name as keyof typeof errors]
     return new ErrorConstructor(message)
@@ -102,16 +104,20 @@ async function request<T>(
 
 function getUserId(): string {
   const token: unknown = SessionStorage.getItem("token")
-  if (typeof token !== "string") throw new errors.TypeError("token is not a string")
+  if (typeof token !== "string") throw new TypeError("token is not a string")
   validate.token(token)
   return utils.extractPayload(token).sub
 }
 
 function getUserRole(): UserRole {
   const token: unknown = SessionStorage.getItem("token")
-  if (typeof token !== "string") throw new errors.TypeError("token is not a string")
+  if (typeof token !== "string") throw new TypeError("token is not a string")
   validate.token(token)
-  return utils.extractPayload(token).role
+  const { role } = utils.extractPayload(token)
+  if (role !== "seller" && role !== "buyer") {
+    throw new errors.ValidationError("invalid user role in token")
+  }
+  return role
 }
 
 export async function registerBuyer(

@@ -1,6 +1,6 @@
 import logic from '../logic';
 import React, { useEffect, useState } from 'react';
-import { utils } from '../com'
+import { utils } from 'com'
 import { View, Text, Image, StyleSheet, ScrollView, Button } from 'react-native';
 import type { Product } from '../types/models'
 

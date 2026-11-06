@@ -1,6 +1,6 @@
 import { z, ZodType } from "zod"
-import { ValidationError } from "./errors.js"
-import utils from "./utils.js"
+import { ValidationError } from "./errors"
+import utils from "./utils"
 
 function validatenWithSchema<T>(schema: ZodType<T>, data: unknown, explain = "data"): void {
     const result = schema.safeParse(data)
@@ -16,7 +16,10 @@ const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9(
 
 const nameSchema = z.string().min(1, { message: "name is empty" })
 
-const birthdateSchema = z.string().transform((str) => new Date(str))
+const birthdateSchema = z.union([
+    z.date(),
+    z.string().transform((str) => new Date(str))
+])
     .pipe(z.date().refine((date) => {
         const ageDifMs = Date.now() - date.getTime()
         const ageDate = new Date(ageDifMs)
@@ -55,15 +58,23 @@ const tokenSchema = z.string().min(1, { message: "token is empty" }).refine(valu
     const now = Date.now() / 1000
     return now < exp
 }, { message: "token expired" })
-const roleSchema = z.enum(["regular", "admin"], { message: "invalid role" })
+const roleSchema = z.enum(["seller", "buyer"], { message: "invalid role" })
 const searchQuerySchema = z.string().min(1, { message: "search query is empty" })
+const stringSchema = z.string()
+const numberSchema = z.number()
 
 
 export const validate = {
+    string(value: unknown, explain = "string") {
+        validatenWithSchema(stringSchema, value, explain)
+    },
+    number(value: unknown, explain = "number") {
+        validatenWithSchema(numberSchema, value, explain)
+    },
     name(name: string, explain = "name") {
         validatenWithSchema(nameSchema, name, explain)
     },
-    birthdate(birthdate: Date, explain = "birthdate") {
+    birthdate(birthdate: Date | string, explain = "birthdate") {
         validatenWithSchema(birthdateSchema, birthdate, explain)
     },
     username(username: string, explain = "username") {

@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "com": "file:../com-ts",
     "@expo/metro-runtime": "^3.2.1",
     "@react-native-community/datetimepicker": "7.7.0",
     "@react-navigation/bottom-tabs": "^6.5.20",

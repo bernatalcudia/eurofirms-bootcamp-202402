@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native'
-import { ContentError } from '../com/errors'
+import { errors } from 'com'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Home from '../pages/Home';
 import CreateProduct from './CreateProduct';
@@ -31,7 +31,7 @@ function MyTabs() {
                     console.error(error)
                     let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-                    if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+                    if (error instanceof errors.ValidationError)
                         feedback = `${feedback}, please correct it`
                     else
                         feedback = 'sorry,there was an error,please try again later'
@@ -43,7 +43,7 @@ function MyTabs() {
             console.error(error)
             let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-            if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+            if (error instanceof errors.ValidationError)
                 feedback = `${feedback}, please correct it`
             else
                 feedback = 'sorry,there was an error,please try again later'

@@ -3,7 +3,21 @@
   "version": "1.0.0",
   "type": "module",
   "description": "",
-  "main": "index.js",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "react-native": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./errors": {
+      "types": "./errors.ts",
+      "import": "./errors.ts",
+      "default": "./errors.ts"
+    }
+  },
   "scripts": {
     "compile-watch": "npx tsc --watch ",
     "test": "echo \"Error: no test specified\" && exit 1"

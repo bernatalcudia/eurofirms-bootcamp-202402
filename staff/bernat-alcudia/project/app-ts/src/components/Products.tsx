@@ -1,7 +1,7 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
-import { ContentError } from '../com/errors'
+import { errors } from 'com'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import logic from '../logic';
@@ -37,7 +37,7 @@ function Products({ searchQuery }: ProductsProps) {
                     console.error(error)
                     let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-                    if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+                    if (error instanceof errors.ValidationError)
                         feedback = `${feedback}, please correct it`
                     else
                         feedback = 'sorry,there was an error,please try again later'
@@ -47,7 +47,7 @@ function Products({ searchQuery }: ProductsProps) {
             console.error(error)
             let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-            if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+            if (error instanceof errors.ValidationError)
                 feedback = `${feedback}, please correct it`
             else
                 feedback = 'sorry,there was an error,please try again later'

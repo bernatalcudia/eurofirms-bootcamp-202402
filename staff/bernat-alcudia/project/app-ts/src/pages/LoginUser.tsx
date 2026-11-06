@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { errors } from '../com';
+import { errors } from 'com';
 
 import logic from '../logic';
 import type { RootNavigation } from '../types/navigation'
 
-const { ContentError, MatchError } = errors
+const { ValidationError, MatchError } = errors
 
 
 
@@ -32,7 +32,7 @@ function LoginUser() {
 
                     let feedback = error.message
 
-                    if (error instanceof TypeError || error instanceof RangeError)
+                    if (error instanceof ValidationError)
                         feedback = `${feedback},please correct it`
                     else if (error instanceof MatchError)
                         feedback = `${feedback},please verify credentials`
@@ -45,7 +45,7 @@ function LoginUser() {
             console.error(error)
             let feedback = error instanceof Error ? error.message : 'Unexpected error'
 
-            if (error instanceof TypeError || error instanceof RangeError || error instanceof ContentError)
+            if (error instanceof ValidationError)
                 feedback = `${feedback},please correct it`
             else if (error instanceof MatchError)
                 feedback = `${feedback},please verify credentials`
