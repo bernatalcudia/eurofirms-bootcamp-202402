@@ -293,7 +293,7 @@ function Products({ searchQuery }: ProductsProps) {
                             </View>
                             <View style={styles.actionsContainer}>
                                 <View style={styles.likeContainer}>
-                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} accessibilityLabel={isLiked ? `Unlike ${product.title}. Currently has ${likeCount} likes.` : `Like ${product.title}. Currently has ${likeCount} likes.`} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
+                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPress={() => handleToggleLikeProduct(product.id)} accessibilityLabel={isLiked ? `Unlike ${product.title}. Currently has ${likeCount} likes.` : `Like ${product.title}. Currently has ${likeCount} likes.`} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
                                         <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
                                     </TouchableOpacity>
                                     <Text style={styles.likeCountText} accessibilityLabel={`${likeCount} likes`} >{likeCount}</Text>
@@ -304,7 +304,7 @@ function Products({ searchQuery }: ProductsProps) {
                                     </TouchableOpacity>
                                     <Text style={styles.commentsCountText} accessibilityLabel={`${product.commentCount ?? 0} comments`} >{product.commentCount ?? 0} </Text>
                                 </View>
-                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleSavedProduct(product.id)} accessibilityLabel={isSaved ? `Unsave ${product.title}` : `Save ${product.title}`} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
+                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPress={() => handleToggleSavedProduct(product.id)} accessibilityLabel={isSaved ? `Unsave ${product.title}` : `Save ${product.title}`} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
                                 </TouchableOpacity>
                             </View>
