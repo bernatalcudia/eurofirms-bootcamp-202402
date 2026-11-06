@@ -15,10 +15,35 @@ Estas indicaciones se aplican solo a `staff/bernat-alcudia/project/`.
 
 - Sigue los patrones existentes en el directorio afectado. En `api-ts/`, conserva TypeScript estricto, imports con extensión `.js` cuando corresponda al patrón local y la separación entre rutas, lógica, modelos y middleware.
 - Mantén la lógica de negocio fuera de las rutas y de los componentes. Reutiliza las validaciones y los errores de `com/` o `com-ts/` que use esa parte del proyecto.
-- Al cambiar un caso de uso de la API, revisa sus pruebas y el consumidor correspondiente en `app/logic/`. Conserva los contratos actuales de rutas, estados HTTP y cuerpos de respuesta, salvo que el cambio solicite explícitamente modificarlos.
+- Al cambiar un caso de uso de la API, revisa sus pruebas y el consumidor correspondiente en `app/logic/` o `app-ts/src/logic/`, según el cliente afectado. Conserva los contratos actuales de rutas, estados HTTP y cuerpos de respuesta, salvo que el cambio solicite explícitamente modificarlos.
 - Para cambios en modelos o datos, comprueba los usos en los casos de uso, rutas y app; evita cambiar el esquema o los nombres de campos sin actualizar los consumidores afectados.
 - Añade o actualiza pruebas para cambios de comportamiento. No introduzcas dependencias, abstracciones o migraciones amplias si una modificación localizada resuelve el problema.
 - No guardes secretos ni valores de `.env` en el código, las pruebas, los logs o la documentación. No muestres esos valores al inspeccionar configuración.
+
+## Cliente TypeScript (`app-ts/`)
+
+- `app/` es el cliente Expo existente en JavaScript y debe seguir funcionando sin cambios por el mero hecho de crear o migrar a `app-ts/`. No renombres ni sobrescribas `app/`; construye el cliente TypeScript como una app independiente.
+- Organiza `app-ts/` como proyecto Expo autónomo, con sus propios `package.json`, `app.json`, `babel.config.js`, `metro.config.js` y `tsconfig.json`. Usa esta estructura para el código fuente:
+
+  ```text
+  app-ts/
+    App.tsx
+    index.ts
+    src/
+      components/
+      logic/
+      navigation/
+      pages/
+      types/
+  ```
+
+- Mantén en `App.tsx` la composición raíz y en `index.ts` la entrada de Expo. Coloca navegación en `src/navigation/`, pantallas en `src/pages/`, componentes reutilizables en `src/components/`, acceso a API y almacenamiento en `src/logic/`, y tipos compartidos del cliente en `src/types/`. Añade subcarpetas cuando una necesidad real lo justifique.
+- Usa `.tsx` para módulos con JSX y `.ts` para lógica, tipos y utilidades sin JSX. Activa `strict` en TypeScript; evita `any` y conversiones de tipo que oculten incompatibilidades. Modela explícitamente roles, estados de producto, respuestas de API y errores.
+- Conserva las funcionalidades, navegación, validaciones y contratos HTTP del cliente JavaScript durante la migración. Migra por pantallas y flujos completos, comprueba cada flujo contra la API elegida y evita duplicar lógica innecesariamente entre los dos clientes.
+- Reutiliza los componentes y dependencias adecuados a React Native/Expo. Alinea las versiones de Expo, React y React Native con el proyecto existente y añade solo las dependencias de tipos necesarias; no copies configuraciones o paquetes de la API Node.js sin comprobar su compatibilidad con Metro.
+- Lee y usa `EXPO_PUBLIC_API_URL` para la URL del backend. Mantén secretos fuera de variables públicas de Expo, ya que se incorporan al cliente.
+- Añade scripts propios en `app-ts/package.json` para iniciar la app y comprobar tipos. Antes de dar por válido un cambio, instala dependencias desde `app-ts/` si corresponde y ejecuta el script de comprobación de TypeScript configurado allí (por ejemplo, `npx tsc --noEmit`); ejecuta también las pruebas disponibles para el flujo afectado. No afirmes que la app compila o se ejecuta en dispositivo si solo pasó la comprobación de tipos.
+- Documenta en `doc/README.md` cómo iniciar `app-ts/` y qué partes siguen disponibles solo en `app/` mientras dure la migración.
 
 ## Commits
 
