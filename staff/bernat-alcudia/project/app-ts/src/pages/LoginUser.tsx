@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { errors } from 'com';
@@ -56,20 +56,19 @@ function LoginUser() {
         }
     }
 
-    const handleRegisterSeller = () => {
-        navigation.navigate('RegisterSeller')
-    }
-    const handleRegisterBuyer = () => {
-        navigation.navigate('RegisterBuyer')
+    const handleRegister = () => {
+        navigation.navigate('RegisterUser')
     }
 
     const styles = StyleSheet.create({
         view: {
-            paddingTop: '50%',
+            flexGrow: 1,
+            paddingVertical: 24,
             display: 'flex',
             flexDirection: 'column',
-            gap: 20,
+            gap: 12,
             alignItems: 'center',
+            justifyContent: 'center',
         },
         input: {
             width: '80%',
@@ -92,19 +91,16 @@ function LoginUser() {
         },
     })
 
-    return <View style={styles.view}>
+    return <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
         <TextInput style={styles.input} placeholder='username' value={username} onChangeText={setUsername} />
         <TextInput style={styles.input} secureTextEntry={true} placeholder='password' value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={[styles.button, { marginTop: 10 }]} onPress={handleSubmit}>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit} accessibilityRole='button'>
             <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleRegisterSeller}>
-            <Text style={styles.buttonText}>Register Seller</Text>
+        <TouchableOpacity style={styles.button} onPress={handleRegister} accessibilityRole='button'>
+            <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleRegisterBuyer}>
-            <Text style={styles.buttonText}>Register Buyer</Text>
-        </TouchableOpacity>
-    </View>
+    </ScrollView>
 }
 
 export default LoginUser

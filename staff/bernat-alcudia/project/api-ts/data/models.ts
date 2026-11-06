@@ -1,5 +1,7 @@
 import { Schema, model, Types } from "mongoose"
 
+export type UserRole = "admin" | "regular"
+
 const { Types: { ObjectId } } = Schema
 
 
@@ -10,7 +12,7 @@ type UserDocType = {
     email: string
     username: string
     password: string
-    role: "seller" | "buyer"
+    role: UserRole
     saved: Types.ObjectId[]
     __v: number
 }
@@ -65,9 +67,9 @@ const userSchema = new Schema<UserDocType>({
     },
     role: {
         type: String,
-        enum: ["seller", "buyer"],
+        enum: ["admin", "regular"],
         required: true,
-        default: "buyer"
+        default: "regular"
     },
     saved: [{
         type: Types.ObjectId,

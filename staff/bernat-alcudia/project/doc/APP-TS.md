@@ -11,3 +11,5 @@ El cliente consume el paquete compartido local `com-ts/` para validaciones, util
 4. Comprueba los tipos con `npm run typecheck`.
 
 El cliente consume las rutas de `api-ts/` para registro, autenticación, productos y comentarios. Las pruebas automatizadas de interfaz aún no están configuradas.
+
+El registro público crea usuarios con el rol `regular`; no permite elegir ni asignar `admin`. Las cuentas `admin` deben aprovisionarse por un mecanismo de confianza del servidor. Tanto `regular` como `admin` pueden acceder a la creación de productos. Para mantener sesiones y cuentas existentes, los roles antiguos `seller` y `buyer` se interpretan como `regular`.

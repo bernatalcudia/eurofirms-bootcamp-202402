@@ -76,9 +76,9 @@ function MyTabs() {
                     }, headerTitleAlign: 'center',
                     headerTitle: () => <SearchProduct onSearch={handleSearch} />, tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='home' color={color} size={size} />), tabBarAccessibilityLabel: 'Home tab, displays your main feed',
                 }}></Tab.Screen>
-            {logic.getLoggedInUserRole() === 'seller' && <Tab.Screen name='CreateProduct' component={CreateProduct} options={{
+            <Tab.Screen name='CreateProduct' component={CreateProduct} options={{
                 tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: 'Create Product tab, navigate to add a new product',
-            }}></Tab.Screen>}
+            }}></Tab.Screen>
 
             <Tab.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} options={{
                 tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: 'Saved Products tab, view your saved items',

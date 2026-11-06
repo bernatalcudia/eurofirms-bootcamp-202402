@@ -114,13 +114,12 @@ function getUserRole(): UserRole {
   if (typeof token !== "string") throw new TypeError("token is not a string")
   validate.token(token)
   const { role } = utils.extractPayload(token)
-  if (role !== "seller" && role !== "buyer") {
-    throw new errors.ValidationError("invalid user role in token")
-  }
-  return role
+  if (role === "admin" || role === "regular") return role
+  if (role === "seller" || role === "buyer") return "regular"
+  throw new errors.ValidationError("invalid user role in token")
 }
 
-export async function registerBuyer(
+export async function registerUser(
   name: string,
   birthdate: string,
   email: string,
@@ -134,27 +133,7 @@ export async function registerBuyer(
   validate.password(password)
   await request<void>("/users/register", {
     method: "POST",
-    body: { name, birthdate, email, username, password, role: "buyer" },
-    authenticated: false,
-    expectedStatus: expectedStatuses.created,
-  })
-}
-
-export async function registerSeller(
-  name: string,
-  birthdate: string,
-  email: string,
-  username: string,
-  password: string,
-): Promise<void> {
-  validate.name(name)
-  validate.birthdate(birthdate)
-  validate.email(email)
-  validate.username(username)
-  validate.password(password)
-  await request<void>("/users/register", {
-    method: "POST",
-    body: { name, birthdate, email, username, password, role: "seller" },
+    body: { name, birthdate, email, username, password },
     authenticated: false,
     expectedStatus: expectedStatuses.created,
   })

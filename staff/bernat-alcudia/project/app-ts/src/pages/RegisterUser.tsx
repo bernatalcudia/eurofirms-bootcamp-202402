@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import logic from '../logic';
 import { errors, utils } from 'com';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -12,10 +12,11 @@ import type { RootNavigation } from '../types/navigation'
 
 const { ValidationError, DuplicityError } = errors
 
-function RegisterSeller({ }) {
+function RegisterUser() {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [birthdate, setBirthdate] = useState<Date | null>(null)
+    const [birthdateInput, setBirthdateInput] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
@@ -30,19 +31,31 @@ function RegisterSeller({ }) {
         setShowDatePicker(false)
     }
 
-    const handleRegisterSeller = () => {
+    const handleBirthdateTextChange = (value: string) => {
+        setBirthdateInput(value)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            setBirthdate(null)
+            return
+        }
+
+        const date = new Date(`${value}T00:00:00.000Z`)
+        setBirthdate(!Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null)
+    }
+
+    const handleRegister = () => {
         if (!birthdate) {
             alert('Please select your birthdate')
             return
         }
         try {
-            logic.registerSeller(name, birthdate.toISOString(), email, username, password)
+            logic.registerUser(name, birthdate.toISOString(), email, username, password)
                 .then(() => {
                     alert('user registered')
                     navigation.navigate('LoginUser')
                     setName('')
                     setEmail('')
                     setBirthdate(null)
+                    setBirthdateInput('')
                     setUsername('')
                     setPassword('')
                 })
@@ -104,22 +117,27 @@ function RegisterSeller({ }) {
         },
     })
 
-
     return <View style={styles.view}>
         <TextInput style={styles.input} placeholder='name' value={name} onChangeText={setName} />
         <TextInput style={styles.input} placeholder='email' value={email} onChangeText={setEmail} />
 
         <TextInput style={styles.input} placeholder='username' value={username} onChangeText={setUsername} />
-        <TextInput style={styles.input} onPress={() => setShowDatePicker(true)} placeholder='birthdate' value={birthdate ? utils.formatDate(birthdate) : ''} />
-        {showDatePicker && (
+        <TextInput
+            style={styles.input}
+            onPress={() => Platform.OS !== 'web' && setShowDatePicker(true)}
+            onChangeText={Platform.OS === 'web' ? handleBirthdateTextChange : undefined}
+            placeholder={Platform.OS === 'web' ? 'birthdate (YYYY-MM-DD)' : 'birthdate'}
+            value={Platform.OS === 'web' ? birthdateInput : birthdate ? utils.formatDate(birthdate) : ''}
+        />
+        {Platform.OS !== 'web' && showDatePicker && (
             <DateTimePicker display='spinner' onChange={handleDateChange} value={birthdate || new Date()} />
 
         )}
         <TextInput style={styles.input} secureTextEntry={true} placeholder='password' value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.button} onPress={handleRegisterSeller}>
-            <Text style={styles.buttonText}>Register</Text>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Register </Text>
         </TouchableOpacity>
     </View>
 }
 
-export default RegisterSeller
+export default RegisterUser

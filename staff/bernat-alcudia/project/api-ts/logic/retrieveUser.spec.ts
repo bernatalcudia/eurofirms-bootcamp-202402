@@ -14,7 +14,7 @@ describe("retrieveUser", () => {
 
     it("retrieves a user", () => {
         let user: UserDocType | null, targetUser: UserDocType | null
-        let userParams: { id: string; name: string; username: string; email: string; role: "seller" | "buyer"; saved: string[] } | null
+        let userParams: { id: string; name: string; username: string; email: string; role: "admin" | "regular"; saved: string[] } | null
         const testDate = new Date("1970-05-07")
         return User.create({
             name: "caller",
@@ -22,16 +22,16 @@ describe("retrieveUser", () => {
             email: "caller@gmail.com",
             username: "caller",
             password: "123123123",
-            role: "buyer",
+            role: "regular",
         })
             .then((_user) => (user = _user))
             .then(() => User.create({
-                name: "seller",
+                name: "regular",
                 birthdate: testDate,
-                email: "seller@gmail.com",
-                username: "seller",
+                email: "regular@gmail.com",
+                username: "regular",
                 password: "123123123",
-                role: "seller",
+                role: "regular",
                 saved: [new mongoose.Types.ObjectId()],
             }))
             .then((_user) => (targetUser = _user))
@@ -40,10 +40,10 @@ describe("retrieveUser", () => {
             .then(() => {
                 expect(userParams).to.deep.equal({
                     id: targetUser!._id.toString(),
-                    name: "seller",
-                    username: "seller",
-                    email: "seller@gmail.com",
-                    role: "seller",
+                    name: "regular",
+                    username: "regular",
+                    email: "regular@gmail.com",
+                    role: "regular",
                     saved: targetUser!.saved.map(id => id.toString()),
                 })
             })
@@ -62,4 +62,3 @@ describe("retrieveUser", () => {
 
     after(() => mongoose.disconnect())
 })
-

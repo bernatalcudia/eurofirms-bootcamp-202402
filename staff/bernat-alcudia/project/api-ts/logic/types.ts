@@ -1,9 +1,11 @@
+import type { UserRole } from "../data/models.js"
+
 type UserType = {
     id: string,
     name: string,
     email: string,
     username: string,
-    role: "seller" | "buyer",
+    role: UserRole,
     saved: string[]
 }
 
@@ -34,9 +36,9 @@ type CommentType = {
 }
 
 
-type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string, role?: "seller" | "buyer") => Promise<void>
+type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string) => Promise<void>
 
-type AuthenticateUser = (username: string, password: string) => Promise<{ id: string, role: string }>
+type AuthenticateUser = (username: string, password: string) => Promise<{ id: string, role: UserRole }>
 
 type ChangeUserPassword = (userId: string, oldPassword: string, newPassword: string, newPasswordRepeat: string) => Promise<void>
 
@@ -98,3 +100,5 @@ export {
     ToggleLikeProduct,
     ToggleSaveProduct, UserType
 }
+
+export type { UserRole }

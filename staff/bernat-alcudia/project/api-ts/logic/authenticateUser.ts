@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import { errors, validate } from "com"
 import { User } from "../data/models.js"
 import { AuthenticateUser } from "./types.js"
+import { normalizeUserRole } from "./normalizeUserRole.js"
 
 const { SystemError, NotFoundError, CredentialsError } = errors
 
@@ -21,7 +22,7 @@ export const authenticateUser: AuthenticateUser = (username: string, password: s
 
                     return {
                         id: user.id,
-                        role: user.role
+                        role: normalizeUserRole(user.role)
                     }
                 })
         })

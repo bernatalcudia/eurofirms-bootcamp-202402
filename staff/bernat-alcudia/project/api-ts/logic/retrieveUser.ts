@@ -2,6 +2,7 @@
 import { User } from "../data/models.js"
 import { RetrieveUser } from "./types.js"
 import { validate, errors } from "com"
+import { normalizeUserRole } from "./normalizeUserRole.js"
 
 const { SystemError, NotFoundError } = errors
 
@@ -20,7 +21,7 @@ export const retrieveUser: RetrieveUser = (userId: string, targetUserId: string)
                 name: targetUser.name,
                 username: targetUser.username,
                 email: targetUser.email,
-                role: targetUser.role,
+                role: normalizeUserRole(targetUser.role),
                 saved: targetUser.saved.map(productId => productId.toString()),
             }
         })

@@ -3,6 +3,7 @@ import bcrypt from "bcrypt"
 import { expect } from "chai"
 import { UserDocType, User } from "../data/models"
 import { authenticateUser } from "./authenticateUser"
+import { normalizeUserRole } from "./normalizeUserRole.js"
 import { errors } from "com"
 
 const { NotFoundError, CredentialsError } = errors
@@ -23,6 +24,24 @@ describe("authenticateUser", () => {
             .finally(() => {
                 expect(userId).to.deep.equal({ id: user?._id.toString(), role: user?.role })
             })
+    })
+
+    it("authenticates an admin", () => {
+        return User.create({
+            name: "admin",
+            birthdate: new Date("1970-05-07"),
+            email: "admin@gmail.com",
+            username: "admin",
+            password: bcrypt.hashSync("123123123", 10),
+            role: "admin",
+        })
+            .then(() => authenticateUser("admin", "123123123"))
+            .then(user => expect(user.role).to.equal("admin"))
+    })
+
+    it("maps legacy roles to regular", () => {
+        expect(normalizeUserRole("seller")).to.equal("regular")
+        expect(normalizeUserRole("buyer")).to.equal("regular")
     })
 
     it("user not found", () => {
@@ -53,4 +72,3 @@ describe("authenticateUser", () => {
 
     afterEach(() => User.deleteMany({}))
 })
-

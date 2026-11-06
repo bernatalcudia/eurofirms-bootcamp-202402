@@ -4,8 +4,7 @@ import type { StackNavigationProp } from "@react-navigation/stack"
 
 export type RootStackParamList = {
   LoginUser: undefined
-  RegisterSeller: undefined
-  RegisterBuyer: undefined
+  RegisterUser: undefined
   Home: undefined
   ChangePassword: undefined
   tabs: undefined

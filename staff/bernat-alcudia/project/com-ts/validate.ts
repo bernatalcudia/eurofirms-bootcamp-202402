@@ -58,7 +58,7 @@ const tokenSchema = z.string().min(1, { message: "token is empty" }).refine(valu
     const now = Date.now() / 1000
     return now < exp
 }, { message: "token expired" })
-const roleSchema = z.enum(["seller", "buyer"], { message: "invalid role" })
+const roleSchema = z.enum(["admin", "regular"], { message: "invalid role" })
 const searchQuerySchema = z.string().min(1, { message: "search query is empty" })
 const stringSchema = z.string()
 const numberSchema = z.number()

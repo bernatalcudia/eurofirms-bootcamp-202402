@@ -8,8 +8,7 @@ import RetrieveSavedProducts from "../components/RetrieveSavedProducts"
 import MyTabs from "../components/MyTabs"
 import Home from "../pages/Home"
 import LoginUser from "../pages/LoginUser"
-import RegisterBuyer from "../pages/RegisterBuyer"
-import RegisterSeller from "../pages/RegisterSeller"
+import RegisterUser from "../pages/RegisterUser"
 import type { RootStackParamList } from "../types/navigation"
 
 const Stack = createStackNavigator<RootStackParamList>()
@@ -18,8 +17,7 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator initialRouteName="LoginUser">
       <Stack.Screen name="LoginUser" component={LoginUser} />
-      <Stack.Screen name="RegisterSeller" component={RegisterSeller} />
-      <Stack.Screen name="RegisterBuyer" component={RegisterBuyer} />
+      <Stack.Screen name="RegisterUser" component={RegisterUser} />
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
       <Stack.Screen

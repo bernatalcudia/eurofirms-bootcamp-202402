@@ -1,4 +1,4 @@
-export type UserRole = "seller" | "buyer"
+export type UserRole = "admin" | "regular"
 export type ProductState = "new" | "used"
 
 export interface User {
