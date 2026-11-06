@@ -8,7 +8,7 @@ Estas indicaciones se aplican solo a `staff/bernat-alcudia/project/`.
 - `app/` es el cliente React Native con Expo en JavaScript; `app-ts/` es su cliente TypeScript independiente. En ambos, las pantallas, componentes y lógica están en sus directorios correspondientes.
 - `api-ts/` es una API Express con TypeScript y MongoDB/Mongoose. Las rutas están en `routes/`, los casos de uso en `logic/`, los modelos en `data/` y el middleware en `middlewares/`.
 - `api/` contiene la API JavaScript y `api-ts/` su implementación TypeScript; sus contratos HTTP no son idénticos. `com/` y `com-ts/` son las variantes JavaScript y TypeScript del paquete compartido.
-- Los clientes `app/` y `app-ts/` usan actualmente los endpoints de `api/`. Comprueba qué backend consume el flujo antes de cambiar rutas o cuerpos de petición.
+- `app/` usa la API JavaScript `api/`; `app-ts/` usa la API TypeScript `api-ts/`. Comprueba el backend correspondiente antes de cambiar rutas o cuerpos de petición.
 - Antes de implementar una funcionalidad, confirma qué API y paquete compartido usa el flujo que vas a modificar. No asumas que las implementaciones paralelas están sincronizadas ni propagues cambios automáticamente a ambas.
 - `doc/README.md` describe el producto y sus casos de uso; distingue lo que ya está implementado de lo que allí figura como versión futura.
 

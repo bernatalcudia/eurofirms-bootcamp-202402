@@ -1,4 +1,4 @@
-import { CredentialsError, DuplicityError, NotFoundError, SystemError, ValidationError } from "com/errors"
+import { CredentialsError, DuplicityError, NotFoundError, OwnershipError, SystemError, ValidationError } from "com/errors"
 import { NextFunction, Request, Response } from "express"
 
 interface ErrorResponse {
@@ -22,6 +22,9 @@ export const errorHandler = (error: Error, _req: Request, res: Response<ErrorRes
     } else if (error instanceof CredentialsError) {
         status = 401
         errorName = CredentialsError.name
+    } else if (error instanceof OwnershipError) {
+        status = 403
+        errorName = OwnershipError.name
     }
 
     res.status(status).json({ error: errorName, message: error.message })

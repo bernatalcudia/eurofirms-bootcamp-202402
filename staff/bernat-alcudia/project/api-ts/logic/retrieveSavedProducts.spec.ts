@@ -37,13 +37,24 @@ describe("retrieveSavedProducts", () => {
                 stock: 5,
                 likes: [],
             }))
-            .then(_product => (product = _product))
+            .then(_product => {
+                product = _product
+                user!.saved.push(product._id)
+                return User.updateOne({ _id: user!._id }, { $set: { saved: user!.saved } })
+            })
             .then(() => retrieveSavedProducts(user!._id.toString()))
             .then(_products => (products = _products))
             .then(() => {
                 expect(products).to.exist
-                expect(products?.length).to.equal(0)
-
+                expect(products).to.have.lengthOf(1)
+                expect(products?.[0]).to.include({
+                    id: product!._id.toString(),
+                    author: user!._id.toString(),
+                    title: "suns",
+                    liked: false,
+                    own: true,
+                })
+                expect(products?.[0].images).to.deep.equal(images)
             })
     })
 

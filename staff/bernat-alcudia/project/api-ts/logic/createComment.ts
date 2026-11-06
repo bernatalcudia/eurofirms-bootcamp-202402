@@ -26,7 +26,7 @@ export const createComment: CreateComment = (userId: string, productId: string, 
                 text
             }
 
-            product.commentCount++
+            product.commentCount = (product.commentCount ?? 0) + 1
 
             return Promise.all([product.save(), Comment.create(comment)])
                 .catch(error => { throw new SystemError(error.message) })

@@ -9,9 +9,10 @@ import type { Comment as ProductComment } from '../types/models'
 interface CommentProps {
     item: ProductComment
     onCommentDeleted: () => void
+    onCommentModified: (commentId: string, text: string) => void
 }
 
-function Comment({ item: comment, onCommentDeleted }: CommentProps) {
+function Comment({ item: comment, onCommentDeleted, onCommentModified }: CommentProps) {
     const [showEdit, setShowEdit] = useState(false)
     const [newComment, setNewComment] = useState(comment.text)
 
@@ -100,7 +101,7 @@ function Comment({ item: comment, onCommentDeleted }: CommentProps) {
 
     const handleDeleteComment = () => {
         try {
-            logic.removeComment(comment.id)//Delete comment
+            logic.removeComment(comment.product, comment.id)//Delete comment
                 .then(() => {
                     showAlert('Success', 'Comment deleted successfully!')
                     onCommentDeleted()
@@ -138,9 +139,10 @@ function Comment({ item: comment, onCommentDeleted }: CommentProps) {
 
     const handleModifiedComment = () => {
         try {
-            logic.modifyComment(comment.id, newComment)//Modified comment
+            logic.modifyComment(comment.product, comment.id, newComment)//Modified comment
                 .then(() => {
                     alert('modified comment')
+                    onCommentModified(comment.id, newComment)
                 })
                 .catch(error => {
                     console.error(error)
@@ -169,10 +171,10 @@ function Comment({ item: comment, onCommentDeleted }: CommentProps) {
 
     return (
         <>
-            <View style={styles.commentItemContainer} accessible={true} accessibilityLabel={`Comment by ${comment?.author.username || 'User'}`}>
+            <View style={styles.commentItemContainer} accessible={true} accessibilityLabel={`Comment by ${typeof comment.author === 'string' ? 'User' : comment.author.username || 'User'}`}>
                 <View style={styles.header}>
                     <View style={styles.actionButtonsContainer}>
-                        <Text style={styles.commentAuthor} accessibilityRole='header' aria-level={'3'}>{comment?.author.username || 'User'}</Text>
+                        <Text style={styles.commentAuthor} accessibilityRole='header' aria-level={'3'}>{typeof comment.author === 'string' ? 'User' : comment.author.username || 'User'}</Text>
                         {comment?.own && !showEdit && (
                             <View style={styles.actionButtonsContainer}>
                                 <TouchableOpacity style={styles.actionButton} onPress={handleShowEdit} accessibilityLabel='Edit comment' accessibilityHint='Activates to edit mode for the comment' accessibilityRole='button'>

@@ -22,16 +22,14 @@ export const removeComment: RemoveComment = (userId: string, productId: string, 
         .then(product => {
             if (!product) throw new NotFoundError("product not found")
 
-            if (product.author.toString() !== userId) throw new OwnershipError("product does not belong user")
-
-            return Comment.findById(commentId)
+            return Comment.findOne({ _id: commentId, product: productId })
                 .catch(error => { throw new SystemError(error.message) })
                 .then(comment => {
                     if (!comment) throw new NotFoundError("comment not found")
 
-                    if (comment.author.toString() !== userId) throw new OwnershipError("user not match")
+                    if (comment.author.toString() !== userId) throw new OwnershipError("comment does not belong to user")
 
-                    product.commentCount--
+                    product.commentCount = Math.max(0, (product.commentCount ?? 0) - 1)
 
                     return Promise.all([product.save(), Comment.deleteOne({ _id: commentId })])
                         .catch(error => { throw new SystemError(error.message) })
@@ -39,4 +37,3 @@ export const removeComment: RemoveComment = (userId: string, productId: string, 
                 })
         })
 }
-

@@ -9,9 +9,9 @@ export const usersRouter = express.Router()
 
 usersRouter.post("/register", jsonBodyParser, async (req, res, next) => {
     try {
-        const { name, birthdate, email, username, password } = req.body
+        const { name, birthdate, email, username, password, role } = req.body
 
-        await logic.registerUser(name, birthdate, email, username, password)
+        await logic.registerUser(name, birthdate, email, username, password, role)
 
         res.status(201).send()
     } catch (error) {

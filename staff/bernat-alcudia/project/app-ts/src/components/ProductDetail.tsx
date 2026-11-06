@@ -225,7 +225,7 @@ function ProductDetail() {
         );
     }
 
-    const isAuthor = product.author.id === logic.getLoggedInUserId()
+    const isAuthor = product.own || product.author === logic.getLoggedInUserId()
 
     return (
         <View style={styles.mainContainer} accessible={true}>

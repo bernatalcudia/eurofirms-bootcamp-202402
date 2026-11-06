@@ -13,22 +13,38 @@ describe("retrieveUser", () => {
     beforeEach(() => User.deleteMany({}))
 
     it("retrieves a user", () => {
-        let user: UserDocType | null, userParams: { id: string; name: string; username: string; email: string; }
+        let user: UserDocType | null, targetUser: UserDocType | null
+        let userParams: { id: string; name: string; username: string; email: string; role: "seller" | "buyer"; saved: string[] } | null
         const testDate = new Date("1970-05-07")
-        const testPassword = "123123123"
-        const newUser = { name: "pepito", birthdate: testDate, email: "pepito@gmail.com", username: "pepito", password: testPassword }
-        return User.create(newUser)
+        return User.create({
+            name: "caller",
+            birthdate: testDate,
+            email: "caller@gmail.com",
+            username: "caller",
+            password: "123123123",
+            role: "buyer",
+        })
             .then((_user) => (user = _user))
-            .catch(error => console.error(error))
-            .then(() => retrieveUser(user?._id?.toString() as string, user?._id.toString() as string))
+            .then(() => User.create({
+                name: "seller",
+                birthdate: testDate,
+                email: "seller@gmail.com",
+                username: "seller",
+                password: "123123123",
+                role: "seller",
+                saved: [new mongoose.Types.ObjectId()],
+            }))
+            .then((_user) => (targetUser = _user))
+            .then(() => retrieveUser(user!._id.toString(), targetUser!._id.toString()))
             .then((_userParams) => (userParams = _userParams))
-
-            .finally(() => {
+            .then(() => {
                 expect(userParams).to.deep.equal({
-                    id: userParams.id,
-                    name: userParams.name,
-                    username: userParams.username,
-                    email: userParams.email
+                    id: targetUser!._id.toString(),
+                    name: "seller",
+                    username: "seller",
+                    email: "seller@gmail.com",
+                    role: "seller",
+                    saved: targetUser!.saved.map(id => id.toString()),
                 })
             })
     })
@@ -46,5 +62,4 @@ describe("retrieveUser", () => {
 
     after(() => mongoose.disconnect())
 })
-
 

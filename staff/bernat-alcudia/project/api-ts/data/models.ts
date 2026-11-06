@@ -10,7 +10,7 @@ type UserDocType = {
     email: string
     username: string
     password: string
-    role: string
+    role: "seller" | "buyer"
     saved: Types.ObjectId[]
     __v: number
 }
@@ -65,9 +65,9 @@ const userSchema = new Schema<UserDocType>({
     },
     role: {
         type: String,
-        enum: ["admin", "regular"],
+        enum: ["seller", "buyer"],
         required: true,
-        default: "regular"
+        default: "buyer"
     },
     saved: [{
         type: Types.ObjectId,
@@ -119,7 +119,13 @@ const productSchema = new Schema<ProductDocType>({
     likes: [{
         type: Types.ObjectId,
         ref: "User"
-    }]
+    }],
+    commentCount: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0
+    }
 
 })
 
@@ -160,4 +166,3 @@ export {
     Product,
     Comment
 }
-

@@ -2,10 +2,11 @@ import { User, Product, Comment } from "../data/models.js"
 import { ModifyComment } from "./types.js"
 import { validate, errors } from "com"
 
-const { SystemError, NotFoundError } = errors
+const { SystemError, NotFoundError, OwnershipError } = errors
 
 export const modifyComment: ModifyComment = (userId: string, productId: string, commentId: string, text: string) => {
     validate.id(userId, "userId")
+    validate.id(productId, "productId")
     validate.id(commentId, "commentId")
     validate.text(text, "text")
 
@@ -20,11 +21,12 @@ export const modifyComment: ModifyComment = (userId: string, productId: string, 
         .then(product => {
             if (!product) throw new NotFoundError("product not found")
 
-            return Comment.findById(commentId)
+            return Comment.findOne({ _id: commentId, product: productId })
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(comment => {
             if (!comment) throw new NotFoundError("comment not found")
+            if (comment.author.toString() !== userId) throw new OwnershipError("comment does not belong to user")
 
             comment.text = text
 
@@ -33,4 +35,3 @@ export const modifyComment: ModifyComment = (userId: string, productId: string, 
                 .then(result => { })
         })
 }
-

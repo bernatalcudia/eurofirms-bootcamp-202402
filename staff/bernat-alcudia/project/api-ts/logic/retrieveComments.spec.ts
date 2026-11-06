@@ -50,6 +50,12 @@ describe("retrieveComments", () => {
                 expect(comments).to.exist
                 expect(comments?.length).to.equal(1)
                 expect(comments?.[0].text).to.equal("this is a comment")
+                expect(comments?.[0].product).to.equal(product!._id.toString())
+                expect(comments?.[0].author).to.deep.equal({
+                    id: user!._id.toString(),
+                    username: user!.username,
+                })
+                expect(comments?.[0].own).to.equal(true)
             })
     })
 

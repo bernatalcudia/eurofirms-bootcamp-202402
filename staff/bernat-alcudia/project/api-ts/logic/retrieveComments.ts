@@ -1,4 +1,5 @@
 import { User, Product, Comment } from "../data/models.js"
+import { Types } from "mongoose"
 import { RetrieveComments } from "./types.js"
 import { validate, errors } from "com"
 
@@ -18,7 +19,7 @@ export const retrieveComments: RetrieveComments = (userId: string, productId: st
         .then(product => {
             if (!product) throw new NotFoundError("product not found")
 
-            return Comment.find({ product: productId }).select("-__v").populate("author", "username").sort("-date").lean()
+            return Comment.find({ product: productId }).select("-__v").populate<{ author: { _id: Types.ObjectId, username: string } }>("author", "username").sort("-date").lean()
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(comments => {
@@ -31,7 +32,10 @@ export const retrieveComments: RetrieveComments = (userId: string, productId: st
                 return {
                     id: comment._id.toString(),
                     product: comment.product.toString(),
-                    author: comment.author.toString(),
+                    author: {
+                        id: comment.author._id.toString(),
+                        username: comment.author.username
+                    },
                     text: comment.text,
                     date: comment.date,
                     own: own

@@ -107,8 +107,8 @@ describe("removeComment", () => {
             })
     })
 
-    it("comment does not belongs to user", () => {
-        let error: Error, user: UserDocType | null, product: ProductDocType | null, user2: UserDocType | null
+    it("comment owner can remove a comment on another user's product", () => {
+        let user: UserDocType | null, product: ProductDocType | null, user2: UserDocType | null
 
         const images = ["https://content.nationalgeographic.com.es/medio/2022/08/07/el-sol_e26b22b0_1200x720.jpg", "https://static.nationalgeographic.es/files/styles/image_3200/public/goes-r_suvi_december_15_2019_levels-1.png?w=1600&h=900"]
 
@@ -148,16 +148,15 @@ describe("removeComment", () => {
                         product: product!._id.toString(),
                         text: "this is a comment"
                     }))
-                    .then(_comment => removeComment(user2!._id.toString(), product!._id.toString(), _comment._id.toString()))
-                    .catch(_error => (error = _error))
-                    .finally(() => {
-                        expect(error).to.be.an.instanceOf(OwnershipError)
-                        expect(error.message).to.equal("product does not belong user")
+                    .then(_comment => removeComment(user2!._id.toString(), product!._id.toString(), _comment._id.toString())
+                        .then(() => Comment.findById(_comment._id.toString())))
+                    .then(removedComment => {
+                        expect(removedComment).to.be.null
                     })
             })
     })
 
-    it("user not match", () => {
+    it("a user cannot remove another user's comment", () => {
         let error: Error, user: UserDocType | null, product: ProductDocType | null, user2: UserDocType | null
 
         const images = ["https://content.nationalgeographic.com.es/medio/2022/08/07/el-sol_e26b22b0_1200x720.jpg", "https://static.nationalgeographic.es/files/styles/image_3200/public/goes-r_suvi_december_15_2019_levels-1.png?w=1600&h=900"]
@@ -202,7 +201,7 @@ describe("removeComment", () => {
                     .catch(_error => (error = _error))
                     .finally(() => {
                         expect(error).to.be.an.instanceOf(OwnershipError)
-                        expect(error.message).to.equal("user not match")
+                        expect(error.message).to.equal("comment does not belong to user")
                     })
             })
     })
@@ -211,4 +210,3 @@ describe("removeComment", () => {
 
     afterEach(() => Comment.deleteMany({}))
 })
-

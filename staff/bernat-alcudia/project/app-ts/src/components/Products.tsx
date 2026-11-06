@@ -74,7 +74,19 @@ function Products({ searchQuery }: ProductsProps) {
     const handleToggleSavedProduct = (productId: string) => {
         try {
             logic.toggleSavedProduct(productId)
-                .then(() => refreshProducts())
+                .then(() => {
+                    setUser(current => {
+                        if (!current) return current
+                        const saved = current.saved ?? []
+                        return {
+                            ...current,
+                            saved: saved.includes(productId)
+                                ? saved.filter(id => id !== productId)
+                                : [...saved, productId],
+                        }
+                    })
+                    refreshProducts()
+                })
                 .catch(error => {
                     console.error(error)
 
@@ -259,8 +271,9 @@ function Products({ searchQuery }: ProductsProps) {
 
 
                 {products.map(product => {
-                    const isLiked = product.likes.includes(logic.getLoggedInUserId())
+                    const isLiked = product.liked ?? product.likes?.includes(logic.getLoggedInUserId()) ?? false
                     const isSaved = user?.saved?.includes(product.id) ?? false
+                    const likeCount = product.likeCount ?? product.likes?.length ?? 0
                     const accessibilityImageLabel = product.images[0] ? `Product image: ${product.title}` : 'No image available for this product.'
 
                     return (
@@ -280,10 +293,10 @@ function Products({ searchQuery }: ProductsProps) {
                             </View>
                             <View style={styles.actionsContainer}>
                                 <View style={styles.likeContainer}>
-                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} accessibilityLabel={isLiked ? `Unlike ${product.title}. Currently has ${product.likes.length} likes.` : `Like ${product.title}. Currently has ${product.likes.length} likes.`} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
+                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPressOut={() => handleToggleLikeProduct(product.id)} accessibilityLabel={isLiked ? `Unlike ${product.title}. Currently has ${likeCount} likes.` : `Like ${product.title}. Currently has ${likeCount} likes.`} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
                                         <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
                                     </TouchableOpacity>
-                                    <Text style={styles.likeCountText} accessibilityLabel={`${product.likes.length} likes`} >{product.likes.length}</Text>
+                                    <Text style={styles.likeCountText} accessibilityLabel={`${likeCount} likes`} >{likeCount}</Text>
                                 </View>
                                 <View style={styles.commentsContainer} accessibilityLabel={`View comments for product ${product.title}. Has ${product.commentCount} comments.`} accessibilityRole='button'>
                                     <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>

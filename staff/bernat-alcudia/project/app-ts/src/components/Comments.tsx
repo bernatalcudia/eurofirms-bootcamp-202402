@@ -126,6 +126,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
 
     const panY = useRef(new Animated.Value(screenHeight)).current;
     const [commentsList, setCommentsList] = useState<ProductComment[]>([])
+    const [commentsRefreshVersion, setCommentsRefreshVersion] = useState(0)
     const [comment, setComment] = useState('')
     const [text, seText] = useState('')
     const commentInputRef = useRef<TextInput | null>(null)
@@ -206,7 +207,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             setCommentsList([])
         }
 
-    }, [productId])
+    }, [productId, commentsRefreshVersion])
 
 
     const handleCreateComment = () => {
@@ -223,6 +224,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     AccessibilityInfo.announceForAccessibility('comment created')
                     onCommentCreated()
                     setComment('')
+                    setCommentsRefreshVersion(version => version + 1)
                 })
                 .catch(error => {
                     console.error(error)
@@ -306,7 +308,18 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
 
                 {/* Content Scrollable */}
                 <View style={styles.contentArea}>
-                    <FlatList data={commentsList} renderItem={({ item }) => <Comment item={item} onCommentDeleted={onCommentDeleted} />} keyExtractor={(item) => item.id.toString()}
+                    <FlatList data={commentsList} renderItem={({ item }) => <Comment
+                        item={item}
+                        onCommentDeleted={() => {
+                            onCommentDeleted()
+                            setCommentsRefreshVersion(version => version + 1)
+                        }}
+                        onCommentModified={(commentId, text) => {
+                            setCommentsList(current => current.map(comment =>
+                                comment.id === commentId ? { ...comment, text } : comment,
+                            ))
+                        }}
+                    />} keyExtractor={(item) => item.id.toString()}
                         contentContainerStyle={styles.commentsList} ListEmptyComponent={() => (
                             <View style={styles.emptyListContainer}>
                                 <Text style={styles.emptyListText} accessibilityLiveRegion='polite'>Add first comment!</Text>

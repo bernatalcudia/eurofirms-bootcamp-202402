@@ -24,7 +24,7 @@ describe("registerUser", () => {
                 return bcrypt.compare(testPassword, hashedPassword)
                     .catch(error => { throw new Error(error.message) })
                     .then(matchPassword => {
-                        return registerUser(newUser.name, newUser.birthdate, newUser.email, newUser.username, newUser.password)
+                        return registerUser(newUser.name, newUser.birthdate, newUser.email, newUser.username, newUser.password, "seller")
                             .then((_value) => (value = _value))
                             .then(() => User.findOne({}).lean())
                             .then((_user) => (user = _user!))
@@ -35,10 +35,17 @@ describe("registerUser", () => {
                                 expect(user?.name).to.equal("pepito")
                                 expect(user?.email).to.equal("pepito@gmail.com")
                                 expect(user?.username).to.equal("pepito")
+                                expect(user?.role).to.equal("seller")
                                 expect(user?.birthdate.toISOString()).to.equal(newUser.birthdate.toISOString())
                             })
                     })
             })
+    })
+
+    it("defaults registrations to buyer", () => {
+        return registerUser("buyer", new Date("1970-05-07"), "buyer@gmail.com", "buyer", "123123123")
+            .then(() => User.findOne({ username: "buyer" }).lean())
+            .then(user => expect(user?.role).to.equal("buyer"))
     })
 
     it("user already exists", () => {

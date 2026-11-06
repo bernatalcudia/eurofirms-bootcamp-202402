@@ -2,7 +2,9 @@ type UserType = {
     id: string,
     name: string,
     email: string,
-    username: string
+    username: string,
+    role: "seller" | "buyer",
+    saved: string[]
 }
 
 type ProductType = {
@@ -25,14 +27,14 @@ type ProductType = {
 type CommentType = {
     id: string
     product: string
-    author: string
+    author: { id: string, username: string }
     text: string
     date: Date
     own: boolean
 }
 
 
-type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string) => Promise<void>
+type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string, role?: "seller" | "buyer") => Promise<void>
 
 type AuthenticateUser = (username: string, password: string) => Promise<{ id: string, role: string }>
 
@@ -96,4 +98,3 @@ export {
     ToggleLikeProduct,
     ToggleSaveProduct, UserType
 }
-

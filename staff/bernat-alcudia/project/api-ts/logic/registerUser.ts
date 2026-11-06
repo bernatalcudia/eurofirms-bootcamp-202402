@@ -5,12 +5,13 @@ import { validate, errors } from "com"
 
 const { SystemError, DuplicityError } = errors
 
-export const registerUser: RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string) => {
+export const registerUser: RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string, role = "buyer") => {
     validate.name(name, "name")
     validate.birthdate(birthdate, "birthdate")
     validate.email(email, "email")
     validate.username(username, "username")
     validate.password(password, "password")
+    validate.role(role, "role")
 
     return User.findOne({ $or: [{ email }, { username }] })
         .catch(error => { throw new SystemError(error.message) })
@@ -21,7 +22,7 @@ export const registerUser: RegisterUser = (name: string, birthdate: Date, email:
                 .catch(error => { throw new SystemError(error.message) })
                 .then(hashedPassword => {
 
-                    const newUser = { name, birthdate, email, username, password: hashedPassword }
+                    const newUser = { name, birthdate, email, username, password: hashedPassword, role }
 
                     return User.create(newUser)
                         .catch(error => { throw new SystemError(error.message) })

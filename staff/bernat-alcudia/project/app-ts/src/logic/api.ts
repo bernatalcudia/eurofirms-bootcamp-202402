@@ -132,9 +132,9 @@ export async function registerBuyer(
   validate.email(email)
   validate.username(username)
   validate.password(password)
-  await request<void>("/users/buyers", {
+  await request<void>("/users/register", {
     method: "POST",
-    body: { name, birthdate, email, username, password },
+    body: { name, birthdate, email, username, password, role: "buyer" },
     authenticated: false,
     expectedStatus: expectedStatuses.created,
   })
@@ -152,9 +152,9 @@ export async function registerSeller(
   validate.email(email)
   validate.username(username)
   validate.password(password)
-  await request<void>("/users/sellers", {
+  await request<void>("/users/register", {
     method: "POST",
-    body: { name, birthdate, email, username, password },
+    body: { name, birthdate, email, username, password, role: "seller" },
     authenticated: false,
     expectedStatus: expectedStatuses.created,
   })
@@ -163,7 +163,7 @@ export async function registerSeller(
 export async function loginUser(username: string, password: string): Promise<void> {
   validate.username(username)
   validate.password(password)
-  const token = await request<string>("/users/auth", {
+  const token = await request<string>("/users/authenticate", {
     method: "POST",
     body: { username, password },
     authenticated: false,
@@ -225,7 +225,7 @@ export async function createProduct(
   validate.number(price, "price")
   validate.state(state)
   validate.number(stock, "stock")
-  await request<void>("/products", {
+  await request<void>("/products/create", {
     method: "POST",
     body: { images, title, description, brand, price, state, stock },
     expectedStatus: expectedStatuses.created,
@@ -233,7 +233,7 @@ export async function createProduct(
 }
 
 export async function retrieveProducts(): Promise<Product[]> {
-  return request<Product[]>("/products")
+  return request<Product[]>("/products/retrieve")
 }
 
 export async function retrieveProductDetails(productId: string): Promise<Product> {
@@ -302,26 +302,32 @@ export async function searchProducts(searchQuery: string): Promise<Product[]> {
 export async function createComment(productId: string, text: string): Promise<void> {
   validate.id(productId, "productId")
   validate.string(text, "text")
-  await request<void>("/comments", {
+  await request<void>("/comments/create", {
     method: "POST",
     body: { productId, text },
     expectedStatus: expectedStatuses.created,
   })
 }
 
-export async function modifyComment(commentId: string, text: string): Promise<void> {
+export async function modifyComment(
+  productId: string,
+  commentId: string,
+  text: string,
+): Promise<void> {
+  validate.id(productId, "productId")
   validate.id(commentId, "commentId")
   validate.string(text, "text")
   await request<void>(`/comments/${commentId}`, {
     method: "PATCH",
-    body: { text },
+    body: { productId, text },
     expectedStatus: expectedStatuses.noContent,
   })
 }
 
-export async function removeComment(commentId: string): Promise<void> {
+export async function removeComment(productId: string, commentId: string): Promise<void> {
+  validate.id(productId, "productId")
   validate.id(commentId, "commentId")
-  await request<void>(`/comments/${commentId}`, {
+  await request<void>(`/comments/${productId}/${commentId}`, {
     method: "DELETE",
     expectedStatus: expectedStatuses.noContent,
   })

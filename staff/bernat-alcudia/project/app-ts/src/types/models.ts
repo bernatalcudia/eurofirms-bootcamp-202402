@@ -12,7 +12,7 @@ export interface User {
 
 export interface Product {
   id: string
-  author: { id: string; username?: string }
+  author: string | { id: string; username?: string }
   images: string[]
   title: string
   description: string
@@ -21,15 +21,18 @@ export interface Product {
   state: ProductState
   stock: number
   date?: string
-  likes: string[]
+  likes?: string[]
+  liked: boolean
+  likeCount: number
+  own: boolean
   commentCount?: number
-  saved?: boolean
 }
 
 export interface Comment {
   id: string
+  product: string
   text: string
-  author: { id: string; username: string }
+  author: string | { id: string; username: string }
   own: boolean
-  date: string
+  date: string | Date
 }
