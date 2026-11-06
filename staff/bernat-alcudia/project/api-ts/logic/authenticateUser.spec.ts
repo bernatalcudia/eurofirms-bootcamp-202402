@@ -4,6 +4,7 @@ import { expect } from "chai"
 import { UserDocType, User } from "../data/models"
 import { authenticateUser } from "./authenticateUser"
 import { normalizeUserRole } from "./normalizeUserRole.js"
+import { normalizeLegacyUserRoles } from "../data/normalizeLegacyUserRoles.js"
 import { verifyAccessToken } from "../middlewares/authentication.js"
 import jwt from "jsonwebtoken"
 import { errors } from "com"
@@ -73,6 +74,38 @@ describe("authenticateUser", () => {
     it("maps legacy roles to regular", () => {
         expect(normalizeUserRole("seller")).to.equal("regular")
         expect(normalizeUserRole("buyer")).to.equal("regular")
+    })
+
+    it("migrates persisted legacy roles before future user updates", async () => {
+        const collection = mongoose.connection.collection("users")
+        await collection.insertMany([
+            {
+                name: "legacy buyer",
+                birthdate: new Date("1970-05-07"),
+                email: "legacy-buyer@gmail.com",
+                username: "legacy-buyer",
+                password: "hashed-password",
+                role: "buyer",
+                saved: [],
+            },
+            {
+                name: "legacy seller",
+                birthdate: new Date("1970-05-07"),
+                email: "legacy-seller@gmail.com",
+                username: "legacy-seller",
+                password: "hashed-password",
+                role: "seller",
+                saved: [],
+            },
+        ])
+
+        const migratedCount = await normalizeLegacyUserRoles()
+        const migratedUsers = await collection.find({
+            username: { $in: ["legacy-buyer", "legacy-seller"] },
+        }).toArray()
+
+        expect(migratedCount).to.equal(2)
+        expect(migratedUsers.map(user => user.role)).to.deep.equal(["regular", "regular"])
     })
 
     it("returns generic credentials error when user is not found", () => {
