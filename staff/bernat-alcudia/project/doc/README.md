@@ -46,6 +46,12 @@ Version 0.1
 - Json Web Token
 - React Native
 
+### Mobile clients
+
+- `../app/` is the existing Expo client in JavaScript.
+- `../app-ts/` is the TypeScript Expo client. Setup, environment configuration and available platform scripts are documented in [APP-TS.md](./APP-TS.md).
+- Both clients currently target the JavaScript API in `../api/`. The routes in `../api-ts/` differ and are not interchangeable without adapting the client contract.
+
 ### Data Model
 
 #### User

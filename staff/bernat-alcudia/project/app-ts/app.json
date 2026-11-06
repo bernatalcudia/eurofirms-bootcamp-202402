@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "android": {
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "name": "Bonit@ Faller@ (TypeScript)",
+    "slug": "bonita-fallera-ts",
+    "version": "1.0.0"
+  }
+}

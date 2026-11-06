@@ -1,0 +1,213 @@
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native'
+import { useEffect, useState } from 'react';
+
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import logic from '../logic'
+import type { Comment as ProductComment } from '../types/models'
+
+interface CommentProps {
+    item: ProductComment
+    onCommentDeleted: () => void
+}
+
+function Comment({ item: comment, onCommentDeleted }: CommentProps) {
+    const [showEdit, setShowEdit] = useState(false)
+    const [newComment, setNewComment] = useState(comment.text)
+
+    useEffect(() => {
+        if (!showEdit) {
+            setNewComment(comment.text)
+        }
+    }, [comment.text, showEdit])
+
+
+    const styles = StyleSheet.create({
+        commentItemContainer: {
+            paddingVertical: 10,
+            borderBottomWidth: 1,
+            borderBottomColor: '#f0f0f0',
+            paddingHorizontal: 5,
+        },
+        header: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+        },
+        authorInfo: {
+
+        },
+        commentAuthor: {
+            fontWeight: 'bold',
+            fontSize: 14,
+            color: '#333',
+        },
+        actionButtonsContainer: {
+            flexDirection: 'row',
+        },
+        actionButton: {
+            padding: 5,
+            marginLeft: 10,
+        },
+        commentText: {
+            fontSize: 14,
+            color: '#555',
+            lineHeight: 20,
+            paddingLeft: 5,
+        },
+        editContainer: {
+            marginTop: 10,
+        },
+        textInput: {
+            borderWidth: 1,
+            borderColor: '#ccc',
+            borderRadius: 5,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            marginBottom: 10,
+            fontSize: 14,
+            textAlignVertical: 'top',
+        },
+        editActions: {
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+        },
+        button: {
+            paddingVertical: 8,
+            paddingHorizontal: 15,
+            borderRadius: 5,
+            marginLeft: 10,
+            alignItems: 'center',
+        },
+        saveButton: {
+            backgroundColor: '#007bff',
+        },
+        cancelButton: {
+            backgroundColor: '#6c757d',
+        },
+        buttonText: {
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: 14,
+        },
+    })
+
+    const showAlert = (title: string, message: string) => {
+        Alert.alert(title, message)
+    }
+
+
+    const handleDeleteComment = () => {
+        try {
+            logic.removeComment(comment.id)//Delete comment
+                .then(() => {
+                    showAlert('Success', 'Comment deleted successfully!')
+                    onCommentDeleted()
+                })
+                .catch(error => {
+                    console.error('Error deleting comment:', error)
+                    showAlert('Error', error.message || 'Failed to delete comment')
+                })
+
+        } catch (error) {
+            console.error('Caught error deleting comment:', error)
+
+            showAlert('Error', error instanceof Error ? error.message : 'An unexpected error occurred.')
+        }
+    }
+
+
+    const handleCommentTextChange = (text: string) => {
+        setNewComment(text)
+    }
+
+    const handleSaveModifiedComment = () => {
+        if (newComment.trim() === '') {
+            showAlert('Validation Error', 'Comment cannot be empty.');
+            return
+        }
+        if (newComment.trim() === comment.text) {
+            showAlert('Info', 'No changes made to the comment.');
+            setShowEdit(false);
+            return
+        }
+        handleModifiedComment()
+        setShowEdit(false)
+    }
+
+    const handleModifiedComment = () => {
+        try {
+            logic.modifyComment(comment.id, newComment)//Modified comment
+                .then(() => {
+                    alert('modified comment')
+                })
+                .catch(error => {
+                    console.error(error)
+
+                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                })
+
+        } catch (error) {
+            console.error(error)
+
+            alert(error instanceof Error ? error.message : 'Unexpected error')
+        }
+    }
+
+    const handleShowEdit = () => {
+        setNewComment(comment.text)
+        setShowEdit(true)
+    }
+
+    const handleCancelEdit = () => {
+        setShowEdit(false);
+        setNewComment(comment.text)
+    };
+
+
+
+    return (
+        <>
+            <View style={styles.commentItemContainer} accessible={true} accessibilityLabel={`Comment by ${comment?.author.username || 'User'}`}>
+                <View style={styles.header}>
+                    <View style={styles.actionButtonsContainer}>
+                        <Text style={styles.commentAuthor} accessibilityRole='header' aria-level={'3'}>{comment?.author.username || 'User'}</Text>
+                        {comment?.own && !showEdit && (
+                            <View style={styles.actionButtonsContainer}>
+                                <TouchableOpacity style={styles.actionButton} onPress={handleShowEdit} accessibilityLabel='Edit comment' accessibilityHint='Activates to edit mode for the comment' accessibilityRole='button'>
+                                    <MaterialCommunityIcons name='pencil' size={20} color='#007bff' />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.actionButton} onPress={handleDeleteComment} accessibilityLabel='Delete comment' accessibilityHint='Deletes this comment permanently' accessibilityRole='button'>
+                                    <MaterialCommunityIcons name={'trash-can-outline'} size={20} color={'#dc3545'} />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </View>
+
+                    {showEdit ? (
+                        <View style={styles.editContainer}>
+                            <TextInput style={styles.textInput} value={newComment} onChangeText={handleCommentTextChange} placeholder='Type new comment' multiline={true} numberOfLines={3} accessibilityLabel='Edit comment text' accessibilityHint='Enter you updated comment here'></TextInput>
+                            <View style={styles.editActions}>
+                                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancelEdit} accessibilityLabel='Cancel editing comment' accessibilityRole='button'>
+                                    <Text style={styles.buttonText}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveModifiedComment} accessibilityLabel='Save modified comment' accessibilityRole='button'>
+                                    <Text style={styles.buttonText}>Save</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                    ) : (
+                        <Text style={styles.commentText}>{comment?.text}</Text>
+                    )}
+                </View>
+
+            </View>
+        </>
+    )
+
+}
+
+
+export default Comment
