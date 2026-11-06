@@ -10,7 +10,14 @@ export const errorHandler = (error: Error, _req: Request, res: Response<ErrorRes
     let status: number = 500
     let errorName: string = SystemError.name
 
-    if (error instanceof ValidationError) {
+    const parserError = error as Error & { status?: number; type?: string }
+    if (parserError.type === "entity.too.large") {
+        status = 413
+        errorName = "PayloadTooLargeError"
+    } else if (parserError.type === "entity.parse.failed") {
+        status = 400
+        errorName = ValidationError.name
+    } else if (error instanceof ValidationError) {
         status = 400
         errorName = ValidationError.name
     } else if (error instanceof DuplicityError) {
@@ -27,5 +34,10 @@ export const errorHandler = (error: Error, _req: Request, res: Response<ErrorRes
         errorName = OwnershipError.name
     }
 
-    res.status(status).json({ error: errorName, message: error.message })
+    if (status === 500) console.error(error)
+
+    res.status(status).json({
+        error: errorName,
+        message: status === 500 ? "internal server error" : error.message,
+    })
 }

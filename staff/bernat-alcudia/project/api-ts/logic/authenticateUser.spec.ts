@@ -4,15 +4,46 @@ import { expect } from "chai"
 import { UserDocType, User } from "../data/models"
 import { authenticateUser } from "./authenticateUser"
 import { normalizeUserRole } from "./normalizeUserRole.js"
+import { verifyAccessToken } from "../middlewares/authentication.js"
+import jwt from "jsonwebtoken"
 import { errors } from "com"
 
-const { NotFoundError, CredentialsError } = errors
+const { CredentialsError } = errors
 
 
 describe("authenticateUser", () => {
     before(() => mongoose.connect(process.env.MONGO_URL_TEST!))
 
     beforeEach(() => User.deleteMany({}))
+
+    it("verifies regular and admin access tokens", () => {
+        const secret = "test-only-signing-secret"
+        const userId = "0123456789abcdef01234567"
+
+        for (const role of ["regular", "admin"]) {
+            const token = jwt.sign({ sub: userId, role }, secret, { algorithm: "HS256" })
+            expect(verifyAccessToken(token, secret)).to.deep.equal({ userId, role })
+        }
+    })
+
+    it("normalizes legacy access tokens and rejects invalid tokens", () => {
+        const secret = "test-only-signing-secret"
+        const userId = "0123456789abcdef01234567"
+        const legacyToken = jwt.sign({ sub: userId, role: "seller" }, secret)
+        const expiredToken = jwt.sign({ sub: userId, role: "regular" }, secret, { expiresIn: -1 })
+        const invalidClaims = jwt.sign({ sub: "not-an-id", role: "regular" }, secret)
+        const invalidRole = jwt.sign({ sub: userId, role: "superuser" }, secret)
+        const wrongAlgorithm = jwt.sign({ sub: userId, role: "regular" }, secret, { algorithm: "HS512" })
+        const validToken = jwt.sign({ sub: userId, role: "regular" }, secret)
+
+        expect(verifyAccessToken(legacyToken, secret)).to.deep.equal({ userId, role: "regular" })
+        expect(() => verifyAccessToken("invalid", secret)).to.throw(CredentialsError)
+        expect(() => verifyAccessToken(expiredToken, secret)).to.throw(CredentialsError)
+        expect(() => verifyAccessToken(invalidClaims, secret)).to.throw(CredentialsError)
+        expect(() => verifyAccessToken(invalidRole, secret)).to.throw(CredentialsError)
+        expect(() => verifyAccessToken(wrongAlgorithm, secret)).to.throw(CredentialsError)
+        expect(() => verifyAccessToken(validToken, "different-secret")).to.throw(CredentialsError)
+    })
 
     it("authenticates a user", () => {
         let user: UserDocType | null, userId: { id: string; role: string }
@@ -44,13 +75,13 @@ describe("authenticateUser", () => {
         expect(normalizeUserRole("buyer")).to.equal("regular")
     })
 
-    it("user not found", () => {
+    it("returns generic credentials error when user is not found", () => {
         let error: Error
         return authenticateUser("pepito", "123123123")
             .catch(_error => (error = _error))
             .finally(() => {
-                expect(error).to.be.an.instanceOf(NotFoundError)
-                expect(error.message).to.equal("user not found")
+                expect(error).to.be.an.instanceOf(CredentialsError)
+                expect(error.message).to.equal("wrong credentials")
             })
     })
 

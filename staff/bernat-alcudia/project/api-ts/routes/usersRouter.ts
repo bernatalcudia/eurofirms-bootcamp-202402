@@ -1,13 +1,20 @@
 import express from "express"
 import jwt from "jsonwebtoken"
 import { logic } from "../logic/index.js"
-import { jsonBodyParser } from "../middlewares/jsonBodyParser.js"
+import {
+    authenticationRateLimiter,
+    getAuthContext,
+    registrationRateLimiter,
+    requireAuthentication,
+    smallJsonBodyParser,
+} from "../middlewares/index.js"
+import { errors } from "com"
 
 const { JWT_SECRET } = process.env
 
 export const usersRouter = express.Router()
 
-usersRouter.post("/register", jsonBodyParser, async (req, res, next) => {
+usersRouter.post("/register", registrationRateLimiter, smallJsonBodyParser, async (req, res, next) => {
     try {
         const { name, birthdate, email, username, password } = req.body
 
@@ -19,7 +26,7 @@ usersRouter.post("/register", jsonBodyParser, async (req, res, next) => {
     }
 })
 
-usersRouter.post("/authenticate", jsonBodyParser, async (req, res, next) => {
+usersRouter.post("/authenticate", authenticationRateLimiter, smallJsonBodyParser, async (req, res, next) => {
     try {
         const { username, password } = req.body
 
@@ -30,7 +37,11 @@ usersRouter.post("/authenticate", jsonBodyParser, async (req, res, next) => {
             return
         }
 
-        const token = jwt.sign({ sub: user.id, role: user.role }, JWT_SECRET!, { expiresIn: "60m" })
+        const token = jwt.sign(
+            { sub: user.id, role: user.role },
+            JWT_SECRET!,
+            { algorithm: "HS256", expiresIn: "60m" },
+        )
 
 
         res.status(200).json(token)
@@ -39,18 +50,17 @@ usersRouter.post("/authenticate", jsonBodyParser, async (req, res, next) => {
     }
 })
 
-usersRouter.get("/:targetUserid", async (req, res, next) => {
+usersRouter.get("/:targetUserid", requireAuthentication, async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId, role } = getAuthContext(req)
 
         const { targetUserid } = req.params
+        if (targetUserid !== userId && role !== "admin") {
+            throw new errors.OwnershipError("not allowed to access this user")
+        }
 
-        const user = await logic.retrieveUser(userId as string, targetUserid)
+        const user = await logic.retrieveUser(userId, targetUserid)
 
         if (!user) {
             res.status(404).send()
@@ -63,18 +73,14 @@ usersRouter.get("/:targetUserid", async (req, res, next) => {
     }
 })
 
-usersRouter.patch("/password", jsonBodyParser, async (req, res, next) => {
+usersRouter.patch("/password", requireAuthentication, smallJsonBodyParser, async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { currentPassword, newPassword, newPasswordRepeat } = req.body
 
-        await logic.changeUserPassword(userId as string, currentPassword, newPassword, newPasswordRepeat)
+        await logic.changeUserPassword(userId, currentPassword, newPassword, newPasswordRepeat)
 
         res.status(204).send()
     } catch (error) {

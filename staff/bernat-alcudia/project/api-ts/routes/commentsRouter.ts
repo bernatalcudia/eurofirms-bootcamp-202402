@@ -1,24 +1,18 @@
 import express from "express"
-import jwt from "jsonwebtoken"
 import { logic } from "../logic/index.js"
-import { jsonBodyParser } from "../middlewares/jsonBodyParser.js"
-
-const { JWT_SECRET } = process.env
+import { getAuthContext, requireAuthentication, smallJsonBodyParser } from "../middlewares/index.js"
 
 export const commentsRouter = express.Router()
+commentsRouter.use(requireAuthentication)
 
-commentsRouter.post("/create", jsonBodyParser, async (req, res, next) => {
+commentsRouter.post("/create", smallJsonBodyParser, async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId, text } = req.body
 
-        await logic.createComment(userId as string, productId, text)
+        await logic.createComment(userId, productId, text)
 
         res.status(201).send()
     } catch (error) {
@@ -26,14 +20,10 @@ commentsRouter.post("/create", jsonBodyParser, async (req, res, next) => {
     }
 })
 
-commentsRouter.patch("/:commentId", jsonBodyParser, async (req, res, next) => {
+commentsRouter.patch("/:commentId", smallJsonBodyParser, async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.body
 
@@ -41,7 +31,7 @@ commentsRouter.patch("/:commentId", jsonBodyParser, async (req, res, next) => {
 
         const { text } = req.body
 
-        await logic.modifyComment(userId as string, productId, commentId, text)
+        await logic.modifyComment(userId, productId, commentId, text)
 
         res.status(204).send()
     } catch (error) {
@@ -52,15 +42,11 @@ commentsRouter.patch("/:commentId", jsonBodyParser, async (req, res, next) => {
 commentsRouter.delete("/:productId/:commentId", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId, commentId } = req.params
 
-        await logic.removeComment(userId as string, productId, commentId)
+        await logic.removeComment(userId, productId, commentId)
 
         res.status(204).send()
     } catch (error) {
@@ -70,15 +56,11 @@ commentsRouter.delete("/:productId/:commentId", async (req, res, next) => {
 
 commentsRouter.get("/:productId", async (req, res, next) => {
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.params
 
-        const comments = await logic.retrieveComments(userId as string, productId)
+        const comments = await logic.retrieveComments(userId, productId)
 
         res.status(200).json(comments)
     } catch (error) {

@@ -1,24 +1,18 @@
 import express from "express"
-import jwt from "jsonwebtoken"
 import { logic } from "../logic/index.js"
-import { jsonBodyParser } from "../middlewares/jsonBodyParser.js"
-
-const { JWT_SECRET } = process.env
+import { getAuthContext, jsonBodyParser, requireAuthentication } from "../middlewares/index.js"
 
 export const productsRouter = express.Router()
+productsRouter.use(requireAuthentication)
 
 productsRouter.post("/create", jsonBodyParser, async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { images, title, description, brand, price, state, stock } = req.body
 
-        await logic.createProduct(userId as string, images, title, description, brand, price, state, stock)
+        await logic.createProduct(userId, images, title, description, brand, price, state, stock)
 
         res.status(201).send()
     } catch (error) {
@@ -29,13 +23,9 @@ productsRouter.post("/create", jsonBodyParser, async (req, res, next) => {
 productsRouter.get("/retrieve", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
+        const { userId } = getAuthContext(req)
 
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
-
-        const products = await logic.retrieveProducts(userId as string)
+        const products = await logic.retrieveProducts(userId)
 
         res.status(200).json(products)
     } catch (error) {
@@ -45,15 +35,11 @@ productsRouter.get("/retrieve", async (req, res, next) => {
 
 productsRouter.get("/search", async (req, res, next) => {
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { query } = req.query
 
-        const products = await logic.searchProduct(userId as string, query as string)
+        const products = await logic.searchProduct(userId, query as string)
 
         res.status(200).json(products)
     } catch (error) {
@@ -64,15 +50,11 @@ productsRouter.get("/search", async (req, res, next) => {
 productsRouter.get("/:productId", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.params
 
-        const product = await logic.retrieveProductDetails(userId as string, productId)
+        const product = await logic.retrieveProductDetails(userId, productId)
 
         res.status(200).json(product)
     } catch (error) {
@@ -83,15 +65,11 @@ productsRouter.get("/:productId", async (req, res, next) => {
 productsRouter.delete("/:productId", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.params
 
-        await logic.removeProduct(userId as string, productId)
+        await logic.removeProduct(userId, productId)
 
         res.status(204).send()
     } catch (error) {
@@ -102,17 +80,13 @@ productsRouter.delete("/:productId", async (req, res, next) => {
 productsRouter.patch("/:productId", jsonBodyParser, async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.params
 
         const { images, title, description, brand, price, state, stock } = req.body
 
-        await logic.modifyProduct(userId as string, productId, images, title, description, brand, price, state, stock)
+        await logic.modifyProduct(userId, productId, images, title, description, brand, price, state, stock)
 
         res.status(204).send()
     } catch (error) {
@@ -123,15 +97,11 @@ productsRouter.patch("/:productId", jsonBodyParser, async (req, res, next) => {
 productsRouter.put("/:productId/likes", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.params
 
-        await logic.toggleLikeProduct(userId as string, productId)
+        await logic.toggleLikeProduct(userId, productId)
 
         res.status(204).send()
     } catch (error) {
@@ -142,15 +112,11 @@ productsRouter.put("/:productId/likes", async (req, res, next) => {
 productsRouter.put("/:productId/saved", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
-
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
+        const { userId } = getAuthContext(req)
 
         const { productId } = req.params
 
-        await logic.toggleSaveProduct(userId as string, productId)
+        await logic.toggleSaveProduct(userId, productId)
 
         res.status(204).send()
     } catch (error) {
@@ -161,13 +127,9 @@ productsRouter.put("/:productId/saved", async (req, res, next) => {
 productsRouter.get("/:userId/saved", async (req, res, next) => {
 
     try {
-        const { authorization } = req.headers
+        const { userId } = getAuthContext(req)
 
-        const token = authorization!.slice(7)
-
-        const { sub: userId } = jwt.verify(token, JWT_SECRET!)
-
-        const saved = await logic.retrieveSavedProducts(userId as string)
+        const saved = await logic.retrieveSavedProducts(userId)
 
         res.status(200).json(saved)
     } catch (error) {

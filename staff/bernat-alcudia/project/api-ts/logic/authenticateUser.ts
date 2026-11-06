@@ -4,7 +4,7 @@ import { User } from "../data/models.js"
 import { AuthenticateUser } from "./types.js"
 import { normalizeUserRole } from "./normalizeUserRole.js"
 
-const { SystemError, NotFoundError, CredentialsError } = errors
+const { SystemError, CredentialsError } = errors
 
 export const authenticateUser: AuthenticateUser = (username: string, password: string) => {
     validate.username(username, "username")
@@ -13,7 +13,7 @@ export const authenticateUser: AuthenticateUser = (username: string, password: s
     return User.findOne({ username })
         .catch(error => { throw new SystemError(error.message) })
         .then(user => {
-            if (!user) throw new NotFoundError("user not found")
+            if (!user) throw new CredentialsError("wrong credentials")
 
             return bcrypt.compare(password, user.password)
                 .catch(error => { throw new SystemError(error.message) })
