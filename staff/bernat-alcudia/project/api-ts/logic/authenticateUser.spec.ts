@@ -3,8 +3,6 @@ import bcrypt from "bcrypt"
 import { expect } from "chai"
 import { UserDocType, User } from "../data/models"
 import { authenticateUser } from "./authenticateUser"
-import { normalizeUserRole } from "./normalizeUserRole.js"
-import { normalizeLegacyUserRoles } from "../data/normalizeLegacyUserRoles.js"
 import { verifyAccessToken } from "../middlewares/authentication.js"
 import jwt from "jsonwebtoken"
 import { errors } from "com"
@@ -27,7 +25,7 @@ describe("authenticateUser", () => {
         }
     })
 
-    it("normalizes legacy access tokens and rejects invalid tokens", () => {
+    it("rejects roles outside the supported set", () => {
         const secret = "test-only-signing-secret"
         const userId = "0123456789abcdef01234567"
         const legacyToken = jwt.sign({ sub: userId, role: "seller" }, secret)
@@ -37,7 +35,7 @@ describe("authenticateUser", () => {
         const wrongAlgorithm = jwt.sign({ sub: userId, role: "regular" }, secret, { algorithm: "HS512" })
         const validToken = jwt.sign({ sub: userId, role: "regular" }, secret)
 
-        expect(verifyAccessToken(legacyToken, secret)).to.deep.equal({ userId, role: "regular" })
+        expect(() => verifyAccessToken(legacyToken, secret)).to.throw(CredentialsError)
         expect(() => verifyAccessToken("invalid", secret)).to.throw(CredentialsError)
         expect(() => verifyAccessToken(expiredToken, secret)).to.throw(CredentialsError)
         expect(() => verifyAccessToken(invalidClaims, secret)).to.throw(CredentialsError)
@@ -69,43 +67,6 @@ describe("authenticateUser", () => {
         })
             .then(() => authenticateUser("admin", "123123123"))
             .then(user => expect(user.role).to.equal("admin"))
-    })
-
-    it("maps legacy roles to regular", () => {
-        expect(normalizeUserRole("seller")).to.equal("regular")
-        expect(normalizeUserRole("buyer")).to.equal("regular")
-    })
-
-    it("migrates persisted legacy roles before future user updates", async () => {
-        const collection = mongoose.connection.collection("users")
-        await collection.insertMany([
-            {
-                name: "legacy buyer",
-                birthdate: new Date("1970-05-07"),
-                email: "legacy-buyer@gmail.com",
-                username: "legacy-buyer",
-                password: "hashed-password",
-                role: "buyer",
-                saved: [],
-            },
-            {
-                name: "legacy seller",
-                birthdate: new Date("1970-05-07"),
-                email: "legacy-seller@gmail.com",
-                username: "legacy-seller",
-                password: "hashed-password",
-                role: "seller",
-                saved: [],
-            },
-        ])
-
-        const migratedCount = await normalizeLegacyUserRoles()
-        const migratedUsers = await collection.find({
-            username: { $in: ["legacy-buyer", "legacy-seller"] },
-        }).toArray()
-
-        expect(migratedCount).to.equal(2)
-        expect(migratedUsers.map(user => user.role)).to.deep.equal(["regular", "regular"])
     })
 
     it("returns generic credentials error when user is not found", () => {

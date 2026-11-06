@@ -3,7 +3,6 @@ import { CredentialsError } from "com/errors"
 import type { NextFunction, Request, Response } from "express"
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import type { UserRole } from "../data/models.js"
-import { normalizeUserRole } from "../logic/normalizeUserRole.js"
 
 export interface AuthContext {
     userId: string
@@ -38,16 +37,10 @@ export function verifyAccessToken(token: string, secret: string): AuthContext {
         throw new CredentialsError("invalid token claims")
     }
 
-    let role: UserRole
-    try {
-        role = normalizeUserRole(payload.role)
-    } catch (error) {
-        if (error instanceof errors.ValidationError) {
-            throw new CredentialsError("invalid token claims")
-        }
-        throw error
+    if (payload.role !== "admin" && payload.role !== "regular") {
+        throw new CredentialsError("invalid token claims")
     }
-
+    const role: UserRole = payload.role
     return { userId: payload.sub, role }
 }
 

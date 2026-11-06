@@ -6,7 +6,6 @@ import { usersRouter } from "./routes/usersRouter"
 import { productsRouter } from "./routes/productsRouter"
 import { commentsRouter } from "./routes/commentsRouter"
 import { apiRateLimiter, errorHandler } from "./middlewares"
-import { normalizeLegacyUserRoles } from "./data/normalizeLegacyUserRoles"
 
 const { MONGO_URL, PORT, JWT_SECRET, CORS_ORIGINS } = process.env
 
@@ -31,9 +30,6 @@ async function start(): Promise<void> {
         : ["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:19006"]
 
     await mongoose.connect(mongoUrl)
-    const migratedUsers = await normalizeLegacyUserRoles()
-    if (migratedUsers > 0) console.info(`Normalized ${migratedUsers} legacy user role(s).`)
-
     const api = express()
 
     api.disable("x-powered-by")

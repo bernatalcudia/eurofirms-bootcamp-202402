@@ -115,7 +115,6 @@ function getUserRole(): UserRole {
   validate.token(token)
   const { role } = utils.extractPayload(token)
   if (role === "admin" || role === "regular") return role
-  if (role === "seller" || role === "buyer") return "regular"
   throw new errors.ValidationError("invalid user role in token")
 }
 
