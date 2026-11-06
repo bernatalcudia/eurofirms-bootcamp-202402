@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { errors } from 'com'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -9,6 +9,7 @@ import logic from '../logic';
 import Comments from './Comments';
 import type { Product, User } from '../types/models'
 import type { TabNavigation } from '../types/navigation'
+import { useLanguage } from '../i18n/LanguageContext'
 
 interface ProductsProps {
     searchQuery: string
@@ -17,11 +18,14 @@ interface ProductsProps {
 function Products({ searchQuery }: ProductsProps) {
     const [products, setProducts] = useState<Product[]>([])
     const [user, setUser] = useState<User>()
+    const [isLoading, setIsLoading] = useState(true)
+    const [loadError, setLoadError] = useState(false)
 
     const [commentsProductId, setCommentsProductId] = useState('')
     const [viewComments, setViewComments] = useState(false)
 
     const navigation = useNavigation<TabNavigation>()
+    const { language, t } = useLanguage()
 
 
 
@@ -35,24 +39,16 @@ function Products({ searchQuery }: ProductsProps) {
                 .then(user => setUser(user))
                 .catch(error => {
                     console.error(error)
-                    let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-                    if (error instanceof errors.ValidationError)
-                        feedback = `${feedback}, please correct it`
-                    else
-                        feedback = 'sorry,there was an error,please try again later'
+                    alert(error instanceof errors.ValidationError
+                        ? t('Please correct the highlighted information and try again.')
+                        : t('Something went wrong. Please try again.'))
                 })
 
         } catch (error) {
             console.error(error)
-            let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-            if (error instanceof errors.ValidationError)
-                feedback = `${feedback}, please correct it`
-            else
-                feedback = 'sorry,there was an error,please try again later'
-
-            alert(feedback)
+            alert(error instanceof errors.ValidationError
+                ? t('Please correct the highlighted information and try again.')
+                : t('Something went wrong. Please try again.'))
         }
     }, [])
 
@@ -90,12 +86,12 @@ function Products({ searchQuery }: ProductsProps) {
                 .catch(error => {
                     console.error(error)
 
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    alert(t('Something went wrong. Please try again.'))
                 })
         } catch (error) {
             console.error(error)
 
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            alert(t('Something went wrong. Please try again.'))
         }
     }
     const handleToggleLikeProduct = (productId: string) => {
@@ -105,12 +101,12 @@ function Products({ searchQuery }: ProductsProps) {
                 .catch(error => {
                     console.error(error)
 
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    alert(t('Something went wrong. Please try again.'))
                 })
         } catch (error) {
             console.error(error)
 
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            alert(t('Something went wrong. Please try again.'))
         }
     }
 
@@ -123,6 +119,8 @@ function Products({ searchQuery }: ProductsProps) {
     }
 
     const searchProducts = (searchQuery: string) => {
+        setIsLoading(true)
+        setLoadError(false)
         try {
             logic.searchProducts(searchQuery) //I return the products searched
                 .then(products => {
@@ -130,29 +128,31 @@ function Products({ searchQuery }: ProductsProps) {
                 })
                 .catch(error => {
                     console.error(error)
-
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    setLoadError(true)
                 })
+                .finally(() => setIsLoading(false))
         } catch (error) {
             console.error(error)
-
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            setLoadError(true)
+            setIsLoading(false)
         }
     }
 
     const refreshProducts = () => {
+        setIsLoading(true)
+        setLoadError(false)
         try {
             logic.retrieveProducts() //I return the products
                 .then(products => setProducts(products))
                 .catch(error => {
                     console.error(error)
-
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    setLoadError(true)
                 })
+                .finally(() => setIsLoading(false))
         } catch (error) {
             console.error(error)
-
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            setLoadError(true)
+            setIsLoading(false)
         }
     }
 
@@ -180,10 +180,14 @@ function Products({ searchQuery }: ProductsProps) {
             justifyContent: 'center',
             alignItems: 'center',
             paddingTop: 20,
+            paddingHorizontal: 12,
         },
         productContainer: {
             padding: 20,
             marginBottom: 15,
+            alignSelf: 'center',
+            maxWidth: 680,
+            width: '100%',
             backgroundColor: '#ffffff',
             borderRadius: 12,
             shadowColor: '#000',
@@ -262,19 +266,71 @@ function Products({ searchQuery }: ProductsProps) {
         },
 
         buttonText: { fontSize: 18, textAlign: 'center', color: 'black' }
+        ,
+        emptyState: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 280,
+            padding: 28,
+        },
+        emptyTitle: {
+            color: '#0f172a',
+            fontSize: 20,
+            fontWeight: '700',
+            marginBottom: 8,
+            textAlign: 'center',
+        },
+        emptyMessage: {
+            color: '#64748b',
+            fontSize: 15,
+            lineHeight: 22,
+            textAlign: 'center',
+        },
+        retryButton: {
+            backgroundColor: '#0f766e',
+            borderRadius: 10,
+            marginTop: 16,
+            paddingHorizontal: 18,
+            paddingVertical: 11,
+        },
+        retryText: {
+            color: '#ffffff',
+            fontWeight: '700',
+        }
     });
 
     return (
         <View style={styles.mainContainer}>
 
-            <ScrollView >
+            <ScrollView contentContainerStyle={products.length === 0 ? styles.emptyState : undefined}>
 
-
-                {products.map(product => {
+                {isLoading ? (
+                    <View style={styles.emptyState} accessibilityRole='progressbar'>
+                        <ActivityIndicator size='large' color='#0f766e' />
+                        <Text style={styles.emptyMessage}>{t('Loading products…')}</Text>
+                    </View>
+                ) : loadError ? (
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyTitle}>{t('Could not load products.')}</Text>
+                        <TouchableOpacity style={styles.retryButton} onPress={searchQuery ? () => searchProducts(searchQuery) : refreshProducts} accessibilityRole='button'>
+                            <Text style={styles.retryText}>{t('Retry')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : products.length === 0 ? (
+                    <View style={styles.emptyState}>
+                        <MaterialCommunityIcons name='shopping-outline' size={46} color='#94a3b8' />
+                        <Text style={styles.emptyTitle}>{searchQuery ? t('No products found') : t('No products yet')}</Text>
+                        <Text style={styles.emptyMessage}>{searchQuery ? t('Try another search or clear the search field.') : t('Be the first to share something with the community.')}</Text>
+                    </View>
+                ) : products.map(product => {
                     const isLiked = product.liked ?? product.likes?.includes(logic.getLoggedInUserId()) ?? false
                     const isSaved = user?.saved?.includes(product.id) ?? false
                     const likeCount = product.likeCount ?? product.likes?.length ?? 0
-                    const accessibilityImageLabel = product.images[0] ? `Product image: ${product.title}` : 'No image available for this product.'
+                    const accessibilityImageLabel = product.images[0] ? t('Product image of {title}', { title: product.title }) : t('No image available for this product.')
+                    const formattedPrice = new Intl.NumberFormat(language === 'es' ? 'es-ES' : 'en-IE', {
+                        style: 'currency',
+                        currency: 'EUR',
+                    }).format(product.price)
 
                     return (
                         <View style={styles.productContainer} key={product.id} >
@@ -283,28 +339,30 @@ function Products({ searchQuery }: ProductsProps) {
 
                             <View style={styles.productInfoContainer} key={product.id}>
 
-                                <TouchableOpacity onPress={() => handleProductDetail(product.id)} accessibilityLabel={`View details for product ${product.title}`} accessibilityRole='button'>
+                                <TouchableOpacity onPress={() => handleProductDetail(product.id)} accessibilityLabel={t('View details for product {title}', { title: product.title })} accessibilityRole='button'>
                                     <Text style={styles.productTitle} >{product.title}</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.productBrand} accessibilityLabel={`Brand: ${product.brand}`} >{product.brand}</Text>
-                                <Text style={styles.productPrice} accessibilityLabel={`Price: ${product.price} euros`}>Price: {product.price}€</Text>
-                                <Text style={styles.productState} accessibilityLabel={`Condition: ${product.state}`}>State: {product.state}</Text>
+                                <Text style={styles.productBrand} accessibilityLabel={`${t('Brand')}: ${product.brand}`}>{product.brand}</Text>
+                                <Text style={styles.productPrice} accessibilityLabel={t('Price: {price} euros', { price: product.price })}>{formattedPrice}</Text>
+                                <Text style={styles.productState} accessibilityLabel={t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}>{t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}</Text>
 
                             </View>
                             <View style={styles.actionsContainer}>
                                 <View style={styles.likeContainer}>
-                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPress={() => handleToggleLikeProduct(product.id)} accessibilityLabel={isLiked ? `Unlike ${product.title}. Currently has ${likeCount} likes.` : `Like ${product.title}. Currently has ${likeCount} likes.`} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
+                                    <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPress={() => handleToggleLikeProduct(product.id)} accessibilityLabel={t(isLiked ? 'Unlike {title}. Currently has {count} likes.' : 'Like {title}. Currently has {count} likes.', { title: product.title, count: likeCount })} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
                                         <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
                                     </TouchableOpacity>
-                                    <Text style={styles.likeCountText} accessibilityLabel={`${likeCount} likes`} >{likeCount}</Text>
+                                    <Text style={styles.likeCountText} accessibilityLabel={t('{count} likes', { count: likeCount })}>{likeCount}</Text>
                                 </View>
-                                <View style={styles.commentsContainer} accessibilityLabel={`View comments for product ${product.title}. Has ${product.commentCount} comments.`} accessibilityRole='button'>
+                                <View style={styles.commentsContainer} accessibilityLabel={product.commentCount === 1
+                                    ? t('View comments for product {title}. Has 1 comment.', { title: product.title })
+                                    : t('View comments for product {title}. Has {count} comments.', { title: product.title, count: product.commentCount ?? 0 })} accessibilityRole='button'>
                                     <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>
                                         <MaterialCommunityIcons name='comment-multiple-outline' size={25} color='#607d8b' />
                                     </TouchableOpacity>
-                                    <Text style={styles.commentsCountText} accessibilityLabel={`${product.commentCount ?? 0} comments`} >{product.commentCount ?? 0} </Text>
+                                    <Text style={styles.commentsCountText} accessibilityLabel={product.commentCount === 1 ? t('1 comment') : t('{count} comments', { count: product.commentCount ?? 0 })}>{product.commentCount ?? 0}</Text>
                                 </View>
-                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPress={() => handleToggleSavedProduct(product.id)} accessibilityLabel={isSaved ? `Unsave ${product.title}` : `Save ${product.title}`} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
+                                <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPress={() => handleToggleSavedProduct(product.id)} accessibilityLabel={t(isSaved ? 'Unsave {title}' : 'Save {title}', { title: product.title })} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
                                 </TouchableOpacity>
                             </View>
@@ -316,7 +374,7 @@ function Products({ searchQuery }: ProductsProps) {
             {/* OVERLAY */}
 
             {
-                commentsProductId && (
+                commentsProductId.length > 0 && (
                     <Comments
                         productId={commentsProductId}
                         visible={viewComments}

@@ -1,10 +1,11 @@
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native'
+import { Alert, Platform, StyleSheet, View, Text, TouchableOpacity, TextInput } from 'react-native'
 import { useEffect, useState } from 'react';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import logic from '../logic'
 import type { Comment as ProductComment } from '../types/models'
+import { useLanguage } from '../i18n/LanguageContext'
 
 interface CommentProps {
     item: ProductComment
@@ -15,6 +16,7 @@ interface CommentProps {
 function Comment({ item: comment, onCommentDeleted, onCommentModified }: CommentProps) {
     const [showEdit, setShowEdit] = useState(false)
     const [newComment, setNewComment] = useState(comment.text)
+    const { t } = useLanguage()
 
     useEffect(() => {
         if (!showEdit) {
@@ -94,66 +96,65 @@ function Comment({ item: comment, onCommentDeleted, onCommentModified }: Comment
         },
     })
 
-    const showAlert = (title: string, message: string) => {
-        Alert.alert(title, message)
+    const showAlert = (message: string) => {
+        Alert.alert(t('Error'), message)
     }
-
 
     const handleDeleteComment = () => {
-        try {
-            logic.removeComment(comment.product, comment.id)//Delete comment
-                .then(() => {
-                    showAlert('Success', 'Comment deleted successfully!')
-                    onCommentDeleted()
-                })
-                .catch(error => {
-                    console.error('Error deleting comment:', error)
-                    showAlert('Error', error.message || 'Failed to delete comment')
-                })
-
-        } catch (error) {
-            console.error('Caught error deleting comment:', error)
-
-            showAlert('Error', error instanceof Error ? error.message : 'An unexpected error occurred.')
+        const removeComment = () => {
+            try {
+                logic.removeComment(comment.product, comment.id)
+                    .then(() => {
+                        onCommentDeleted()
+                    })
+                    .catch(error => {
+                        console.error('Error deleting comment:', error)
+                        showAlert(error instanceof Error ? error.message : t('Unexpected error'))
+                    })
+            } catch (error) {
+                console.error('Caught error deleting comment:', error)
+                showAlert(error instanceof Error ? error.message : t('Unexpected error'))
+            }
         }
-    }
 
+        if (Platform.OS === 'web') {
+            if (globalThis.confirm(t('Are you sure you want to delete this comment?'))) removeComment()
+            return
+        }
+
+        Alert.alert(t('Delete comment'), t('Are you sure you want to delete this comment?'), [
+            { text: t('No'), style: 'cancel' },
+            { text: t('Delete'), style: 'destructive', onPress: removeComment },
+        ])
+    }
 
     const handleCommentTextChange = (text: string) => {
         setNewComment(text)
     }
 
     const handleSaveModifiedComment = () => {
-        if (newComment.trim() === '') {
-            showAlert('Validation Error', 'Comment cannot be empty.');
+        const updatedText = newComment.trim()
+        if (!updatedText) {
+            showAlert(t('Comment cannot be blank.'))
             return
         }
-        if (newComment.trim() === comment.text) {
-            showAlert('Info', 'No changes made to the comment.');
-            setShowEdit(false);
+        if (updatedText === comment.text) {
+            setShowEdit(false)
             return
         }
-        handleModifiedComment()
-        setShowEdit(false)
-    }
-
-    const handleModifiedComment = () => {
         try {
-            logic.modifyComment(comment.product, comment.id, newComment)//Modified comment
+            logic.modifyComment(comment.product, comment.id, updatedText)
                 .then(() => {
-                    alert('modified comment')
-                    onCommentModified(comment.id, newComment)
+                    onCommentModified(comment.id, updatedText)
+                    setShowEdit(false)
                 })
                 .catch(error => {
                     console.error(error)
-
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    showAlert(error instanceof Error ? error.message : t('Unexpected error'))
                 })
-
         } catch (error) {
             console.error(error)
-
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            showAlert(error instanceof Error ? error.message : t('Unexpected error'))
         }
     }
 
@@ -163,52 +164,47 @@ function Comment({ item: comment, onCommentDeleted, onCommentModified }: Comment
     }
 
     const handleCancelEdit = () => {
-        setShowEdit(false);
+        setShowEdit(false)
         setNewComment(comment.text)
-    };
+    }
 
-
+    const authorName = typeof comment.author === 'string' ? t('Username') : comment.author.username || t('Username')
 
     return (
-        <>
-            <View style={styles.commentItemContainer} accessible={true} accessibilityLabel={`Comment by ${typeof comment.author === 'string' ? 'User' : comment.author.username || 'User'}`}>
-                <View style={styles.header}>
-                    <View style={styles.actionButtonsContainer}>
-                        <Text style={styles.commentAuthor} accessibilityRole='header' aria-level={'3'}>{typeof comment.author === 'string' ? 'User' : comment.author.username || 'User'}</Text>
-                        {comment?.own && !showEdit && (
-                            <View style={styles.actionButtonsContainer}>
-                                <TouchableOpacity style={styles.actionButton} onPress={handleShowEdit} accessibilityLabel='Edit comment' accessibilityHint='Activates to edit mode for the comment' accessibilityRole='button'>
-                                    <MaterialCommunityIcons name='pencil' size={20} color='#007bff' />
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.actionButton} onPress={handleDeleteComment} accessibilityLabel='Delete comment' accessibilityHint='Deletes this comment permanently' accessibilityRole='button'>
-                                    <MaterialCommunityIcons name={'trash-can-outline'} size={20} color={'#dc3545'} />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    </View>
-
-                    {showEdit ? (
-                        <View style={styles.editContainer}>
-                            <TextInput style={styles.textInput} value={newComment} onChangeText={handleCommentTextChange} placeholder='Type new comment' multiline={true} numberOfLines={3} accessibilityLabel='Edit comment text' accessibilityHint='Enter you updated comment here'></TextInput>
-                            <View style={styles.editActions}>
-                                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancelEdit} accessibilityLabel='Cancel editing comment' accessibilityRole='button'>
-                                    <Text style={styles.buttonText}>Cancel</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveModifiedComment} accessibilityLabel='Save modified comment' accessibilityRole='button'>
-                                    <Text style={styles.buttonText}>Save</Text>
-                                </TouchableOpacity>
-                            </View>
+        <View style={styles.commentItemContainer} accessible={true} accessibilityLabel={t('Comment by {username}', { username: authorName })}>
+            <View style={styles.header}>
+                <View style={styles.actionButtonsContainer}>
+                    <Text style={styles.commentAuthor} accessibilityRole='header' aria-level={'3'}>{authorName}</Text>
+                    {comment?.own && !showEdit && (
+                        <View style={styles.actionButtonsContainer}>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleShowEdit} accessibilityLabel={t('Edit comment')} accessibilityRole='button'>
+                                <MaterialCommunityIcons name='pencil' size={20} color='#007bff' />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteComment} accessibilityLabel={t('Delete comment')} accessibilityRole='button'>
+                                <MaterialCommunityIcons name='trash-can-outline' size={20} color='#dc3545' />
+                            </TouchableOpacity>
                         </View>
-
-                    ) : (
-                        <Text style={styles.commentText}>{comment?.text}</Text>
                     )}
                 </View>
 
+                {showEdit ? (
+                    <View style={styles.editContainer}>
+                        <TextInput style={styles.textInput} value={newComment} onChangeText={handleCommentTextChange} placeholder={t('Type your updated comment')} multiline numberOfLines={3} accessibilityLabel={t('Edit comment text')} />
+                        <View style={styles.editActions}>
+                            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancelEdit} accessibilityLabel={t('Cancel editing comment')} accessibilityRole='button'>
+                                <Text style={styles.buttonText}>{t('Cancel')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveModifiedComment} accessibilityLabel={t('Save modified comment')} accessibilityRole='button'>
+                                <Text style={styles.buttonText}>{t('Save')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                ) : (
+                    <Text style={styles.commentText}>{comment?.text}</Text>
+                )}
             </View>
-        </>
+        </View>
     )
-
 }
 
 

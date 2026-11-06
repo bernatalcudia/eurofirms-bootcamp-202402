@@ -5,8 +5,17 @@
     "noEmit": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "types": ["node", "react", "react-native"]
+    "types": [
+      "node",
+      "react",
+      "react-native"
+    ]
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

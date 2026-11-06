@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import logic from '../logic';
 import { errors, utils } from 'com';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import type { DateTimePickerEvent } from '@react-native-community/datetimepicker'
 import type { RootNavigation } from '../types/navigation'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 
@@ -19,10 +20,10 @@ function RegisterUser() {
     const [birthdateInput, setBirthdateInput] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const navigation = useNavigation<RootNavigation>()
-
-
+    const { t } = useLanguage()
 
     const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -44,13 +45,15 @@ function RegisterUser() {
 
     const handleRegister = () => {
         if (!birthdate) {
-            alert('Please select your birthdate')
+            alert(t('Please select a valid birthdate.'))
             return
         }
+        if (isSubmitting) return
+        setIsSubmitting(true)
         try {
             logic.registerUser(name, birthdate.toISOString(), email, username, password)
                 .then(() => {
-                    alert('user registered')
+                    alert(t('Account created. You can now sign in.'))
                     navigation.navigate('LoginUser')
                     setName('')
                     setEmail('')
@@ -60,84 +63,125 @@ function RegisterUser() {
                     setPassword('')
                 })
                 .catch(error => {
-                    console.error(error.message)
-
-                    let feedback = error.message
-
-                    if (error instanceof ValidationError)
-                        feedback = `${feedback}, please correct it`
-                    else if (error instanceof DuplicityError)
-                        feedback = `${feedback},please try with another user`
-                    else
-                        feedback = 'sorry,there was an error,please try again later'
-
+                    console.error(error)
+                    const feedback = error instanceof ValidationError
+                        ? t('Please correct the highlighted information and try again.')
+                        : error instanceof DuplicityError
+                            ? t('That username or email is already in use.')
+                            : t('Something went wrong while creating your account. Please try again.')
                     alert(feedback)
                 })
+                .finally(() => setIsSubmitting(false))
         } catch (error) {
             console.error(error)
-            let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-            if (error instanceof ValidationError)
-                feedback = `${feedback}, please correct it`
-            else if (error instanceof DuplicityError)
-                feedback = `${feedback}, please try with another user`
-            else
-                feedback = 'sorry, there was an error,please try again later'
-
+            setIsSubmitting(false)
+            const feedback = error instanceof ValidationError
+                ? t('Please correct the highlighted information and try again.')
+                : error instanceof DuplicityError
+                    ? t('That username or email is already in use.')
+                    : t('Something went wrong while creating your account. Please try again.')
             alert(feedback)
         }
     };
 
     const styles = StyleSheet.create({
         view: {
-            paddingTop: '20%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 20,
+            flexGrow: 1,
+            padding: 24,
             alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#f1f5f9',
+        },
+        card: {
+            alignItems: 'center',
+            backgroundColor: '#ffffff',
+            borderRadius: 18,
+            elevation: 3,
+            maxWidth: 420,
+            padding: 24,
+            shadowColor: '#0f172a',
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.1,
+            shadowRadius: 12,
+            width: '100%',
+        },
+        heading: {
+            color: '#0f172a',
+            fontSize: 24,
+            fontWeight: '700',
+            marginBottom: 8,
+            textAlign: 'center',
+        },
+        subtitle: {
+            color: '#64748b',
+            fontSize: 15,
+            marginBottom: 18,
+            textAlign: 'center',
         },
         input: {
-            width: '80%',
-            padding: 10,
-            marginVertical: 10,
+            width: '100%',
+            paddingHorizontal: 14,
+            paddingVertical: 13,
+            marginBottom: 12,
             borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 5,
+            borderColor: '#cbd5e1',
+            borderRadius: 10,
+            backgroundColor: '#ffffff',
+            fontSize: 16,
         },
         button: {
-            width: '80%',
-            padding: 15,
-            backgroundColor: 'black',
-            borderRadius: 5,
+            width: '100%',
+            padding: 14,
+            backgroundColor: '#0f766e',
+            borderRadius: 10,
+            marginTop: 6,
         },
         buttonText: {
             color: '#fff',
             fontSize: 16,
-            alignSelf: 'center'
+            fontWeight: '700',
+            textAlign: 'center',
         },
     })
 
-    return <View style={styles.view}>
-        <TextInput style={styles.input} placeholder='name' value={name} onChangeText={setName} />
-        <TextInput style={styles.input} placeholder='email' value={email} onChangeText={setEmail} />
-
-        <TextInput style={styles.input} placeholder='username' value={username} onChangeText={setUsername} />
-        <TextInput
-            style={styles.input}
-            onPress={() => Platform.OS !== 'web' && setShowDatePicker(true)}
-            onChangeText={Platform.OS === 'web' ? handleBirthdateTextChange : undefined}
-            placeholder={Platform.OS === 'web' ? 'birthdate (YYYY-MM-DD)' : 'birthdate'}
-            value={Platform.OS === 'web' ? birthdateInput : birthdate ? utils.formatDate(birthdate) : ''}
-        />
-        {Platform.OS !== 'web' && showDatePicker && (
-            <DateTimePicker display='spinner' onChange={handleDateChange} value={birthdate || new Date()} />
-
-        )}
-        <TextInput style={styles.input} secureTextEntry={true} placeholder='password' value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>Register </Text>
-        </TouchableOpacity>
-    </View>
+    return (
+        <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
+            <View style={styles.card}>
+                <Text style={styles.heading} accessibilityRole='header'>{t('Create your account')}</Text>
+                <Text style={styles.subtitle}>{t('Join the community and find something you love.')}</Text>
+                <TextInput style={styles.input} placeholder={t('Name')} placeholderTextColor='#64748b' value={name} onChangeText={setName} autoCapitalize='words' accessibilityLabel={t('Name')} />
+                <TextInput style={styles.input} placeholder={t('Email')} placeholderTextColor='#64748b' value={email} onChangeText={setEmail} keyboardType='email-address' autoCapitalize='none' autoCorrect={false} accessibilityLabel={t('Email')} />
+                <TextInput style={styles.input} placeholder={t('Username')} placeholderTextColor='#64748b' value={username} onChangeText={setUsername} autoCapitalize='none' autoCorrect={false} accessibilityLabel={t('Username')} />
+                <TextInput
+                    style={styles.input}
+                    onPress={() => Platform.OS !== 'web' && setShowDatePicker(true)}
+                    onChangeText={Platform.OS === 'web' ? handleBirthdateTextChange : undefined}
+                    placeholder={Platform.OS === 'web' ? t('Birthdate (YYYY-MM-DD)') : t('Choose your birthdate')}
+                    placeholderTextColor='#64748b'
+                    value={Platform.OS === 'web' ? birthdateInput : birthdate ? utils.formatDate(birthdate) : ''}
+                    accessibilityLabel={t('Birthdate')}
+                    accessibilityHint={t('Choose your birthdate')}
+                    editable={Platform.OS === 'web'}
+                />
+                {Platform.OS !== 'web' && showDatePicker && (
+                    <DateTimePicker display='spinner' onChange={handleDateChange} value={birthdate || new Date()} maximumDate={new Date()} />
+                )}
+                <TextInput style={styles.input} secureTextEntry placeholder={t('Password')} placeholderTextColor='#64748b' value={password} onChangeText={setPassword} autoCapitalize='none' accessibilityLabel={t('Password')} textContentType='newPassword' />
+                <TouchableOpacity
+                    style={[styles.button, isSubmitting && { opacity: 0.7 }]}
+                    onPress={handleRegister}
+                    disabled={isSubmitting || !name.trim() || !email.trim() || !username.trim() || !password}
+                    accessibilityRole='button'
+                    accessibilityLabel={t('Register')}
+                    accessibilityState={{ disabled: isSubmitting || !name.trim() || !email.trim() || !username.trim() || !password }}
+                >
+                    {isSubmitting
+                        ? <ActivityIndicator color='#ffffff' />
+                        : <Text style={styles.buttonText}>{t('Register')}</Text>}
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
+    )
 }
 
 export default RegisterUser

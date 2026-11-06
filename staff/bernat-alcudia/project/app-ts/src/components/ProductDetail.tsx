@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Button, Alert, Platform, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Alert, Platform, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import logic from '../logic';
 import { utils } from 'com'
 import { useRoute, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { Product } from '../types/models'
 import type { ProductRoute, RootNavigation } from '../types/navigation'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -155,12 +156,15 @@ const styles = StyleSheet.create({
 
 function ProductDetail() {
     const [product, setProduct] = useState<Product | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [loadError, setLoadError] = useState(false)
 
     const navigation = useNavigation<RootNavigation>()
 
     const route = useRoute<ProductRoute>()
 
     const { id: productId } = route.params
+    const { language, t } = useLanguage()
 
     const handleDeleteProduct = () => {
         const deleteProduct = () => {
@@ -170,30 +174,30 @@ function ProductDetail() {
                     .catch(error => {
                         console.error(error)
 
-                        alert(error instanceof Error ? error.message : 'Unexpected error')
+                        alert(error instanceof Error ? error.message : t('Unexpected error'))
                     })
             } catch (error) {
                 console.error(error)
 
-                alert(error instanceof Error ? error.message : 'Unexpected error')
+                alert(error instanceof Error ? error.message : t('Unexpected error'))
             }
         }
 
         if (Platform.OS === 'web') {
-            if (globalThis.confirm('Are you sure you want to delete this product?')) {
+            if (globalThis.confirm(t('Are you sure you want to delete this product?'))) {
                 deleteProduct()
             }
 
             return
         }
 
-        Alert.alert('Confirm delete product', 'Are you sure you want to delete this product?', [
+        Alert.alert(t('Delete product'), t('Are you sure you want to delete this product?'), [
             {
-                text: 'Cancel',
+                text: t('Cancel'),
                 style: 'cancel',
             },
             {
-                text: 'Delete',
+                text: t('Delete'),
                 onPress: deleteProduct,
                 style: 'destructive',
             },
@@ -205,6 +209,8 @@ function ProductDetail() {
     }
 
     const showProductDetails = () => {
+        setIsLoading(true)
+        setLoadError(false)
         try {
             logic.retrieveProductDetails(productId)
                 .then(product => {
@@ -212,13 +218,13 @@ function ProductDetail() {
                 })
                 .catch(error => {
                     console.error(error)
-
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    setLoadError(true)
                 })
+                .finally(() => setIsLoading(false))
         } catch (error) {
             console.error(error)
-
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            setLoadError(true)
+            setIsLoading(false)
         }
     }
 
@@ -227,45 +233,61 @@ function ProductDetail() {
         showProductDetails()
     }, [productId])
 
-    if (!product) {
+    if (isLoading) {
         return (
-            <View style={styles.loadingContainer} accessible={true} accessibilityLabel='Loading product details' accessibilityRole='alert' >
-                <Text style={styles.loadingText}>Loading details product...</Text>
+            <View style={styles.loadingContainer} accessible={true} accessibilityLabel={t('Loading product details')} accessibilityRole='alert' >
+                <ActivityIndicator size='large' color='#0f766e' />
+                <Text style={styles.loadingText}>{t('Loading product details…')}</Text>
             </View>
         );
     }
 
+    if (loadError || !product) {
+        return (
+            <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>{t('Could not load product details.')}</Text>
+                <TouchableOpacity style={styles.actionButton} onPress={showProductDetails} accessibilityRole='button'>
+                    <Text>{t('Retry')}</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
     const isAuthor = product.own || product.author === logic.getLoggedInUserId()
+    const formattedPrice = new Intl.NumberFormat(language === 'es' ? 'es-ES' : 'en-IE', {
+        style: 'currency',
+        currency: 'EUR',
+    }).format(product.price)
 
     return (
         <View style={styles.mainContainer} accessible={true}>
-            <ScrollView accessibilityLabel='Product details scroll view' accessibilityHint='Scrolls to view more product information.'>
+            <ScrollView accessibilityLabel={t('Product details for {title}', { title: product.title })}>
                 <View style={styles.productCard}>
-                    <ScrollView horizontal style={styles.imageScrollView} accessibilityLabel='Product images' accessibilityHint={`Scrolls horizontally to view ${product.images.length} product images.`}  >
+                    <ScrollView horizontal style={styles.imageScrollView} accessibilityLabel={t('Product images')}>
 
-                        <View style={styles.imageContainer} key={product.id} accessible={true} accessibilityLabel='Product image gallery' >
+                        <View style={styles.imageContainer} key={product.id} accessible={true} accessibilityLabel={t('Product image gallery')}>
                             {product.images.map((image, index) => (
-                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} onError={(error) => console.error('Error loading image:', error)} accessible={true} accessibilityLabel={`${product.title} image ${index + 1} of ${product.images.length}`} accessibilityRole='image' />
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} onError={(error) => console.error('Error loading image:', error)} accessible={true} accessibilityLabel={t('Product image {number} of {count}: {title}', { number: index + 1, count: product.images.length, title: product.title })} accessibilityRole='image' />
                             ))}
                         </View>
                     </ScrollView>
 
                     <View style={styles.infoContainer}>
-                        <Text style={styles.dateText} accessible={true} accessibilityLabel={`Last modified on ${product.date ? utils.formatDate(new Date(product.date)) : ''}`}>Last Modified: {product.date ? utils.formatDate(new Date(product.date)) : ''}</Text>
-                        <Text style={styles.titleText} accessible={true} accessibilityRole='header' accessibilityLabel={`Product name: ${product.title}`}>{product.title}</Text>
-                        <Text style={styles.brandText} accessible={true} accessibilityLabel={`Brand: ${product.brand}`} >{product.brand}</Text>
-                        <Text style={styles.priceText} accessible={true} accessibilityLabel={`Price: ${product.price} euros`} accessibilityValue={{ text: `${product.price} euros` }}>{product.price}€</Text>
-                        <Text style={styles.stateText} accessible={true} accessibilityLabel={`Condition: ${product.state}`}>Condition: {product.state}</Text>
-                        <Text style={styles.stockText} accessible={true} accessibilityLabel={product.stock > 0 ? `Availability: ${product.stock} in stock` : 'Availability: Out of Stock'} accessibilityValue={{ text: product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock' }}>Availability: {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}</Text>
-                        <Text style={styles.descriptionText} accessible={true} accessibilityLabel={`Product description: ${product.description}`}>{product.description}</Text>
+                        <Text style={styles.dateText} accessible={true} accessibilityLabel={t('Last updated: {date}', { date: product.date ? utils.formatDate(new Date(product.date)) : '' })}>{t('Last updated: {date}', { date: product.date ? utils.formatDate(new Date(product.date)) : '' })}</Text>
+                        <Text style={styles.titleText} accessible={true} accessibilityRole='header' accessibilityLabel={t('Product name: {title}', { title: product.title })}>{product.title}</Text>
+                        <Text style={styles.brandText} accessible={true} accessibilityLabel={t('Brand: {brand}', { brand: product.brand })}>{product.brand}</Text>
+                        <Text style={styles.priceText} accessible={true} accessibilityLabel={t('Price: {price} euros', { price: product.price })} accessibilityValue={{ text: t('Price: {price} euros', { price: product.price }) }}>{formattedPrice}</Text>
+                        <Text style={styles.stateText} accessible={true} accessibilityLabel={t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}>{t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}</Text>
+                        <Text style={styles.stockText} accessible={true} accessibilityLabel={product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')} accessibilityValue={{ text: product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock') }}>{product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')}</Text>
+                        <Text style={styles.descriptionText} accessible={true} accessibilityLabel={t('Product description: {description}', { description: product.description })}>{product.description}</Text>
                     </View>
 
                     {isAuthor && (
                         <View style={styles.actionButtonsContainer}>
-                            <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail} accessible={true} accessibilityLabel='Modify product' accessibilityHint='Activates to edit product details.' accessibilityRole='button'>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail} accessible={true} accessibilityLabel={t('Modify product')} accessibilityHint={t('Modify product')} accessibilityRole='button'>
                                 <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct} accessible={true} accessibilityLabel='Delete product' accessibilityHint='Activates to remove this product.' accessibilityRole='button'>
+                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct} accessible={true} accessibilityLabel={t('Delete product')} accessibilityHint={t('Delete product')} accessibilityRole='button'>
                                 <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' />
                             </TouchableOpacity>
                         </View>

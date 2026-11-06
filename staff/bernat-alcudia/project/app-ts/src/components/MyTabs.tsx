@@ -7,10 +7,11 @@ import CreateProduct from './CreateProduct';
 import RetrieveSavedProducts from './RetrieveSavedProducts';
 import SearchProduct from './SearchProducts';
 import Profile from './Profile';
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import logic from '../logic';
 import type { MainTabParamList, RootNavigation } from '../types/navigation'
 import type { User } from '../types/models'
+import { useLanguage } from '../i18n/LanguageContext'
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
 
@@ -18,6 +19,7 @@ function MyTabs() {
     const [, setUser] = useState<User>()
     const [searchQuery, setSearchQuery] = useState('')
     const navigation = useNavigation<RootNavigation>()
+    const { t } = useLanguage()
 
     useEffect(() => {
         try {
@@ -29,32 +31,22 @@ function MyTabs() {
                 .then(user => setUser(user))
                 .catch(error => {
                     console.error(error)
-                    let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-                    if (error instanceof errors.ValidationError)
-                        feedback = `${feedback}, please correct it`
-                    else
-                        feedback = 'sorry,there was an error,please try again later'
-
-                    alert(feedback)
+                    alert(error instanceof errors.ValidationError
+                        ? t('Please correct the highlighted information and try again.')
+                        : t('Something went wrong. Please try again.'))
                 })
 
         } catch (error) {
             console.error(error)
-            let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-            if (error instanceof errors.ValidationError)
-                feedback = `${feedback}, please correct it`
-            else
-                feedback = 'sorry,there was an error,please try again later'
-
-            alert(feedback)
+            alert(error instanceof errors.ValidationError
+                ? t('Please correct the highlighted information and try again.')
+                : t('Something went wrong. Please try again.'))
         }
     }, [])
 
-    const handleSearch = (searchQuery: string) => {
+    const handleSearch = useCallback((searchQuery: string) => {
         setSearchQuery(searchQuery)
-    }
+    }, [])
 
     return (
         <Tab.Navigator
@@ -74,31 +66,29 @@ function MyTabs() {
                     headerStyle: {
                         height: 100,
                     }, headerTitleAlign: 'center',
-                    headerTitle: () => <SearchProduct onSearch={handleSearch} />, tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='home' color={color} size={size} />), tabBarAccessibilityLabel: 'Home tab, displays your main feed',
+                    headerTitle: () => <SearchProduct onSearch={handleSearch} />, tabBarLabel: t('Home'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='home' color={color} size={size} />), tabBarAccessibilityLabel: t('Home tab, displays your main feed'),
                 }}></Tab.Screen>
             <Tab.Screen name='CreateProduct' component={CreateProduct} options={{
-                tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: 'Create Product tab, navigate to add a new product',
+                title: t('Create product'), tabBarLabel: t('Create product'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: t('Create product tab'),
             }}></Tab.Screen>
 
             <Tab.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} options={{
-                tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: 'Saved Products tab, view your saved items',
+                title: t('Saved products'), tabBarLabel: t('Saved'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: t('Saved products tab'),
             }}></Tab.Screen>
 
             <Tab.Screen
                 name='Profile'
                 component={Profile}
                 options={{
-                    tabBarLabel: 'Profile',
-                    tabBarAccessibilityLabel: 'Profile tab, access your account settings and logout',
-                    headerTitle: 'My Profile',
+                    tabBarLabel: t('Profile'),
+                    tabBarAccessibilityLabel: t('Profile and account settings tab'),
+                    headerTitle: t('My profile'),
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name='account-circle' color={color} size={size} />
                     ),
                 }}
             />
-        </Tab.Navigator >
-
-        //TODO add messages tab and profile tab
+        </Tab.Navigator>
     );
 }
 

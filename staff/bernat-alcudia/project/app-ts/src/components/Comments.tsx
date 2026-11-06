@@ -9,6 +9,7 @@ import logic from '../logic';
 
 import Comment from './Comment';
 import type { Comment as ProductComment } from '../types/models'
+import { useLanguage } from '../i18n/LanguageContext'
 
 const screenHeight = Dimensions.get('window').height || 600;
 
@@ -130,6 +131,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
     const [comment, setComment] = useState('')
     const [text, seText] = useState('')
     const commentInputRef = useRef<TextInput | null>(null)
+    const { t } = useLanguage()
 
     useEffect(() => {
 
@@ -180,13 +182,9 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     .then(commentsList => setCommentsList(commentsList))
                     .catch(error => {
                         console.error(error)
-                        let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-                        if (error instanceof errors.ValidationError)
-                            feedback = `${feedback}, please correct it`
-                        else {
-                            feedback = 'sorry,there was an error,please try again later'
-                        }
+                        const feedback = error instanceof errors.ValidationError
+                            ? t('Please correct the highlighted information and try again.')
+                            : t('Something went wrong. Please try again.')
                         alert(feedback)
                         AccessibilityInfo.announceForAccessibility(feedback)
 
@@ -194,12 +192,9 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
 
             } catch (error) {
                 console.error(error)
-                let feedback = error instanceof Error ? error.message : 'Unexpected error'
-
-                if (error instanceof errors.ValidationError)
-                    feedback = `${feedback}, please correct it`
-                else
-                    feedback = 'sorry,there was an error,please try again later'
+                const feedback = error instanceof errors.ValidationError
+                    ? t('Please correct the highlighted information and try again.')
+                    : t('Something went wrong. Please try again.')
 
                 AccessibilityInfo.announceForAccessibility(feedback)
             }
@@ -212,28 +207,27 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
 
     const handleCreateComment = () => {
         if (!comment.trim()) {
-            alert('Comment field is empty')
-            AccessibilityInfo.announceForAccessibility('Comment field is empty')
+            alert(t('Comment cannot be empty.'))
+            AccessibilityInfo.announceForAccessibility(t('Comment cannot be empty.'))
             return
         }
         try {
             logic.createComment(productId, comment)//Create comment
 
                 .then(() => {
-                    alert('comment created')
-                    AccessibilityInfo.announceForAccessibility('comment created')
+                    AccessibilityInfo.announceForAccessibility(t('Comment added.'))
                     onCommentCreated()
                     setComment('')
                     setCommentsRefreshVersion(version => version + 1)
                 })
                 .catch(error => {
                     console.error(error)
-                    alert(error instanceof Error ? error.message : 'Unexpected error')
+                    alert(error instanceof Error ? error.message : t('Unexpected error'))
                 })
         } catch (error) {
             console.error(error)
 
-            alert(error instanceof Error ? error.message : 'Unexpected error')
+            alert(error instanceof Error ? error.message : t('Unexpected error'))
         }
     }
 
@@ -254,7 +248,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                         },
                     ]}
                     accessible={true}
-                    accessibilityLabel='Tap to close comments'
+                    accessibilityLabel={t('Close comments')}
                     accessibilityRole='button'
                     onStartShouldSetResponder={() => {
                         Animated.timing(panY, {
@@ -275,7 +269,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                 ]}
                 {...PanResponders.panHandlers}
                 accessible={true}
-                accessibilityLabel={'Comments section,drag down to close'}
+                accessibilityLabel={t('Comments')}
                 accessibilityRole={'menu'}
             >
                 {/* Drag bar */}
@@ -288,7 +282,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                             useNativeDriver: true,
                         }).start(() => onClose());
                     }}
-                    accessibilityLabel='Drag bar. Tap to close comments.'
+                    accessibilityLabel={t('Close comments')}
                     accessibilityRole='button'
                 />
 
@@ -300,10 +294,10 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                             duration: 300,
                             useNativeDriver: true
                         }).start(() => onClose())
-                    }} style={styles.closeButton} accessibilityLabel='Close comments' accessibilityRole='button'>
+                    }} style={styles.closeButton} accessibilityLabel={t('Close comments')} accessibilityRole='button'>
                         <MaterialCommunityIcons name='chevron-down' size={30} color='black' />
                     </TouchableOpacity>
-                    <Text style={styles.title} accessibilityRole='header'>Comments</Text>
+                    <Text style={styles.title} accessibilityRole='header'>{t('Comments')}</Text>
                 </View>
 
                 {/* Content Scrollable */}
@@ -322,9 +316,9 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     />} keyExtractor={(item) => item.id.toString()}
                         contentContainerStyle={styles.commentsList} ListEmptyComponent={() => (
                             <View style={styles.emptyListContainer}>
-                                <Text style={styles.emptyListText} accessibilityLiveRegion='polite'>Add first comment!</Text>
+                                <Text style={styles.emptyListText} accessibilityLiveRegion='polite'>{t('Add the first comment')}</Text>
                             </View>
-                        )} accessibilityLabel='List of comments' />
+                        )} accessibilityLabel={t('List of comments')} />
                 </View>
 
                 <KeyboardAvoidingView
@@ -332,8 +326,8 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
                 >
                     <View style={styles.inputContainer}>
-                        <TextInput ref={commentInputRef} style={styles.input} placeholder='Add a comment' value={comment} onChangeText={setComment} multiline accessibilityLabel='Comment input field' accessibilityHint='Type your comment here' returnKeyType='send' onSubmitEditing={handleCreateComment} />
-                        <TouchableOpacity style={styles.sendButton} onPress={handleCreateComment} disabled={!comment.trim()} accessibilityLabel={comment.trim() ? 'Send comment' : 'Send comment button,disabled'} >
+                        <TextInput ref={commentInputRef} style={styles.input} placeholder={t('Add a comment')} value={comment} onChangeText={setComment} multiline accessibilityLabel={t('Comment input field')} accessibilityHint={t('Add a comment')} returnKeyType='send' onSubmitEditing={handleCreateComment} />
+                        <TouchableOpacity style={styles.sendButton} onPress={handleCreateComment} disabled={!comment.trim()} accessibilityLabel={t('Send comment')} accessibilityState={{ disabled: !comment.trim() }}>
                             <MaterialCommunityIcons name='send' size={24} color={comment.trim() ? 'black' : '#ccc'}></MaterialCommunityIcons>
                         </TouchableOpacity>
                     </View>

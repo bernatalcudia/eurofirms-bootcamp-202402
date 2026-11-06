@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import logic from '../logic'
 import { View, Image, StyleSheet, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform, Linking } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker'
 import type { RadioButtonProps } from 'react-native-radio-buttons-group'
 import type { ProductState } from '../types/models'
 import type { RootNavigation } from '../types/navigation'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 const styles = StyleSheet.create({
@@ -169,33 +170,38 @@ function CreateProduct({ }) {
     const [price, setPrice] = useState('')
     const [state, setState] = useState<ProductState | null>(null)
     const [stock, setStock] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [selectedId, setSelectedId] = useState('1')
 
     const navigation = useNavigation<RootNavigation>()
+    const { t } = useLanguage()
+    const permissionsRequested = useRef(false)
 
     const radioButtons = useMemo<RadioButtonProps[]>(() => ([
         {
             id: '1',
-            label: 'new',
+            label: t('New'),
             value: 'new',
             selected: true,
-            accessibilityLabel: 'New Condition'
+            accessibilityLabel: t('New condition')
         },
         {
             id: '2',
-            label: 'used',
+            label: t('Used'),
             value: 'used',
             selected: false,
-            accessibilityLabel: 'Used condition'
+            accessibilityLabel: t('Used condition')
         }
-    ]), [])
+    ]), [t])
 
     const selectedRadioButton = radioButtons.find(button => button.id === selectedId)
 
 
 
     useEffect(() => {
+        if (permissionsRequested.current) return
+        permissionsRequested.current = true
         const requestPermissions = async () => {
             try {
                 if (Platform.OS !== 'web') {
@@ -205,15 +211,15 @@ function CreateProduct({ }) {
 
                     if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
                         Alert.alert(
-                            'Permissions Required',
-                            'To use this feature, please grant access to your camera and photo library.',
+                            t('Permission required'),
+                            t('Grant access to your camera and photo library in device settings.'),
                             [
                                 {
-                                    text: 'Cancel',
+                                    text: t('Cancel'),
                                     style: 'cancel'
                                 },
                                 {
-                                    text: 'Open Settings',
+                                    text: t('Open settings'),
                                     onPress: () => Linking.openSettings()
                                 }
                             ],
@@ -224,38 +230,39 @@ function CreateProduct({ }) {
             } catch (error) {
                 console.error('Error requesting permissions:', error)
                 Alert.alert(
-                    'Error',
-                    'Failed to request necessary permissions. Please try again later.'
+                    t('Error'),
+                    t('Grant access to your camera and photo library in device settings.')
                 )
             }
         }
 
         requestPermissions()
-    }, [])
+    }, [t])
 
     const selectImage = async () => {
         try {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
             if (status !== 'granted') {
-                Alert.alert('Permission Denied', 'Please grant access to you media library to select image')
+                Alert.alert(t('Permission denied'), t('Grant access to your photo library to select images.'))
                 return
             }
 
             const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, mediaTypes: ImagePicker.MediaTypeOptions.Images, base64: true })
-            if (result.canceled) {
-                console.log('Image selection cancelled')
-
-            }
+            if (result.canceled) return
             if (result.assets && result.assets.length > 0) {
                 const base64Images = result.assets.map(asset => asset.base64).filter((image): image is string => image !== null)
+                if (images.length + base64Images.length > 10) {
+                    Alert.alert(t('Add photos to continue'), t('You can select up to 10 photos.'))
+                    return
+                }
                 setImages(prevImages => [...prevImages, ...base64Images])
             } else {
-                Alert.alert('No Images Selected', 'It seems no images were picked. Please try again.')
+                Alert.alert(t('No images selected'), t('Image selection failed. Please try again.'))
             }
         } catch (error) {
             console.error('Error selecting image', error)
-            Alert.alert('Error', 'Failed to select images.Please try again later')
+            Alert.alert(t('Error'), t('Image selection failed. Please try again.'))
         }
     }
 
@@ -265,8 +272,8 @@ function CreateProduct({ }) {
 
             if (status !== 'granted') {
                 Alert.alert(
-                    'Permission Denied',
-                    'Please grant camera access to take pictures.'
+                    t('Permission denied'),
+                    t('Grant access to your camera to take a picture.')
                 )
                 return
             }
@@ -277,35 +284,40 @@ function CreateProduct({ }) {
             })
 
             if (result.canceled) {
-                console.log('Camera operation cancelled.')
                 return
             }
 
             if (result.assets && result.assets.length > 0) {
                 const base64Images = result.assets.map(asset => asset.base64).filter((image): image is string => image !== null)
+                if (images.length + base64Images.length > 10) {
+                    Alert.alert(t('Add photos to continue'), t('You can select up to 10 photos.'))
+                    return
+                }
                 setImages(prevImages => [...prevImages, ...base64Images])
             } else {
-                Alert.alert('No Picture Taken', 'It seems no picture was taken. Please try again.')
+                Alert.alert(t('No picture taken'), t('Could not take a picture. Please try again.'))
             }
 
         } catch (error) {
             console.error('Error taking picture:', error)
             Alert.alert(
-                'Error',
-                'Failed to take a picture. Please try again later.'
+                t('Error'),
+                t('Could not take a picture. Please try again.')
             )
         }
     }
 
     const handleCreateProduct = () => {
+        if (isSubmitting) return
+        setIsSubmitting(true)
         try {
-            if (!selectedRadioButton) throw new Error('Select a product condition')
+            if (!selectedRadioButton) throw new Error(t('Select a product condition.'))
             if (selectedRadioButton.value !== 'new' && selectedRadioButton.value !== 'used') {
-                throw new Error('Select a product condition')
+                throw new Error(t('Select a product condition.'))
             }
             logic.createProduct(images, title, description, brand, Number(price), selectedRadioButton.value, Number(stock))
                 .then(() => {
-                    Alert.alert('Success', 'Product created successfully!')
+                    Alert.alert(t('Create product'), t('Product created successfully.'))
                     setImages([])
                     setTitle('')
                     setDescription('')
@@ -317,13 +329,13 @@ function CreateProduct({ }) {
                 })
                 .catch(error => {
                     console.error(error)
-
-                    Alert.alert('Error', error instanceof Error ? error.message : 'Unexpected error')
+                    Alert.alert(t('Error'), t('Please check product details and try again.'))
                 })
+                .finally(() => setIsSubmitting(false))
         } catch (error) {
             console.error(error)
-
-            Alert.alert('Error', error instanceof Error ? error.message : 'Unexpected error')
+            setIsSubmitting(false)
+            Alert.alert(t('Error'), t('Please check product details and try again.'))
         }
     }
 
@@ -339,56 +351,57 @@ function CreateProduct({ }) {
             <View style={styles.container}>
 
 
-                <Text style={styles.sectionTitle} accessibilityRole='header'>Photos</Text>
+                <Text style={styles.sectionTitle} accessibilityRole='header'>{t('Photos')}</Text>
                 <View style={styles.photoActionsContainer}>
-                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityHint='Button to insert images with phone storage' accessibilityLabel='Upload photos from gallery' accessible={true} >
+                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityHint={t('Add photos from gallery')} accessibilityLabel={t('Upload photos')} accessible={true} >
                         <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityElementsHidden={true} ></MaterialCommunityIcons>
-                        <Text style={styles.buttonOutlineText}  >Upload photos</Text>
+                        <Text style={styles.buttonOutlineText}>{t('Upload photos')}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture} accessibilityLabel='Take a new photo' accessibilityHint='Opens your phones camera to take a picture' accessible={true}>
+                    <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={takePicture} accessibilityLabel={t('Take picture')} accessibilityHint={t('Take a new picture')} accessible={true}>
                         <MaterialCommunityIcons name='camera-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityElementsHidden={true}></MaterialCommunityIcons>
-                        <Text style={styles.buttonOutlineText} >Take Picture</Text>
+                        <Text style={styles.buttonOutlineText}>{t('Take picture')}</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.galleryPreview} accessibilityLabel='Selected images preview'>
+                <View style={styles.galleryPreview} accessibilityLabel={t('Product images')}>
                     {images.length > 0 ? images.map((image, index) => (
-                        <View key={index} style={styles.imageContainer} accessible={true} accessibilityLabel={`Product image ${index + 1}`}>
-                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityLabel={`Thumbnail of product image ${index + 1}`} ></Image>
-                            <TouchableOpacity onPress={() => handleDeleteImage(image)} accessibilityLabel={`Remove image ${index + 1}`} accessibilityHint='Deletes this product image' accessible={true}>
-                                <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityHint='icon close-circle' accessible={true} />
+                        <View key={index} style={styles.imageContainer} accessible={true} accessibilityLabel={t('Product image {number}', { number: index + 1 })}>
+                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityLabel={t('Product image {number}', { number: index + 1 })}></Image>
+                            <TouchableOpacity onPress={() => handleDeleteImage(image)} accessibilityLabel={t('Remove image {number}', { number: index + 1 })} accessibilityHint={t('Remove image {number}', { number: index + 1 })} accessible={true}>
+                                <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityHint={t('Close icon')} accessible={true} />
                             </TouchableOpacity>
                         </View>
                     ))
                         :
-                        <View style={styles.placeholderContainer} accessibilityLabel='No images selected yet'>
-                            <Image style={styles.placeholderImage} source={{ uri: 'https://fakeimg.pl/200x200/cccccc/d61a1a?font=bebas' }} accessibilityLabel='Placeholder image for product photos'></Image>
-                            <Text style={styles.placeholderText}>Add up to 10 photos</Text>
+                        <View style={styles.placeholderContainer} accessibilityLabel={t('No images selected yet')}>
+                            <MaterialCommunityIcons name='image-multiple-outline' size={46} color='#94a3b8' />
+                            <Text style={styles.placeholderText}>{t('No images selected yet')}</Text>
+                            <Text style={styles.placeholderText}>{t('Add up to 10 photos')}</Text>
                         </View>
                     }
                 </View>
 
 
-                <Text style={styles.label} nativeID='titleLabel'>Title</Text>
-                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder='Blue Summer Dress' placeholderTextColor={'#aaa'} accessibilityLabel='Product title input' accessibilityHint='Enter the title of your product' />
+                <Text style={styles.label} nativeID='titleLabel'>{t('Title')}</Text>
+                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder={t('Enter product title')} placeholderTextColor={'#aaa'} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
 
-                <Text style={styles.label}>Brand</Text>
-                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder='Zara,H&M,Celio' placeholderTextColor={'#aaa'} accessibilityLabel='Product brand input' accessibilityHint='Enter the brand of your product.  For example, Zara or H&M.' />
+                <Text style={styles.label}>{t('Brand')}</Text>
+                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder={t('Enter product brand')} placeholderTextColor={'#aaa'} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
 
-                <Text style={styles.label}>Price</Text>
-                <TextInput style={styles.input} keyboardType='numeric' value={price} onChangeText={setPrice} placeholder='price' placeholderTextColor={'#aaa'} accessibilityLabel='Product price input' accessibilityHint='Enter the price of your product in numbers' />
+                <Text style={styles.label}>{t('Price')}</Text>
+                <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={setPrice} placeholder={t('Enter price')} placeholderTextColor={'#aaa'} accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
 
-                <Text style={styles.label}>State</Text>
-                <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel='Product condition radio buttons' />
+                <Text style={styles.label}>{t('Condition')}</Text>
+                <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel={t('Product condition selection')} />
 
-                <Text style={styles.label}>Stock</Text>
-                <TextInput style={styles.input} keyboardType='numeric' value={stock} onChangeText={setStock} placeholder='3' placeholderTextColor={'#aaa'} accessibilityLabel='Product stock input' accessibilityHint='Enter the number of items available in stock' />
+                <Text style={styles.label}>{t('Stock')}</Text>
+                <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
 
-                <Text style={styles.label}>Description</Text>
-                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder='Describe your product' placeholderTextColor={'#aaa'} multiline={true} numberOfLines={4} accessibilityLabel='Product description input' accessibilityHint='Provide a detailed description of your product, including features, condition, and any relevant information.' />
+                <Text style={styles.label}>{t('Description')}</Text>
+                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={'#aaa'} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
-                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton]} onPress={handleCreateProduct} accessibilityLabel='Create product button' accessibilityHint='Tap to save and create your product listing' accessible={true}>
-                    <Text style={styles.buttonPrimaryText}>Create</Text>
+                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && { opacity: 0.65 }]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Create listing')} accessibilityHint={t('Create listing')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
+                    <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Create listing')}</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView >

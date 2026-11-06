@@ -1,20 +1,39 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { Alert, Platform, Text, TouchableOpacity, StyleSheet, View } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import logic from '../logic'
 import type { RootNavigation } from '../types/navigation'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 
 function Profile() {
 
     const navigation = useNavigation<RootNavigation>()
+    const { t } = useLanguage()
 
     const styles = StyleSheet.create({
         container: {
             flex: 1,
             backgroundColor: '#f5f5f5',
             padding: 16,
+        },
+        sectionTitle: {
+            color: '#475569',
+            fontSize: 14,
+            fontWeight: '700',
+            marginBottom: 8,
+            maxWidth: 420,
+            width: '100%',
+        },
+        languageHint: {
+            color: '#64748b',
+            fontSize: 13,
+            lineHeight: 19,
+            marginBottom: 8,
+            maxWidth: 420,
+            width: '100%',
         },
         logoutSection: {
             marginTop: 20,
@@ -70,9 +89,20 @@ function Profile() {
 
 
     const handleLogout = () => {
-        logic.logoutUser()
+        const logout = () => {
+            logic.logoutUser()
+            navigation.navigate('LoginUser')
+        }
 
-        navigation.navigate('LoginUser')
+        if (Platform.OS === 'web') {
+            if (globalThis.confirm(t('Are you sure you want to log out?'))) logout()
+            return
+        }
+
+        Alert.alert(t('Confirm sign out'), t('Are you sure you want to log out?'), [
+            { text: t('No'), style: 'cancel' },
+            { text: t('Yes, log out'), style: 'destructive', onPress: logout },
+        ])
     }
 
 
@@ -80,15 +110,18 @@ function Profile() {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.sectionTitle}>{t('Account settings')}</Text>
+            <LanguageSwitcher />
+            <Text style={styles.languageHint}>{t('Language change applies throughout the app and is remembered on this device.')}</Text>
             <View style={styles.actionButtonContainer}>
                 <TouchableOpacity
                     onPress={handleNavigateChangePassword}
                     style={styles.actionButton}
-                    accessibilityLabel='Change your account password'
+                    accessibilityLabel={t('Change password')}
                     accessibilityRole='button'
                 >
                     <MaterialCommunityIcons name='lock-reset' size={24} color={'#424242'} />
-                    <Text style={styles.actionButtonText}>Change Password</Text>
+                    <Text style={styles.actionButtonText}>{t('Change password')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -96,11 +129,11 @@ function Profile() {
                 <TouchableOpacity
                     onPress={handleLogout}
                     style={[styles.actionButton, styles.logoutButton]}
-                    accessibilityLabel='Log out of your account'
+                    accessibilityLabel={t('Log out')}
                     accessibilityRole='button'
                 >
                     <MaterialCommunityIcons name='logout' size={24} color={'#D32F2F'} />
-                    <Text style={styles.logoutButtonText}>Log out</Text>
+                    <Text style={styles.logoutButtonText}>{t('Log out')}</Text>
                 </TouchableOpacity>
             </View>
         </View>
