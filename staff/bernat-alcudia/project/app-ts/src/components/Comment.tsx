@@ -1,4 +1,4 @@
-import { Alert, Platform, StyleSheet, View, Text, TouchableOpacity, TextInput } from 'react-native'
+import { Alert, Platform, View, Text, TouchableOpacity, TextInput } from 'react-native'
 import { useEffect, useState } from 'react';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,6 +7,7 @@ import logic from '../logic'
 import type { Comment as ProductComment } from '../types/models'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
+import createCommentStyles from '../styles/Comment.styles'
 
 interface CommentProps {
     item: ProductComment
@@ -27,78 +28,7 @@ function Comment({ item: comment, onCommentDeleted, onCommentModified }: Comment
     }, [comment.text, showEdit])
 
 
-    const styles = StyleSheet.create({
-        commentItemContainer: {
-            paddingVertical: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
-            paddingHorizontal: 5,
-        },
-        header: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 8,
-        },
-        authorInfo: {
-
-        },
-        commentAuthor: {
-            fontWeight: 'bold',
-            fontSize: 14,
-            color: colors.text,
-        },
-        actionButtonsContainer: {
-            flexDirection: 'row',
-        },
-        actionButton: {
-            padding: 5,
-            marginLeft: 10,
-        },
-        commentText: {
-            fontSize: 14,
-            color: colors.mutedText,
-            lineHeight: 20,
-            paddingLeft: 5,
-        },
-        editContainer: {
-            marginTop: 10,
-        },
-        textInput: {
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 5,
-            paddingHorizontal: 10,
-            paddingVertical: 8,
-            marginBottom: 10,
-            fontSize: 14,
-            textAlignVertical: 'top',
-            backgroundColor: colors.input,
-            color: colors.text,
-        },
-        editActions: {
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-        },
-        button: {
-            paddingVertical: 8,
-            paddingHorizontal: 15,
-            borderRadius: 5,
-            marginLeft: 10,
-            alignItems: 'center',
-        },
-        saveButton: {
-            backgroundColor: colors.primary,
-        },
-        cancelButton: {
-            backgroundColor: colors.surfaceAlt,
-        },
-        buttonText: {
-            color: colors.onPrimary,
-            fontWeight: 'bold',
-            fontSize: 14,
-        },
-    })
+    const styles = createCommentStyles(colors)
 
     const showAlert = (message: string) => {
         Alert.alert(t('Error'), message)
@@ -196,7 +126,7 @@ function Comment({ item: comment, onCommentDeleted, onCommentModified }: Comment
                         <TextInput style={styles.textInput} value={newComment} onChangeText={handleCommentTextChange} placeholder={t('Type your updated comment')} multiline numberOfLines={3} accessibilityLabel={t('Edit comment text')} />
                         <View style={styles.editActions}>
                             <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancelEdit} accessibilityLabel={t('Cancel editing comment')} accessibilityRole='button'>
-                                <Text style={[styles.buttonText, { color: colors.text }]}>{t('Cancel')}</Text>
+                                <Text style={[styles.buttonText, styles.cancelButtonText]}>{t('Cancel')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveModifiedComment} accessibilityLabel={t('Save modified comment')} accessibilityRole='button'>
                                 <Text style={styles.buttonText}>{t('Save')}</Text>

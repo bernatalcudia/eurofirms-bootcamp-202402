@@ -1,4 +1,4 @@
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
@@ -7,6 +7,7 @@ import type { RootNavigation } from '../types/navigation'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../i18n/LanguageContext'
 import { themeColors, useTheme, type ThemeName } from '../theme/ThemeContext'
+import createProfileStyles, { getPaletteSwatchStyle } from '../styles/Profile.styles'
 
 function Profile() {
     const navigation = useNavigation<RootNavigation>()
@@ -14,28 +15,7 @@ function Profile() {
     const { theme, colors, setTheme } = useTheme()
     const [expandedSection, setExpandedSection] = useState<'language' | 'appearance' | null>(null)
 
-    const styles = StyleSheet.create({
-        container: { flexGrow: 1, backgroundColor: colors.background, padding: 20, alignItems: 'center' },
-        content: { width: '100%', maxWidth: 520 },
-        subtitle: { color: colors.mutedText, fontSize: 15, lineHeight: 22, marginBottom: 24 },
-        sectionTitle: { color: colors.mutedText, fontSize: 13, fontWeight: '700', marginBottom: 8, marginTop: 16, textTransform: 'uppercase' },
-        card: { backgroundColor: colors.surface, borderRadius: 16, borderColor: colors.border, borderWidth: 1, overflow: 'hidden' },
-        disclosure: { flexDirection: 'row', alignItems: 'center', minHeight: 58, paddingHorizontal: 16 },
-        disclosureIcon: { marginRight: 12 },
-        disclosureText: { flex: 1, color: colors.text, fontSize: 16, fontWeight: '600' },
-        disclosureContent: { borderTopWidth: 1, borderTopColor: colors.border, padding: 16 },
-        hint: { color: colors.mutedText, fontSize: 14, lineHeight: 20, marginTop: 12 },
-        action: { flexDirection: 'row', alignItems: 'center', minHeight: 56, paddingHorizontal: 16, borderTopWidth: 1, borderTopColor: colors.border },
-        actionText: { color: colors.text, fontSize: 16, fontWeight: '600', marginLeft: 12 },
-        logoutText: { color: colors.danger },
-        themeOptions: { gap: 8 },
-        themeOption: { flexDirection: 'row', alignItems: 'center', padding: 12, borderWidth: 1, borderColor: colors.border, borderRadius: 12 },
-        selectedTheme: { backgroundColor: colors.surfaceAlt, borderColor: colors.primary },
-        themeName: { flex: 1, color: colors.text, fontSize: 15, fontWeight: '700' },
-        themeDescription: { color: colors.mutedText, fontSize: 13, marginTop: 3 },
-        palettePreview: { flexDirection: 'row', gap: 6, marginTop: 8 },
-        paletteSwatch: { width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: colors.border },
-    })
+    const styles = createProfileStyles(colors)
 
     const toggleSection = (section: 'language' | 'appearance') => {
         setExpandedSection(current => current === section ? null : section)
@@ -97,14 +77,14 @@ function Profile() {
                     )}
                     <Pressable
                         onPress={() => toggleSection('appearance')}
-                        style={[styles.disclosure, { borderTopWidth: 1, borderTopColor: colors.border }]}
+                        style={[styles.disclosure, styles.disclosureWithTopBorder]}
                         accessibilityRole='button'
                         accessibilityLabel={t('Choose appearance')}
                         accessibilityState={{ expanded: expandedSection === 'appearance' }}
                     >
                         <MaterialCommunityIcons name='palette-outline' size={22} color={colors.primary} style={styles.disclosureIcon} />
                         <Text style={styles.disclosureText}>{t('Appearance')}</Text>
-                        <Text style={{ color: colors.mutedText, marginRight: 8 }}>{t(theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'Fallera')}</Text>
+                        <Text style={styles.disclosureValue}>{t(theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'Fallera')}</Text>
                         <MaterialCommunityIcons name={expandedSection === 'appearance' ? 'chevron-up' : 'chevron-down'} size={22} color={colors.mutedText} />
                     </Pressable>
                     {expandedSection === 'appearance' && (
@@ -118,12 +98,12 @@ function Profile() {
                                     accessibilityLabel={`${option.title}. ${option.description}`}
                                     accessibilityState={{ selected: theme === option.id }}
                                 >
-                                    <View style={{ flex: 1 }}>
+                                    <View style={styles.themeOptionContent}>
                                         <Text style={styles.themeName}>{option.title}</Text>
                                         <Text style={styles.themeDescription}>{option.description}</Text>
                                         <View style={styles.palettePreview} accessibilityElementsHidden importantForAccessibility='no-hide-descendants'>
                                             {[themeColors[option.id].background, themeColors[option.id].surfaceAlt, themeColors[option.id].primary, themeColors[option.id].accent].map((color, index) => (
-                                                <View key={`${option.id}-${index}`} style={[styles.paletteSwatch, { backgroundColor: color }]} />
+                                                <View key={`${option.id}-${index}`} style={[styles.paletteSwatch, getPaletteSwatchStyle(color)]} />
                                             ))}
                                         </View>
                                     </View>

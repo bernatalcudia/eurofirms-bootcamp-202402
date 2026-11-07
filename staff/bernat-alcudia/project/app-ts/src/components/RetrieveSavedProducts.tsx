@@ -1,100 +1,11 @@
 import logic from '../logic';
 import React, { useEffect, useState } from 'react';
 import { utils } from 'com'
-import { ActivityIndicator, View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import type { Product } from '../types/models'
 import { useLanguage } from '../i18n/LanguageContext'
-import { useTheme, type ThemeColors } from '../theme/ThemeContext'
-
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-
-    centeredContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: colors.background,
-    },
-    productContainer: {
-        marginBottom: 20,
-        backgroundColor: colors.surface,
-        borderRadius: 10,
-        padding: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-
-    },
-
-    imagesScrollViewContainer: {
-        marginBottom: 15,
-    },
-
-
-    image: {
-        width: 150,
-        height: 150,
-        borderRadius: 10,
-        marginLeft: 10,
-        alignSelf: 'center'
-    },
-    dateText: {
-        fontSize: 12,
-        color: colors.mutedText,
-        marginBottom: 5,
-    },
-    titleText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        color: colors.text,
-    },
-    brandText: {
-        fontSize: 16,
-        color: colors.mutedText,
-        marginBottom: 5,
-    },
-    priceText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: colors.primary,
-        marginBottom: 5,
-    },
-    stateText: {
-        fontSize: 14,
-        fontStyle: 'italic',
-        color: colors.mutedText,
-        marginBottom: 3,
-    },
-    stockText: {
-        fontSize: 14,
-        color: colors.mutedText,
-        marginBottom: 3,
-    },
-    descriptionText: {
-        fontSize: 14,
-        color: colors.text,
-        marginTop: 10,
-    },
-    emptyText: {
-        color: colors.text,
-        fontSize: 16,
-        textAlign: 'center',
-    },
-    retryButton: {
-        backgroundColor: colors.primary,
-        borderRadius: 10,
-        marginTop: 16,
-        paddingHorizontal: 18,
-        paddingVertical: 11,
-    },
-    retryText: {
-        color: colors.onPrimary,
-        fontWeight: '700',
-    },
-});
+import { useTheme } from '../theme/ThemeContext'
+import createRetrieveSavedProductsStyles from '../styles/RetrieveSavedProducts.styles'
 
 function RetrieveSavedProducts() {
     const [products, setProducts] = useState<Product[]>([])
@@ -102,7 +13,7 @@ function RetrieveSavedProducts() {
     const [hasError, setHasError] = useState(false)
     const { language, t } = useLanguage()
     const { colors } = useTheme()
-    const styles = createStyles(colors)
+    const styles = createRetrieveSavedProductsStyles(colors)
 
     const showSavedProducts = () => {
         setIsLoading(true)

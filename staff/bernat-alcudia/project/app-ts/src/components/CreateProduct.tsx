@@ -10,7 +10,7 @@ import type { ProductState } from '../types/models'
 import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
-import createCreateProductStyles from './CreateProduct.styles'
+import createCreateProductStyles from '../styles/CreateProduct.styles'
 
 function CreateProduct({ }) {
     const [images, setImages] = useState<string[]>([])
@@ -38,7 +38,7 @@ function CreateProduct({ }) {
             selected: true,
             color: colors.primary,
             borderColor: colors.primary,
-            labelStyle: { color: colors.text },
+            labelStyle: styles.radioLabel,
             accessibilityLabel: t('New condition')
         },
         {
@@ -48,7 +48,7 @@ function CreateProduct({ }) {
             selected: false,
             color: colors.primary,
             borderColor: colors.primary,
-            labelStyle: { color: colors.text },
+            labelStyle: styles.radioLabel,
             accessibilityLabel: t('Used condition')
         }
     ]), [colors.primary, colors.text, t])
@@ -258,7 +258,7 @@ function CreateProduct({ }) {
                 <Text style={styles.label}>{t('Description')}</Text>
                 <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
-                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && { opacity: 0.65 }]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Create listing')} accessibilityHint={t('Create listing')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
+                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && styles.disabledButton]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Create listing')} accessibilityHint={t('Create listing')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
                     <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Create listing')}</Text>
                 </TouchableOpacity>
             </View>

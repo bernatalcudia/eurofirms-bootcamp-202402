@@ -10,7 +10,7 @@ El cliente consume el paquete compartido local `com-ts/` para validaciones, util
 3. Inicia Expo desde `app-ts/` con `npm start`; usa `npm run android`, `npm run ios` o `npm run web` para las plataformas correspondientes.
 4. Comprueba los tipos con `npm run typecheck`.
 
-Los estilos de `CreateProduct` están separados en `src/components/CreateProduct.styles.ts`; reciben la paleta activa para conservar la compatibilidad con los temas.
+Los estilos de pantallas, componentes y navegación están centralizados en `src/styles/`, en módulos por pantalla/componente. Las fábricas de estilos reciben la paleta activa para conservar la compatibilidad con los temas; los estilos de autenticación compartidos se definen en `Auth.styles.ts`.
 
 El cliente consume las rutas de `api-ts/` para registro, autenticación, productos y comentarios. Las pruebas automatizadas de interfaz aún no están configuradas.
 

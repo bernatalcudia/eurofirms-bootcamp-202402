@@ -12,21 +12,19 @@ import RegisterUser from "../pages/RegisterUser"
 import type { RootStackParamList } from "../types/navigation"
 import { useLanguage } from "../i18n/LanguageContext"
 import { useTheme } from "../theme/ThemeContext"
+import { createAppNavigatorStyles } from "../styles/Navigation.styles"
 
 const Stack = createStackNavigator<RootStackParamList>()
 
 export default function AppNavigator() {
   const { t } = useLanguage()
   const { colors } = useTheme()
+  const styles = createAppNavigatorStyles(colors)
 
   return (
     <Stack.Navigator
       initialRouteName="LoginUser"
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.surface },
-        headerTintColor: colors.text,
-        headerTitleStyle: { fontWeight: '700' },
-      }}
+      screenOptions={styles}
     >
       <Stack.Screen name="LoginUser" component={LoginUser} options={{ title: t('Login'), headerShown: false }} />
       <Stack.Screen name="RegisterUser" component={RegisterUser} options={{ title: t('Register') }} />

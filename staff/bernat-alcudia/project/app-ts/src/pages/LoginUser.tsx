@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { errors } from 'com';
@@ -8,6 +8,7 @@ import logic from '../logic';
 import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
+import { authDisabledButton, authLogo, createLoginStyles } from '../styles/Auth.styles'
 
 const { ValidationError, MatchError } = errors
 
@@ -58,84 +59,11 @@ function LoginUser() {
         navigation.navigate('RegisterUser')
     }
 
-    const styles = StyleSheet.create({
-        view: {
-            flexGrow: 1,
-            padding: 24,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.background,
-        },
-        card: {
-            alignItems: 'center',
-            backgroundColor: colors.surface,
-            borderRadius: 18,
-            elevation: 3,
-            maxWidth: 420,
-            padding: 24,
-            shadowColor: colors.text,
-            shadowOffset: { width: 0, height: 3 },
-            shadowOpacity: 0.1,
-            shadowRadius: 12,
-            width: '100%',
-        },
-        heading: {
-            color: colors.text,
-            fontSize: 26,
-            fontWeight: '700',
-            marginBottom: 8,
-            textAlign: 'center',
-        },
-        subtitle: {
-            color: colors.mutedText,
-            fontSize: 15,
-            marginBottom: 20,
-            textAlign: 'center',
-        },
-        input: {
-            width: '100%',
-            paddingHorizontal: 14,
-            paddingVertical: 13,
-            marginBottom: 12,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 10,
-            backgroundColor: colors.input,
-            color: colors.text,
-            fontSize: 16,
-        },
-        button: {
-            width: '100%',
-            padding: 14,
-            backgroundColor: colors.primary,
-            borderRadius: 10,
-            marginTop: 6,
-        },
-        secondaryButton: {
-            width: '100%',
-            padding: 13,
-            borderColor: colors.primary,
-            borderWidth: 1,
-            borderRadius: 10,
-            marginTop: 10,
-        },
-        buttonText: {
-            color: colors.onPrimary,
-            fontSize: 16,
-            fontWeight: '700',
-            textAlign: 'center',
-        },
-        secondaryButtonText: {
-            color: colors.primary,
-            fontSize: 16,
-            fontWeight: '700',
-            textAlign: 'center',
-        },
-    })
+    const styles = createLoginStyles(colors)
 
     return <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
         <View style={styles.card}>
-            <Image source={require('../../assets/bonita-fallera-logo.png')} style={{ width: 190, height: 150, marginBottom: 8 }} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
+            <Image source={require('../../assets/bonita-fallera-logo.png')} style={authLogo} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
             <Text style={styles.heading} accessibilityRole='header'>{t('Welcome back')}</Text>
             <Text style={styles.subtitle}>{t('Sign in to discover products')}</Text>
             <TextInput
@@ -163,7 +91,7 @@ function LoginUser() {
                 onSubmitEditing={handleSubmit}
             />
             <TouchableOpacity
-                style={[styles.button, isSubmitting && { opacity: 0.7 }]}
+                style={[styles.button, isSubmitting && authDisabledButton]}
                 onPress={handleSubmit}
                 disabled={isSubmitting || !username.trim() || !password}
                 accessibilityRole='button'

@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar"
 import AppNavigator from "./src/navigation/AppNavigator"
 import { LanguageProvider } from "./src/i18n/LanguageContext"
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext"
+import { getStatusBarStyle } from "./src/styles/Navigation.styles"
 
 function AppNavigation() {
   const { theme, colors } = useTheme()
@@ -24,7 +25,7 @@ function AppNavigation() {
   return (
     <NavigationContainer theme={navigationTheme}>
       <AppNavigator />
-      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={getStatusBarStyle(theme)} />
     </NavigationContainer>
   )
 }

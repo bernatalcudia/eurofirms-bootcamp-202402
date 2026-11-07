@@ -1,10 +1,9 @@
-import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useTheme } from '../theme/ThemeContext'
-
-
+import createSearchProductsStyles from '../styles/SearchProducts.styles'
 
 interface SearchProductProps {
     onSearch: (query: string) => void
@@ -20,30 +19,7 @@ function SearchProduct({ onSearch }: SearchProductProps) {
         return () => clearTimeout(timeout)
     }, [onSearch, text])
 
-    const styles = StyleSheet.create({
-        input: {
-            flex: 1,
-            paddingHorizontal: 14,
-            paddingVertical: 8,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 10,
-            height: 42,
-            backgroundColor: colors.input,
-            color: colors.text,
-        },
-        view: {
-            alignItems: 'center',
-            flexDirection: 'row',
-            width: '100%',
-            justifyContent: 'center',
-            paddingHorizontal: 16,
-        },
-        clearButton: {
-            marginLeft: 8,
-            padding: 8,
-        }
-    })
+    const styles = createSearchProductsStyles(colors)
 
     return (
         <View style={styles.view}>

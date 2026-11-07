@@ -13,6 +13,7 @@ import type { MainTabParamList, RootNavigation } from '../types/navigation'
 import type { User } from '../types/models'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
+import { createTabNavigatorStyles } from '../styles/Navigation.styles'
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
 
@@ -22,6 +23,7 @@ function MyTabs() {
     const navigation = useNavigation<RootNavigation>()
     const { t } = useLanguage()
     const { colors } = useTheme()
+    const styles = createTabNavigatorStyles(colors)
 
     useEffect(() => {
         try {
@@ -52,34 +54,21 @@ function MyTabs() {
 
     return (
         <Tab.Navigator
-            screenOptions={{
-                tabBarActiveTintColor: colors.primary, tabBarInactiveTintColor: colors.mutedText, tabBarShowLabel: false,
-                tabBarStyle: {
-                    height: 60, paddingBottom: 5, paddingTop: 5,
-                    backgroundColor: colors.surface,
-                    borderTopColor: colors.border,
-                },
-                tabBarLabelStyle: {
-                    fontSize: 12,
-                },
-            }}
+            screenOptions={styles}
 
         >
             <Tab.Screen name='Home' children={() => <Home searchQuery={searchQuery} />}
                 options={{
-                    headerStyle: {
-                        height: 100,
-                        backgroundColor: colors.surface,
-                    }, headerTitleAlign: 'center',
+                    headerStyle: styles.homeHeaderStyle, headerTitleAlign: styles.homeHeaderTitleAlign,
                     headerTitle: () => <SearchProduct onSearch={handleSearch} />, tabBarLabel: t('Home'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='home' color={color} size={size} />), tabBarAccessibilityLabel: t('Home tab, displays your main feed'),
-                    headerTintColor: colors.text,
+                    headerTintColor: styles.headerTintColor,
                 }}></Tab.Screen>
             <Tab.Screen name='CreateProduct' component={CreateProduct} options={{
-                title: t('Create product'), headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text, tabBarLabel: t('Create product'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: t('Create product tab'),
+                title: t('Create product'), headerStyle: styles.headerStyle, headerTintColor: styles.headerTintColor, tabBarLabel: t('Create product'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: t('Create product tab'),
             }}></Tab.Screen>
 
             <Tab.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} options={{
-                title: t('Saved products'), headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text, tabBarLabel: t('Saved'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: t('Saved products tab'),
+                title: t('Saved products'), headerStyle: styles.headerStyle, headerTintColor: styles.headerTintColor, tabBarLabel: t('Saved'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: t('Saved products tab'),
             }}></Tab.Screen>
 
             <Tab.Screen
@@ -89,8 +78,8 @@ function MyTabs() {
                     tabBarLabel: t('Profile'),
                     tabBarAccessibilityLabel: t('Profile and account settings tab'),
                     headerTitle: t('My profile'),
-                    headerStyle: { backgroundColor: colors.surface },
-                    headerTintColor: colors.text,
+                    headerStyle: styles.headerStyle,
+                    headerTintColor: styles.headerTintColor,
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name='account-circle' color={color} size={size} />
                     ),
