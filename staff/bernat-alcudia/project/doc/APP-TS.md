@@ -16,4 +16,4 @@ El registro público crea usuarios con el rol `regular`; no permite elegir ni as
 
 ## Apariencia e idioma
 
-En el perfil se puede desplegar la preferencia de idioma (español o inglés) y elegir entre los temas Claro, Oscuro y Fallera. Las preferencias se guardan en el dispositivo. El tema Fallera usa los colores del logo; las paletas mantienen contraste legible y se aplican también a navegación, formularios y estados de catálogo. El idioma se cambia únicamente desde el perfil.
+En el perfil se puede desplegar la preferencia de idioma (español o inglés) y elegir entre los temas Claro, Oscuro y Fallera. Las preferencias se guardan en el dispositivo. Fallera tiene una paleta propia de tonos cálidos, rosa/burdeos y terracota, diferenciada de Claro y con una muestra visible en el selector. Las paletas mantienen contraste legible y se aplican también a navegación, formularios y estados de catálogo. El idioma se cambia únicamente desde el perfil.

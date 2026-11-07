@@ -6,7 +6,7 @@ import logic from '../logic'
 import type { RootNavigation } from '../types/navigation'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../i18n/LanguageContext'
-import { useTheme, type ThemeName } from '../theme/ThemeContext'
+import { themeColors, useTheme, type ThemeName } from '../theme/ThemeContext'
 
 function Profile() {
     const navigation = useNavigation<RootNavigation>()
@@ -33,6 +33,8 @@ function Profile() {
         selectedTheme: { backgroundColor: colors.surfaceAlt, borderColor: colors.primary },
         themeName: { flex: 1, color: colors.text, fontSize: 15, fontWeight: '700' },
         themeDescription: { color: colors.mutedText, fontSize: 13, marginTop: 3 },
+        palettePreview: { flexDirection: 'row', gap: 6, marginTop: 8 },
+        paletteSwatch: { width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: colors.border },
     })
 
     const toggleSection = (section: 'language' | 'appearance') => {
@@ -119,6 +121,11 @@ function Profile() {
                                     <View style={{ flex: 1 }}>
                                         <Text style={styles.themeName}>{option.title}</Text>
                                         <Text style={styles.themeDescription}>{option.description}</Text>
+                                        <View style={styles.palettePreview} accessibilityElementsHidden importantForAccessibility='no-hide-descendants'>
+                                            {[themeColors[option.id].background, themeColors[option.id].surfaceAlt, themeColors[option.id].primary, themeColors[option.id].accent].map((color, index) => (
+                                                <View key={`${option.id}-${index}`} style={[styles.paletteSwatch, { backgroundColor: color }]} />
+                                            ))}
+                                        </View>
                                     </View>
                                     {theme === option.id && <MaterialCommunityIcons name='check-circle' size={22} color={colors.primary} />}
                                 </Pressable>
