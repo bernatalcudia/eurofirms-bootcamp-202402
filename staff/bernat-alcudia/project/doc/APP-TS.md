@@ -10,6 +10,8 @@ El cliente consume el paquete compartido local `com-ts/` para validaciones, util
 3. Inicia Expo desde `app-ts/` con `npm start`; usa `npm run android`, `npm run ios` o `npm run web` para las plataformas correspondientes.
 4. Comprueba los tipos con `npm run typecheck`.
 
+Los estilos de `CreateProduct` están separados en `src/components/CreateProduct.styles.ts`; reciben la paleta activa para conservar la compatibilidad con los temas.
+
 El cliente consume las rutas de `api-ts/` para registro, autenticación, productos y comentarios. Las pruebas automatizadas de interfaz aún no están configuradas.
 
 El registro público crea usuarios con el rol `regular`; no permite elegir ni asignar `admin`. Las cuentas `admin` deben aprovisionarse por un mecanismo de confianza del servidor. Tanto `regular` como `admin` pueden acceder a la creación de productos. La aplicación solo acepta los roles `regular` y `admin`.
