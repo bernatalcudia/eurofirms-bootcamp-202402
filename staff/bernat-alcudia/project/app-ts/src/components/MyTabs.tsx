@@ -7,6 +7,7 @@ import CreateProduct from './CreateProduct';
 import RetrieveSavedProducts from './RetrieveSavedProducts';
 import SearchProduct from './SearchProducts';
 import Profile from './Profile';
+import ChatInbox from './ChatInbox';
 import React, { useCallback, useState, useEffect } from 'react';
 import logic from '../logic';
 import type { MainTabParamList, RootNavigation } from '../types/navigation'
@@ -64,12 +65,18 @@ function MyTabs() {
                     headerTintColor: styles.headerTintColor,
                 }}></Tab.Screen>
             <Tab.Screen name='CreateProduct' component={CreateProduct} options={{
-                title: t('Create product'), headerStyle: styles.headerStyle, headerTintColor: styles.headerTintColor, tabBarLabel: t('Create product'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: t('Create product tab'),
+                title: t('Create product'), headerStyle: styles.headerStyle, headerTintColor: styles.headerTintColor, tabBarLabel: t('Sell'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='plus-circle-outline' color={color} size={size} />), tabBarAccessibilityLabel: t('Create product tab'),
             }}></Tab.Screen>
 
             <Tab.Screen name='RetrieveSavedProducts' component={RetrieveSavedProducts} options={{
                 title: t('Saved products'), headerStyle: styles.headerStyle, headerTintColor: styles.headerTintColor, tabBarLabel: t('Saved'), tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name='bookmark-multiple' color={color} size={size} />), tabBarAccessibilityLabel: t('Saved products tab'),
             }}></Tab.Screen>
+
+            <Tab.Screen name='Messages' component={ChatInbox} options={{
+                title: t('Messages'), headerStyle: styles.headerStyle, headerTintColor: styles.headerTintColor,
+                tabBarLabel: t('Messages'), tabBarAccessibilityLabel: t('Messages tab'),
+                tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name='message-text-outline' color={color} size={size} />,
+            }} />
 
             <Tab.Screen
                 name='Profile'

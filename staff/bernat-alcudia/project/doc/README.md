@@ -50,7 +50,13 @@ Version 0.1
 
 - `../app/` is the existing Expo client in JavaScript.
 - `../app-ts/` is the TypeScript Expo client. Setup, environment configuration and available platform scripts are documented in [APP-TS.md](./APP-TS.md).
-- Both clients currently target the JavaScript API in `../api/`. The routes in `../api-ts/` differ and are not interchangeable without adapting the client contract.
+- `app/` uses the JavaScript API in `../api/`; `app-ts/` uses the TypeScript API in `../api-ts/`. Their route contracts are separate and must not be mixed.
+
+### Messaging and offers
+
+- Users can start a product-specific conversation with its seller, send messages, and review their conversations in the Messages tab.
+- Either participant can propose a price. Only the other participant can accept or reject a pending offer; only one offer can be awaiting a response at a time.
+- Acceptance records that both users agree on the proposed price. It does not process a payment, complete a sale, or change product stock.
 
 ### Data Model
 
@@ -86,13 +92,14 @@ Version 0.1
 
 #### Message
 - id (auto)
-- from (user.id)
-- to (user.id)
+- from (participant User.id)
 - text (string)
+- date (Date)
 
 #### Chat
-- id (string)
-- userFrom (User.id)
-- userTo (user.id)
-- messages (message[])
-- date (Date)
+- id (auto)
+- product (Product.id)
+- participants (two User.id values)
+- messages (Message[])
+- offers ({ amount, offeredBy, status, date, respondedBy, respondedAt }[])
+- createdAt / updatedAt (Date)

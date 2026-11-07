@@ -42,6 +42,35 @@ type CommentDocType = {
     __v: number
 }
 
+type ChatMessageDocType = {
+    _id: Types.ObjectId
+    from: Types.ObjectId
+    text: string
+    date: Date
+}
+
+type ChatOfferDocType = {
+    _id: Types.ObjectId
+    amount: number
+    offeredBy: Types.ObjectId
+    status: "pending" | "accepted" | "rejected"
+    date: Date
+    respondedBy?: Types.ObjectId
+    respondedAt?: Date
+}
+
+type ChatDocType = {
+    _id: Types.ObjectId
+    key: string
+    product: Types.ObjectId
+    participants: Types.ObjectId[]
+    messages: ChatMessageDocType[]
+    offers: ChatOfferDocType[]
+    createdAt: Date
+    updatedAt: Date
+    __v: number
+}
+
 const userSchema = new Schema<UserDocType>({
     name: {
         type: String,
@@ -153,13 +182,91 @@ const commentSchema = new Schema<CommentDocType>({
     }
 })
 
+const chatMessageSchema = new Schema<ChatMessageDocType>({
+    from: {
+        type: ObjectId,
+        required: true,
+        ref: "User"
+    },
+    text: {
+        type: String,
+        required: true,
+        maxlength: 2000
+    },
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+})
+
+const chatOfferSchema = new Schema<ChatOfferDocType>({
+    amount: {
+        type: Number,
+        required: true,
+        min: 0.01
+    },
+    offeredBy: {
+        type: ObjectId,
+        required: true,
+        ref: "User"
+    },
+    status: {
+        type: String,
+        enum: ["pending", "accepted", "rejected"],
+        required: true,
+        default: "pending"
+    },
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    respondedBy: {
+        type: ObjectId,
+        ref: "User"
+    },
+    respondedAt: Date
+})
+
+const chatSchema = new Schema<ChatDocType>({
+    key: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    product: {
+        type: ObjectId,
+        required: true,
+        ref: "Product"
+    },
+    participants: [{
+        type: ObjectId,
+        required: true,
+        ref: "User"
+    }],
+    messages: {
+        type: [chatMessageSchema],
+        default: []
+    },
+    offers: {
+        type: [chatOfferSchema],
+        default: []
+    }
+}, { timestamps: true })
+
 
 
 const User = model<UserDocType>("User", userSchema)
 const Product = model<ProductDocType>("Product", productSchema)
 const Comment = model<CommentDocType>("Comment", commentSchema)
+const Chat = model<ChatDocType>("Chat", chatSchema)
 
 export {
+    Chat,
+    ChatDocType,
+    ChatMessageDocType,
+    ChatOfferDocType,
     UserDocType,
     ProductDocType,
     CommentDocType,

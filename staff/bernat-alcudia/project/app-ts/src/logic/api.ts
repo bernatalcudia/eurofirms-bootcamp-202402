@@ -1,6 +1,6 @@
 import SessionStorage from "react-native-session-storage"
 import { errors, validate, utils } from "com"
-import type { Comment, Product, ProductState, User, UserRole } from "../types/models"
+import type { Chat, ChatSummary, Comment, Product, ProductState, User, UserRole } from "../types/models"
 
 interface ApiErrorBody {
   error?: string
@@ -64,6 +64,7 @@ async function request<T>(
     body?: unknown
     authenticated?: boolean
     expectedStatus?: number
+    parseResponse?: boolean
   } = {},
 ): Promise<T> {
   const {
@@ -71,6 +72,7 @@ async function request<T>(
     body,
     authenticated = true,
     expectedStatus = expectedStatuses.ok,
+    parseResponse = false,
   } = options
   const headers: Record<string, string> = {}
   if (body !== undefined) headers["Content-Type"] = "application/json"
@@ -90,7 +92,7 @@ async function request<T>(
   }
 
   if (response.status !== expectedStatus) return readError(response)
-  if (response.status === 204 || expectedStatus === expectedStatuses.created) {
+  if (response.status === 204 || (expectedStatus === expectedStatuses.created && !parseResponse)) {
     return undefined as T
   }
   try {
@@ -314,4 +316,59 @@ export async function removeComment(productId: string, commentId: string): Promi
 export async function retrieveComments(productId: string): Promise<Comment[]> {
   validate.id(productId, "productId")
   return request<Comment[]>(`/comments/${productId}`)
+}
+
+export async function retrieveChats(): Promise<ChatSummary[]> {
+  return request<ChatSummary[]>("/chats")
+}
+
+export async function startChat(productId: string): Promise<Chat> {
+  validate.id(productId, "productId")
+  return request<Chat>("/chats", { method: "POST", body: { productId } })
+}
+
+export async function retrieveChat(chatId: string): Promise<Chat> {
+  validate.id(chatId, "chatId")
+  return request<Chat>(`/chats/${chatId}`)
+}
+
+export async function sendChatMessage(chatId: string, text: string): Promise<Chat> {
+  validate.id(chatId, "chatId")
+  validate.string(text, "text")
+  if (!text.trim() || text.trim().length > 2000) {
+    throw new errors.ValidationError("message must contain 1 to 2000 characters")
+  }
+  return request<Chat>(`/chats/${chatId}/messages`, {
+    method: "POST",
+    body: { text },
+    expectedStatus: expectedStatuses.created,
+    parseResponse: true,
+  })
+}
+
+export async function createChatOffer(chatId: string, amount: number): Promise<Chat> {
+  validate.id(chatId, "chatId")
+  validate.number(amount, "amount")
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new errors.ValidationError("offer must be greater than zero")
+  }
+  return request<Chat>(`/chats/${chatId}/offers`, {
+    method: "POST",
+    body: { amount },
+    expectedStatus: expectedStatuses.created,
+    parseResponse: true,
+  })
+}
+
+export async function respondToChatOffer(
+  chatId: string,
+  offerId: string,
+  decision: "accept" | "reject",
+): Promise<Chat> {
+  validate.id(chatId, "chatId")
+  validate.id(offerId, "offerId")
+  return request<Chat>(`/chats/${chatId}/offers/${offerId}`, {
+    method: "PATCH",
+    body: { decision },
+  })
 }

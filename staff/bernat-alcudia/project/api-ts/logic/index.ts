@@ -17,12 +17,13 @@ import { createComment } from "./createComment.js"
 import { modifyComment } from "./modifyComment.js"
 import { removeComment } from "./removeComment.js"
 import { retrieveComments } from "./retrieveComments.js"
+import { createChatOffer, respondToChatOffer, retrieveChat, retrieveChats, sendChatMessage, startChat } from "./chat.js"
 
 
 
 export const logic: Logic = {
     registerUser, authenticateUser, changeUserPassword, retrieveUser,
     createProduct, modifyProduct, removeProduct, retrieveProductDetails, retrieveProducts, retrieveSavedProducts, searchProduct, toggleLikeProduct, toggleSaveProduct,
-    createComment, modifyComment, removeComment, retrieveComments
+    createComment, modifyComment, removeComment, retrieveComments,
+    startChat, retrieveChats, retrieveChat, sendChatMessage, createChatOffer, respondToChatOffer
 }
-

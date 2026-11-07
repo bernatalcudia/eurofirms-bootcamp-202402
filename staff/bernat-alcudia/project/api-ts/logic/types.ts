@@ -35,6 +35,36 @@ type CommentType = {
     own: boolean
 }
 
+type ChatMessageType = {
+    id: string
+    from: string
+    text: string
+    date: Date
+}
+
+type ChatOfferType = {
+    id: string
+    amount: number
+    offeredBy: string
+    status: "pending" | "accepted" | "rejected"
+    date: Date
+    respondedBy?: string
+    respondedAt?: Date
+}
+
+type ChatSummaryType = {
+    id: string
+    product: { id: string; title: string; images: string[]; price: number } | null
+    otherUser: { id: string; username: string }
+    lastMessage: ChatMessageType | null
+    updatedAt: Date
+}
+
+type ChatType = ChatSummaryType & {
+    messages: ChatMessageType[]
+    offers: ChatOfferType[]
+}
+
 
 type RegisterUser = (name: string, birthdate: Date, email: string, username: string, password: string) => Promise<void>
 
@@ -70,6 +100,23 @@ type RemoveComment = (userId: string, productId: string, commentId: string) => P
 
 type RetrieveComments = (userId: string, productId: string) => Promise<CommentType[]>
 
+type StartChat = (userId: string, productId: string) => Promise<ChatType>
+
+type RetrieveChats = (userId: string) => Promise<ChatSummaryType[]>
+
+type RetrieveChat = (userId: string, chatId: string) => Promise<ChatType>
+
+type SendChatMessage = (userId: string, chatId: string, text: string) => Promise<ChatType>
+
+type CreateChatOffer = (userId: string, chatId: string, amount: number) => Promise<ChatType>
+
+type RespondToChatOffer = (
+    userId: string,
+    chatId: string,
+    offerId: string,
+    decision: "accept" | "reject",
+) => Promise<ChatType>
+
 type Logic = {
     registerUser: RegisterUser,
     authenticateUser: AuthenticateUser,
@@ -89,7 +136,14 @@ type Logic = {
     createComment: CreateComment,
     modifyComment: ModifyComment,
     removeComment: RemoveComment,
-    retrieveComments: RetrieveComments
+    retrieveComments: RetrieveComments,
+
+    startChat: StartChat,
+    retrieveChats: RetrieveChats,
+    retrieveChat: RetrieveChat,
+    sendChatMessage: SendChatMessage,
+    createChatOffer: CreateChatOffer,
+    respondToChatOffer: RespondToChatOffer
 }
 
 export {
@@ -98,7 +152,9 @@ export {
     RetrieveProducts,
     RetrieveSavedProducts, RetrieveUser, SearchProduct,
     ToggleLikeProduct,
-    ToggleSaveProduct, UserType
+    ToggleSaveProduct, UserType,
+    ChatMessageType, ChatOfferType, ChatSummaryType, ChatType,
+    StartChat, RetrieveChats, RetrieveChat, SendChatMessage, CreateChatOffer, RespondToChatOffer
 }
 
 export type { UserRole }

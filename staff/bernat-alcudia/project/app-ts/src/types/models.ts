@@ -36,3 +36,35 @@ export interface Comment {
   own: boolean
   date: string | Date
 }
+
+export type ChatOfferStatus = "pending" | "accepted" | "rejected"
+
+export interface ChatMessage {
+  id: string
+  from: string
+  text: string
+  date: string
+}
+
+export interface ChatOffer {
+  id: string
+  amount: number
+  offeredBy: string
+  status: ChatOfferStatus
+  date: string
+  respondedBy?: string
+  respondedAt?: string
+}
+
+export interface ChatSummary {
+  id: string
+  product: { id: string; title: string; images: string[]; price: number } | null
+  otherUser: { id: string; username: string }
+  lastMessage: ChatMessage | null
+  updatedAt: string
+}
+
+export interface Chat extends ChatSummary {
+  messages: ChatMessage[]
+  offers: ChatOffer[]
+}

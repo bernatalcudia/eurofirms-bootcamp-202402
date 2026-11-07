@@ -34,6 +34,8 @@ const createProductDetailStyles = (colors: ThemeColors) => {
         descriptionText: { fontSize: 15, color: colors.text, lineHeight: 22, marginTop: 10, textAlign: 'justify' },
         actionButtonsContainer: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: 15, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 15 },
         actionButton: { padding: 10, borderRadius: 5, backgroundColor: colors.surfaceAlt },
+        contactSellerButton: { backgroundColor: colors.primary, borderRadius: 14, minHeight: 50, alignItems: 'center', justifyContent: 'center', marginTop: 8, paddingHorizontal: 18 },
+        contactSellerText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
         modifyIcon: { fontSize: 26, color: colors.primary },
         deleteIcon: { fontSize: 26, color: colors.danger },
         loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },

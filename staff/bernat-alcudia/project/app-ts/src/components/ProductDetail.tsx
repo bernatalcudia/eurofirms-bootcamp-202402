@@ -14,6 +14,7 @@ function ProductDetail() {
     const [product, setProduct] = useState<Product | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState(false)
+    const [isStartingChat, setIsStartingChat] = useState(false)
 
     const navigation = useNavigation<RootNavigation>()
 
@@ -64,6 +65,20 @@ function ProductDetail() {
 
     const handleModifyProductDetail = () => {
         navigation.navigate('ModifyProduct', { id: productId })
+    }
+
+    const handleContactSeller = async () => {
+        if (isStartingChat) return
+        setIsStartingChat(true)
+        try {
+            const chat = await logic.startChat(productId)
+            navigation.navigate('ChatConversation', { chatId: chat.id })
+        } catch (error) {
+            console.error('Could not start conversation:', error)
+            Alert.alert(t('Error'), t('Could not start a conversation. Please try again.'))
+        } finally {
+            setIsStartingChat(false)
+        }
     }
 
     const showProductDetails = () => {
@@ -149,6 +164,19 @@ function ProductDetail() {
                                 <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' />
                             </TouchableOpacity>
                         </View>
+                    )}
+                    {!isAuthor && (
+                        <TouchableOpacity
+                            style={[styles.contactSellerButton, isStartingChat && { opacity: 0.6 }]}
+                            onPress={() => void handleContactSeller()}
+                            disabled={isStartingChat}
+                            accessibilityRole='button'
+                            accessibilityLabel={t('Message seller')}
+                        >
+                            <Text style={styles.contactSellerText}>
+                                {isStartingChat ? t('Loading…') : t('Message seller')}
+                            </Text>
+                        </TouchableOpacity>
                     )}
                 </View>
             </ScrollView >

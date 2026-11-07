@@ -5,6 +5,7 @@ import helmet from "helmet"
 import { usersRouter } from "./routes/usersRouter"
 import { productsRouter } from "./routes/productsRouter"
 import { commentsRouter } from "./routes/commentsRouter"
+import { chatsRouter } from "./routes/chatsRouter"
 import { apiRateLimiter, errorHandler } from "./middlewares"
 
 const { MONGO_URL, PORT, JWT_SECRET, CORS_ORIGINS } = process.env
@@ -49,6 +50,7 @@ async function start(): Promise<void> {
     api.use("/users", usersRouter)
     api.use("/products", productsRouter)
     api.use("/comments", commentsRouter)
+    api.use("/chats", chatsRouter)
 
     api.use(errorHandler)
 
