@@ -1,8 +1,7 @@
-import { errors } from "com"
+import { errors, isUserRole, type UserRole } from "com"
 import { CredentialsError } from "com/errors"
 import type { NextFunction, Request, Response } from "express"
 import jwt, { type JwtPayload } from "jsonwebtoken"
-import type { UserRole } from "../data/models.js"
 
 export interface AuthContext {
     userId: string
@@ -32,14 +31,11 @@ export function verifyAccessToken(token: string, secret: string): AuthContext {
         typeof payload !== "object" ||
         typeof payload.sub !== "string" ||
         !/^[\da-f]{24}$/i.test(payload.sub) ||
-        typeof payload.role !== "string"
+        !isUserRole(payload.role)
     ) {
         throw new CredentialsError("invalid token claims")
     }
 
-    if (payload.role !== "admin" && payload.role !== "regular") {
-        throw new CredentialsError("invalid token claims")
-    }
     const role: UserRole = payload.role
     return { userId: payload.sub, role }
 }

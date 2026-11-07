@@ -1,4 +1,6 @@
-export type UserRole = "admin" | "regular"
+import type { UserRole } from "com"
+export type { UserRole } from "com"
+
 export type ProductState = "new" | "used"
 
 export interface User {

@@ -1,6 +1,5 @@
 import { Schema, model, Types } from "mongoose"
-
-export type UserRole = "admin" | "regular"
+import { USER_ROLES, type UserRole } from "com"
 
 const { Types: { ObjectId } } = Schema
 
@@ -96,9 +95,9 @@ const userSchema = new Schema<UserDocType>({
     },
     role: {
         type: String,
-        enum: ["admin", "regular"],
+        enum: USER_ROLES,
         required: true,
-        default: "regular"
+        default: USER_ROLES[0]
     },
     saved: [{
         type: Types.ObjectId,
@@ -275,3 +274,5 @@ export {
     Product,
     Comment
 }
+
+export type { UserRole }

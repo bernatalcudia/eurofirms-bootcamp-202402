@@ -60,35 +60,50 @@ async function findChat(userId: string, chatId: string) {
     return chat
 }
 
-async function mapChat(userId: string, chat: Awaited<ReturnType<typeof findChat>>): Promise<ChatType> {
+type ChatDocument = Awaited<ReturnType<typeof findChat>>
+
+async function mapChats(userId: string, chats: ChatDocument[]): Promise<ChatType[]> {
+    if (!chats.length) return []
+
+    const productIds = [...new Set(chats.map(chat => chat.product.toString()))]
+    const participantIds = [...new Set(chats.flatMap(chat => chat.participants.map(id => id.toString())))]
     const [product, users] = await Promise.all([
-        Product.findById(chat.product).select("title images price").lean()
+        Product.find({ _id: { $in: productIds } })
+            .select({ title: 1, price: 1, images: { $slice: 1 } })
+            .lean()
             .catch(error => { throw new SystemError(error.message) }),
-        User.find({ _id: { $in: chat.participants } }).select("username").lean()
+        User.find({ _id: { $in: participantIds } }).select("username").lean()
             .catch(error => { throw new SystemError(error.message) }),
     ])
-    const otherParticipant = chat.participants.find(participant => participant.toString() !== userId)
-    if (!otherParticipant) throw new SystemError("chat has no other participant")
-    const otherUser = users.find(user => user._id.toString() === otherParticipant.toString())
-    const lastMessage = chat.messages.length ? chat.messages[chat.messages.length - 1] : null
+    const productsById = new Map(product.map(item => [item._id.toString(), item]))
+    const usersById = new Map(users.map(user => [user._id.toString(), user]))
 
-    return {
-        id: chat._id.toString(),
-        product: product ? {
-            id: product._id.toString(),
-            title: product.title,
-            images: product.images,
-            price: product.price,
-        } : null,
-        otherUser: {
-            id: otherParticipant.toString(),
-            username: otherUser?.username ?? "user",
-        },
-        lastMessage: lastMessage ? mapMessage(lastMessage) : null,
-        updatedAt: chat.updatedAt,
-        messages: chat.messages.map(mapMessage),
-        offers: chat.offers.map(mapOffer),
-    }
+    return chats.map(chat => {
+        const otherParticipant = chat.participants.find(participant => participant.toString() !== userId)
+        if (!otherParticipant) throw new SystemError("chat has no other participant")
+        const otherParticipantId = otherParticipant.toString()
+        const relatedProduct = productsById.get(chat.product.toString())
+        const otherUser = usersById.get(otherParticipantId)
+        const lastMessage = chat.messages.at(-1) ?? null
+
+        return {
+            id: chat._id.toString(),
+            product: relatedProduct ? {
+                id: relatedProduct._id.toString(),
+                title: relatedProduct.title,
+                images: relatedProduct.images,
+                price: relatedProduct.price,
+            } : null,
+            otherUser: {
+                id: otherParticipantId,
+                username: otherUser?.username ?? "user",
+            },
+            lastMessage: lastMessage ? mapMessage(lastMessage) : null,
+            updatedAt: chat.updatedAt,
+            messages: chat.messages.map(mapMessage),
+            offers: chat.offers.map(mapOffer),
+        }
+    })
 }
 
 export const startChat: StartChat = async (userId, productId) => {
@@ -116,7 +131,9 @@ export const startChat: StartChat = async (userId, productId) => {
         throw new SystemError(error.message)
     })
     if (!chat) throw new SystemError("chat could not be created")
-    return mapChat(userId, chat)
+    const [mappedChat] = await mapChats(userId, [chat])
+    if (!mappedChat) throw new SystemError("chat could not be mapped")
+    return mappedChat
 }
 
 export const retrieveChats: RetrieveChats = async userId => {
@@ -125,15 +142,17 @@ export const retrieveChats: RetrieveChats = async userId => {
     const chats = await Chat.find({ participants: userId }).sort({ updatedAt: -1 })
         .catch(error => { throw new SystemError(error.message) })
 
-    return Promise.all(chats.map(async chat => {
-        const mapped = await mapChat(userId, chat)
+    const mappedChats = await mapChats(userId, chats)
+    return mappedChats.map(mapped => {
         const { messages: _messages, offers: _offers, ...summary } = mapped
         return summary satisfies ChatSummaryType
-    }))
+    })
 }
 
 export const retrieveChat: RetrieveChat = async (userId, chatId) => {
-    return mapChat(userId, await findChat(userId, chatId))
+    const [mappedChat] = await mapChats(userId, [await findChat(userId, chatId)])
+    if (!mappedChat) throw new SystemError("chat could not be mapped")
+    return mappedChat
 }
 
 export const sendChatMessage: SendChatMessage = async (userId, chatId, text) => {

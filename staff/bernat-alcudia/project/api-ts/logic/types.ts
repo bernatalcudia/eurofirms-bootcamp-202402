@@ -1,4 +1,4 @@
-import type { UserRole } from "../data/models.js"
+import type { UserRole } from "com"
 
 type UserType = {
     id: string,

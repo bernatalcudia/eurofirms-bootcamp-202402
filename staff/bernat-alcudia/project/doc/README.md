@@ -67,7 +67,7 @@ Version 0.1
 - username (string,required)
 - email (string,required)
 - password (string,required)
-- role (seller | buyer)
+- role (`regular` | `admin`; new accounts default to `regular`)
 - saved (array of Post.id)
 
 #### Product

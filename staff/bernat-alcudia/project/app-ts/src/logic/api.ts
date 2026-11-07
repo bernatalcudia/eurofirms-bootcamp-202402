@@ -1,10 +1,34 @@
 import SessionStorage from "react-native-session-storage"
-import { errors, validate, utils } from "com"
-import type { Chat, ChatSummary, Comment, Product, ProductState, User, UserRole } from "../types/models"
+import { errors, isUserRole, validate, utils, type UserRole } from "com"
+import type { Chat, ChatSummary, Comment, Product, ProductState, User } from "../types/models"
+import { executeApiRequest, type ApiRequestOptions } from "./http"
 
-interface ApiErrorBody {
-  error?: string
-  message?: string
+function apiUrl(path: string): string {
+  const baseUrl = process.env.EXPO_PUBLIC_API_URL
+  if (!baseUrl) throw new errors.SystemError("EXPO_PUBLIC_API_URL is not configured")
+  return `${baseUrl.replace(/\/+$/, "")}${path}`
+}
+
+function getToken(): string {
+  const token: unknown = SessionStorage.getItem("token")
+  if (typeof token !== "string") throw new TypeError("token is not a string")
+  validate.token(token)
+  return token
+}
+
+function authorizationHeader(): string {
+  return `Bearer ${getToken()}`
+}
+
+async function request<T>(
+  path: string,
+  options: ApiRequestOptions & {
+    authenticated?: boolean
+  } = {},
+): Promise<T> {
+  const { authenticated = true, ...requestOptions } = options
+  const authorization = authenticated ? authorizationHeader() : undefined
+  return executeApiRequest<T>(apiUrl(path), requestOptions, authorization)
 }
 
 const expectedStatuses = {
@@ -13,110 +37,13 @@ const expectedStatuses = {
   noContent: 204,
 } as const
 
-function apiUrl(path: string): string {
-  const baseUrl = process.env.EXPO_PUBLIC_API_URL
-  if (!baseUrl) throw new errors.SystemError("EXPO_PUBLIC_API_URL is not configured")
-  return `${baseUrl.replace(/\/+$/, "")}${path}`
-}
-
-function authorizationHeader(): string {
-  const token: unknown = SessionStorage.getItem("token")
-  if (typeof token !== "string") throw new TypeError("token is not a string")
-  validate.token(token)
-  return `Bearer ${token}`
-}
-
-function getError(message: string, name?: string): Error {
-  if (name === "TypeError") return new TypeError(message)
-  if (name === "RangeError") return new RangeError(message)
-  if (name && Object.prototype.hasOwnProperty.call(errors, name)) {
-    const ErrorConstructor = errors[name as keyof typeof errors]
-    return new ErrorConstructor(message)
-  }
-  return new errors.SystemError(message)
-}
-
-async function readError(response: Response): Promise<never> {
-  let body: unknown
-  try {
-    body = await response.json()
-  } catch {
-    throw new errors.SystemError(`Request failed with status ${response.status}`)
-  }
-
-  if (
-    typeof body === "object" &&
-    body !== null &&
-    "message" in body &&
-    typeof body.message === "string"
-  ) {
-    const name =
-      "error" in body && typeof body.error === "string" ? body.error : undefined
-    throw getError(body.message, name)
-  }
-  throw new errors.SystemError(`Request failed with status ${response.status}`)
-}
-
-async function request<T>(
-  path: string,
-  options: {
-    method?: string
-    body?: unknown
-    authenticated?: boolean
-    expectedStatus?: number
-    parseResponse?: boolean
-  } = {},
-): Promise<T> {
-  const {
-    method = "GET",
-    body,
-    authenticated = true,
-    expectedStatus = expectedStatuses.ok,
-    parseResponse = false,
-  } = options
-  const headers: Record<string, string> = {}
-  if (body !== undefined) headers["Content-Type"] = "application/json"
-  if (authenticated) headers.Authorization = authorizationHeader()
-
-  let response: Response
-  try {
-    response = await fetch(apiUrl(path), {
-      method,
-      headers,
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    })
-  } catch (error) {
-    throw new errors.SystemError(
-      error instanceof Error ? error.message : "Network request failed",
-    )
-  }
-
-  if (response.status !== expectedStatus) return readError(response)
-  if (response.status === 204 || (expectedStatus === expectedStatuses.created && !parseResponse)) {
-    return undefined as T
-  }
-  try {
-    return (await response.json()) as T
-  } catch (error) {
-    throw new errors.SystemError(
-      error instanceof Error ? error.message : "Invalid server response",
-    )
-  }
-}
-
 function getUserId(): string {
-  const token: unknown = SessionStorage.getItem("token")
-  if (typeof token !== "string") throw new TypeError("token is not a string")
-  validate.token(token)
-  return utils.extractPayload(token).sub
+  return utils.extractPayload(getToken()).sub
 }
 
 function getUserRole(): UserRole {
-  const token: unknown = SessionStorage.getItem("token")
-  if (typeof token !== "string") throw new TypeError("token is not a string")
-  validate.token(token)
-  const { role } = utils.extractPayload(token)
-  if (role === "admin" || role === "regular") return role
+  const { role } = utils.extractPayload(getToken())
+  if (isUserRole(role)) return role
   throw new errors.ValidationError("invalid user role in token")
 }
 

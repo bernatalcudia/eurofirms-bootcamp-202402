@@ -5,7 +5,7 @@ import { UserDocType, User } from "../data/models"
 import { authenticateUser } from "./authenticateUser"
 import { verifyAccessToken } from "../middlewares/authentication.js"
 import jwt from "jsonwebtoken"
-import { errors } from "com"
+import { errors, isUserRole, USER_ROLES } from "com"
 
 const { CredentialsError } = errors
 
@@ -16,6 +16,10 @@ describe("authenticateUser", () => {
     beforeEach(() => User.deleteMany({}))
 
     it("verifies regular and admin access tokens", () => {
+        expect(USER_ROLES).to.deep.equal(["regular", "admin"])
+        expect(isUserRole("regular")).to.equal(true)
+        expect(isUserRole("admin")).to.equal(true)
+        expect(isUserRole("seller")).to.equal(false)
         const secret = "test-only-signing-secret"
         const userId = "0123456789abcdef01234567"
 
