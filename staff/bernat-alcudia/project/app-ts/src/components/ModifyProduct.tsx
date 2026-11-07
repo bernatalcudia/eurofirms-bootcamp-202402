@@ -9,6 +9,7 @@ import logic from '../logic';
 import type { ProductState } from '../types/models'
 import type { ProductRoute, RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme } from '../theme/ThemeContext'
 
 
 
@@ -28,6 +29,7 @@ function ModifyProduct() {
 
     const [selectedId, setSelectedId] = useState('');
     const { t } = useLanguage()
+    const { colors } = useTheme()
     const permissionsRequested = useRef(false)
 
     const radioButtons = useMemo<RadioButtonProps[]>(() => ([
@@ -35,15 +37,21 @@ function ModifyProduct() {
             id: '1',
             label: t('New'),
             value: 'new',
-            selected: false
+            selected: false,
+            color: colors.primary,
+            borderColor: colors.primary,
+            labelStyle: { color: colors.text },
         },
         {
             id: '2',
             label: t('Used'),
             value: 'used',
-            selected: false
+            selected: false,
+            color: colors.primary,
+            borderColor: colors.primary,
+            labelStyle: { color: colors.text },
         }
-    ]), [t]);
+    ]), [colors.primary, colors.text, t]);
 
     const selectedRadioButton = radioButtons.find(button => button.id === selectedId)
 
@@ -57,7 +65,7 @@ function ModifyProduct() {
     const styles = StyleSheet.create({
 
         scrollView: {
-            backgroundColor: '#f8f8f8',
+            backgroundColor: colors.background,
         },
         scrollViewContent: {
             paddingBottom: 30,
@@ -65,16 +73,16 @@ function ModifyProduct() {
         container: {
             flex: 1,
             padding: 15,
-            backgroundColor: '#ffffff'
+            backgroundColor: colors.surface
         },
         sectionTitle: {
             fontSize: 18,
             fontWeight: 'bold',
-            color: '#333',
+            color: colors.text,
             marginTop: 20,
             marginBottom: 15,
             borderBottomWidth: 1,
-            borderBottomColor: '#eee',
+            borderBottomColor: colors.border,
             paddingBottom: 5,
         },
         photoActionsContainer: {
@@ -94,25 +102,25 @@ function ModifyProduct() {
             marginHorizontal: 5,
         },
         buttonPrimary: {
-            backgroundColor: '#09B1BA',
-            borderColor: '#09B1BA',
+            backgroundColor: colors.primary,
+            borderColor: colors.primary,
             marginTop: 30,
         },
         buttonOutline: {
-            backgroundColor: '#fff',
-            borderColor: '#09B1BA'
+            backgroundColor: colors.surface,
+            borderColor: colors.primary
         },
         buttonIcon: {
             marginRight: 8,
         },
         buttonPrimaryText: {
-            color: '#ffffff',
+            color: colors.onPrimary,
             fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
         },
         buttonOutlineText: {
-            color: '#09B1BA',
+            color: colors.primary,
             fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
@@ -130,38 +138,38 @@ function ModifyProduct() {
             width: 60,
             height: 60,
             borderRadius: 8,
-            backgroundColor: '#eee',
+            backgroundColor: colors.surfaceAlt,
             borderWidth: 1,
-            borderColor: '#ddd',
+            borderColor: colors.border,
         },
         deleteButton: {
             position: 'absolute',
             top: -8,
             right: -8,
-            backgroundColor: 'white',
+            backgroundColor: colors.surface,
             borderRadius: 12,
             padding: 1,
         },
         deleteIconBackground: {
-            backgroundColor: 'white',
+            backgroundColor: colors.surface,
             borderRadius: 12,
             overflow: 'hidden',
         },
         label: {
             fontSize: 14,
-            color: '#555',
+            color: colors.mutedText,
             marginBottom: 6,
             fontWeight: '600',
         },
         input: {
-            backgroundColor: '#ffffff',
+            backgroundColor: colors.input,
             borderWidth: 1,
-            borderColor: '#ddd',
+            borderColor: colors.border,
             borderRadius: 8,
             paddingHorizontal: 15,
             paddingVertical: 10,
             fontSize: 16,
-            color: '#333',
+            color: colors.text,
             marginBottom: 15,
         },
         textArea: {
@@ -175,7 +183,7 @@ function ModifyProduct() {
         },
         radioLabel: {
             fontSize: 16,
-            color: '#333'
+            color: colors.text
         },
     })
 
@@ -374,7 +382,7 @@ function ModifyProduct() {
                             <View key={index} style={styles.imageContainer}>
                                 <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.imageThumbnail} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={t('Product image {number}', { number: index + 1 })} />
                                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(image)} accessibilityLabel={t('Remove image {number}', { number: index + 1 })} accessibilityHint={t('Remove image {number}', { number: index + 1 })}>
-                                    <MaterialCommunityIcons name='close-circle' size={25} color={'black'} style={styles.deleteIconBackground} accessibilityElementsHidden={true} />
+                                    <MaterialCommunityIcons name='close-circle' size={25} color={colors.text} style={styles.deleteIconBackground} accessibilityElementsHidden={true} />
                                 </TouchableOpacity>
                             </View>
                         ))}
@@ -383,22 +391,22 @@ function ModifyProduct() {
                     <Text style={styles.sectionTitle} accessibilityRole='header'>{t('Details')}</Text>
 
                     <Text style={styles.label} accessibilityLabel={t('Product title input')}>{t('Title')}</Text>
-                    <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder={t('Enter product title')} placeholderTextColor='#aaa' accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
+                    <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder={t('Enter product title')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
 
                     <Text style={styles.label} accessibilityLabel={t('Product brand input')}>{t('Brand')}</Text>
-                    <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder={t('Enter product brand')} placeholderTextColor='#aaa' accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
+                    <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder={t('Enter product brand')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
 
                     <Text style={styles.label} accessibilityLabel={t('Product price input')}>{t('Price')}</Text>
-                    <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={setPrice} placeholder={t('Enter price')} placeholderTextColor='#aaa' accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
+                    <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={setPrice} placeholder={t('Enter price')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
 
                     <Text style={styles.label}>{t('Condition')}</Text>
-                    <RadioGroup labelStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel={t('Product condition selection')} />
+                    <RadioGroup containerStyle={styles.radioGroupContainer} labelStyle={styles.radioLabel} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel={t('Product condition selection')} />
 
                     <Text style={styles.label} accessibilityLabel={t('Product stock input')}>{t('Stock')}</Text>
-                    <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
+                    <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
 
                     <Text style={styles.label} accessibilityLabel={t('Product description input')}>{t('Description')}</Text>
-                    <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={'#aaa'} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
+                    <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
 
                     <TouchableOpacity style={[styles.button, styles.buttonPrimary, isSubmitting && { opacity: 0.65 }]} onPress={handleModifyProduct} disabled={isSubmitting} accessibilityLabel={t('Save changes')} accessibilityHint={t('Save changes')} accessibilityState={{ disabled: isSubmitting }}>

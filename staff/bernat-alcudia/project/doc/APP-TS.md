@@ -13,3 +13,7 @@ El cliente consume el paquete compartido local `com-ts/` para validaciones, util
 El cliente consume las rutas de `api-ts/` para registro, autenticación, productos y comentarios. Las pruebas automatizadas de interfaz aún no están configuradas.
 
 El registro público crea usuarios con el rol `regular`; no permite elegir ni asignar `admin`. Las cuentas `admin` deben aprovisionarse por un mecanismo de confianza del servidor. Tanto `regular` como `admin` pueden acceder a la creación de productos. La aplicación solo acepta los roles `regular` y `admin`.
+
+## Apariencia e idioma
+
+En el perfil se puede desplegar la preferencia de idioma (español o inglés) y elegir entre los temas Claro, Oscuro y Fallera. Las preferencias se guardan en el dispositivo. El tema Fallera usa los colores del logo; las paletas mantienen contraste legible y se aplican también a navegación, formularios y estados de catálogo. El idioma se cambia únicamente desde el perfil.

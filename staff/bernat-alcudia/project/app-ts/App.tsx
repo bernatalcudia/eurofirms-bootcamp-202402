@@ -1,16 +1,40 @@
 import React from "react"
-import { NavigationContainer } from "@react-navigation/native"
+import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
 import AppNavigator from "./src/navigation/AppNavigator"
 import { LanguageProvider } from "./src/i18n/LanguageContext"
+import { ThemeProvider, useTheme } from "./src/theme/ThemeContext"
+
+function AppNavigation() {
+  const { theme, colors } = useTheme()
+  const baseTheme = theme === 'dark' ? DarkTheme : DefaultTheme
+  const navigationTheme = {
+    ...baseTheme,
+    colors: {
+      ...baseTheme.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.surface,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.accent,
+    },
+  }
+
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      <AppNavigator />
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+    </NavigationContainer>
+  )
+}
 
 export default function App() {
   return (
     <LanguageProvider>
-      <NavigationContainer>
-        <AppNavigator />
-        <StatusBar style="auto" />
-      </NavigationContainer>
+      <ThemeProvider>
+        <AppNavigation />
+      </ThemeProvider>
     </LanguageProvider>
   )
 }

@@ -4,19 +4,20 @@ import { utils } from 'com'
 import { ActivityIndicator, View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import type { Product } from '../types/models'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme, type ThemeColors } from '../theme/ThemeContext'
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
 
     centeredContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#f8fafc',
+        backgroundColor: colors.background,
     },
     productContainer: {
         marginBottom: 20,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: colors.surface,
         borderRadius: 10,
         padding: 15,
         shadowColor: '#000',
@@ -41,55 +42,56 @@ const styles = StyleSheet.create({
     },
     dateText: {
         fontSize: 12,
-        color: '#888',
+        color: colors.mutedText,
         marginBottom: 5,
     },
     titleText: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 5,
+        color: colors.text,
     },
     brandText: {
         fontSize: 16,
-        color: '#555',
+        color: colors.mutedText,
         marginBottom: 5,
     },
     priceText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: 'green',
+        color: colors.primary,
         marginBottom: 5,
     },
     stateText: {
         fontSize: 14,
         fontStyle: 'italic',
-        color: '#666',
+        color: colors.mutedText,
         marginBottom: 3,
     },
     stockText: {
         fontSize: 14,
-        color: '#666',
+        color: colors.mutedText,
         marginBottom: 3,
     },
     descriptionText: {
         fontSize: 14,
-        color: '#333',
+        color: colors.text,
         marginTop: 10,
     },
     emptyText: {
-        color: '#475569',
+        color: colors.text,
         fontSize: 16,
         textAlign: 'center',
     },
     retryButton: {
-        backgroundColor: '#0f766e',
+        backgroundColor: colors.primary,
         borderRadius: 10,
         marginTop: 16,
         paddingHorizontal: 18,
         paddingVertical: 11,
     },
     retryText: {
-        color: '#ffffff',
+        color: colors.onPrimary,
         fontWeight: '700',
     },
 });
@@ -99,6 +101,8 @@ function RetrieveSavedProducts() {
     const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
     const { language, t } = useLanguage()
+    const { colors } = useTheme()
+    const styles = createStyles(colors)
 
     const showSavedProducts = () => {
         setIsLoading(true)
@@ -129,7 +133,7 @@ function RetrieveSavedProducts() {
             <View style={styles.centeredContainer}>
                 {isLoading ? (
                     <>
-                        <ActivityIndicator size='large' color='#0f766e' />
+                        <ActivityIndicator size='large' color={colors.primary} />
                         <Text style={styles.emptyText}>{t('Loading products…')}</Text>
                     </>
                 ) : hasError ? (

@@ -9,11 +9,12 @@ import type { RadioButtonProps } from 'react-native-radio-buttons-group'
 import type { ProductState } from '../types/models'
 import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme, type ThemeColors } from '../theme/ThemeContext'
 
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     scrollView: {
-        backgroundColor: '#f8f8f8'
+        backgroundColor: colors.background
     },
     scrollViewContent: {
         paddingBottom: 30,
@@ -22,12 +23,12 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 15,
         paddingTop: 10,
-        backgroundColor: '#ffffff',
+        backgroundColor: colors.surface,
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#333',
+        color: colors.text,
         marginTop: 20,
         marginBottom: 15,
     },
@@ -48,24 +49,24 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     buttonPrimary: {
-        backgroundColor: '#09B1BA',
-        borderColor: '#09B1BA',
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
     },
     buttonOutline: {
-        backgroundColor: '#fff',
-        borderColor: '#09B1BA',
+        backgroundColor: colors.surface,
+        borderColor: colors.primary,
     },
     buttonIcon: {
         marginRight: 8,
     },
     buttonPrimaryText: {
-        color: '#ffffff',
+        color: colors.onPrimary,
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
     },
     buttonOutlineText: {
-        color: '#09B1BA',
+        color: colors.primary,
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
@@ -83,9 +84,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingVertical: 20,
         borderWidth: 1,
-        borderColor: '#e0e0e0',
+        borderColor: colors.border,
         borderRadius: 8,
-        backgroundColor: '#f9f9f9'
+        backgroundColor: colors.surfaceAlt
     },
     placeholderImage: {
         width: 100,
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     placeholderText: {
-        color: '#777',
+        color: colors.mutedText,
         fontSize: 14,
     },
     imageContainer: {
@@ -105,9 +106,9 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 8,
-        backgroundColor: '#eee',
+        backgroundColor: colors.surfaceAlt,
         borderWidth: 1,
-        borderColor: '#ddd'
+        borderColor: colors.border
     },
     deleteButton: {
         position: 'absolute',
@@ -116,25 +117,25 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     deleteIconBackground: {
-        backgroundColor: 'white',
+        backgroundColor: colors.surface,
         borderRadius: 12,
         overflow: 'hidden',
     },
     label: {
         fontSize: 14,
-        color: '#555',
+        color: colors.mutedText,
         marginBottom: 6,
         fontWeight: '600',
     },
     input: {
-        backgroundColor: '#ffffff',
+        backgroundColor: colors.input,
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: colors.border,
         borderRadius: 8,
         paddingHorizontal: 15,
         paddingVertical: 12,
         fontSize: 16,
-        color: '#333',
+        color: colors.text,
         marginBottom: 15,
     },
     textArea: {
@@ -146,13 +147,13 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         alignItems: 'flex-start',
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: colors.border,
         borderRadius: 8,
         padding: 10,
     },
     radioLabel: {
         fontSize: 16,
-        color: '#333',
+        color: colors.text,
         lineHeight: 24,
     },
     submitButton: {
@@ -176,6 +177,8 @@ function CreateProduct({ }) {
 
     const navigation = useNavigation<RootNavigation>()
     const { t } = useLanguage()
+    const { colors } = useTheme()
+    const styles = createStyles(colors)
     const permissionsRequested = useRef(false)
 
     const radioButtons = useMemo<RadioButtonProps[]>(() => ([
@@ -184,6 +187,9 @@ function CreateProduct({ }) {
             label: t('New'),
             value: 'new',
             selected: true,
+            color: colors.primary,
+            borderColor: colors.primary,
+            labelStyle: { color: colors.text },
             accessibilityLabel: t('New condition')
         },
         {
@@ -191,9 +197,12 @@ function CreateProduct({ }) {
             label: t('Used'),
             value: 'used',
             selected: false,
+            color: colors.primary,
+            borderColor: colors.primary,
+            labelStyle: { color: colors.text },
             accessibilityLabel: t('Used condition')
         }
-    ]), [t])
+    ]), [colors.primary, colors.text, t])
 
     const selectedRadioButton = radioButtons.find(button => button.id === selectedId)
 
@@ -374,7 +383,7 @@ function CreateProduct({ }) {
                     ))
                         :
                         <View style={styles.placeholderContainer} accessibilityLabel={t('No images selected yet')}>
-                            <MaterialCommunityIcons name='image-multiple-outline' size={46} color='#94a3b8' />
+                            <MaterialCommunityIcons name='image-multiple-outline' size={46} color={colors.mutedText} />
                             <Text style={styles.placeholderText}>{t('No images selected yet')}</Text>
                             <Text style={styles.placeholderText}>{t('Add up to 10 photos')}</Text>
                         </View>
@@ -383,22 +392,22 @@ function CreateProduct({ }) {
 
 
                 <Text style={styles.label} nativeID='titleLabel'>{t('Title')}</Text>
-                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder={t('Enter product title')} placeholderTextColor={'#aaa'} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
+                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder={t('Enter product title')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
 
                 <Text style={styles.label}>{t('Brand')}</Text>
-                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder={t('Enter product brand')} placeholderTextColor={'#aaa'} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
+                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder={t('Enter product brand')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
 
                 <Text style={styles.label}>{t('Price')}</Text>
-                <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={setPrice} placeholder={t('Enter price')} placeholderTextColor={'#aaa'} accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
+                <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={setPrice} placeholder={t('Enter price')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
 
                 <Text style={styles.label}>{t('Condition')}</Text>
                 <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel={t('Product condition selection')} />
 
                 <Text style={styles.label}>{t('Stock')}</Text>
-                <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={'#aaa'} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
+                <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
 
                 <Text style={styles.label}>{t('Description')}</Text>
-                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={'#aaa'} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
+                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
                 <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && { opacity: 0.65 }]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Create listing')} accessibilityHint={t('Create listing')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
                     <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Create listing')}</Text>

@@ -10,20 +10,25 @@ import Home from "../pages/Home"
 import LoginUser from "../pages/LoginUser"
 import RegisterUser from "../pages/RegisterUser"
 import type { RootStackParamList } from "../types/navigation"
-import LanguageSwitcher from "../components/LanguageSwitcher"
 import { useLanguage } from "../i18n/LanguageContext"
+import { useTheme } from "../theme/ThemeContext"
 
 const Stack = createStackNavigator<RootStackParamList>()
 
 export default function AppNavigator() {
   const { t } = useLanguage()
+  const { colors } = useTheme()
 
   return (
     <Stack.Navigator
       initialRouteName="LoginUser"
-      screenOptions={{ headerRight: () => <LanguageSwitcher compact /> }}
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.surface },
+        headerTintColor: colors.text,
+        headerTitleStyle: { fontWeight: '700' },
+      }}
     >
-      <Stack.Screen name="LoginUser" component={LoginUser} options={{ title: t('Login') }} />
+      <Stack.Screen name="LoginUser" component={LoginUser} options={{ title: t('Login'), headerShown: false }} />
       <Stack.Screen name="RegisterUser" component={RegisterUser} options={{ title: t('Register') }} />
       <Stack.Screen name="Home" component={Home} options={{ title: t('Home') }} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ title: t('Change password') }} />

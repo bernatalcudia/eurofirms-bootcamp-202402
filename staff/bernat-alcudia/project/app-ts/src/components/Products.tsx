@@ -10,6 +10,7 @@ import Comments from './Comments';
 import type { Product, User } from '../types/models'
 import type { TabNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme } from '../theme/ThemeContext'
 
 interface ProductsProps {
     searchQuery: string
@@ -26,6 +27,7 @@ function Products({ searchQuery }: ProductsProps) {
 
     const navigation = useNavigation<TabNavigation>()
     const { language, t } = useLanguage()
+    const { colors } = useTheme()
 
 
 
@@ -171,12 +173,12 @@ function Products({ searchQuery }: ProductsProps) {
         },
         commentsCountText: {
             fontSize: 16,
-            color: '#333333',
+            color: colors.text,
             fontWeight: '500',
         },
         mainContainer: {
             flex: 1,
-            backgroundColor: '#f4f6f8',
+            backgroundColor: colors.background,
             justifyContent: 'center',
             alignItems: 'center',
             paddingTop: 20,
@@ -188,7 +190,7 @@ function Products({ searchQuery }: ProductsProps) {
             alignSelf: 'center',
             maxWidth: 680,
             width: '100%',
-            backgroundColor: '#ffffff',
+            backgroundColor: colors.surface,
             borderRadius: 12,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
@@ -202,7 +204,7 @@ function Products({ searchQuery }: ProductsProps) {
             padding: 10,
             marginVertical: 10,
             borderWidth: 1,
-            borderColor: '#ccc',
+            borderColor: colors.border,
             borderRadius: 5,
             alignSelf: 'center'
         },
@@ -210,8 +212,7 @@ function Products({ searchQuery }: ProductsProps) {
             width: '100%',
             height: 300,
             borderRadius: 10,
-            backgroundColor: '#e0e0e0',
-            resizeMode: 'cover',
+            backgroundColor: colors.surfaceAlt,
 
         },
         productInfoContainer: {
@@ -220,23 +221,23 @@ function Products({ searchQuery }: ProductsProps) {
         productTitle: {
             fontSize: 18,
             fontWeight: 'bold',
-            color: '#333333',
+            color: colors.text,
             marginBottom: 4,
         },
         productBrand: {
             fontSize: 14,
-            color: '#555555',
+            color: colors.mutedText,
             marginBottom: 4,
         },
         productPrice: {
             fontSize: 16,
             fontWeight: '600',
-            color: '#00796b',
+            color: colors.primary,
             marginBottom: 4,
         },
         productState: {
             fontSize: 14,
-            color: '#777777',
+            color: colors.mutedText,
             fontStyle: 'italic',
         },
         actionsContainer: {
@@ -245,7 +246,7 @@ function Products({ searchQuery }: ProductsProps) {
             alignItems: 'center',
             paddingTop: 10,
             borderTopWidth: 1,
-            borderTopColor: '#eeeeee',
+            borderTopColor: colors.border,
         },
         likeContainer: {
             flexDirection: 'row',
@@ -254,7 +255,7 @@ function Products({ searchQuery }: ProductsProps) {
         },
         likeCountText: {
             fontSize: 16,
-            color: '#333333',
+            color: colors.text,
             fontWeight: '500',
         },
         buttonPressIn: {
@@ -265,7 +266,7 @@ function Products({ searchQuery }: ProductsProps) {
             padding: 5
         },
 
-        buttonText: { fontSize: 18, textAlign: 'center', color: 'black' }
+        buttonText: { fontSize: 18, textAlign: 'center', color: colors.text }
         ,
         emptyState: {
             alignItems: 'center',
@@ -274,27 +275,27 @@ function Products({ searchQuery }: ProductsProps) {
             padding: 28,
         },
         emptyTitle: {
-            color: '#0f172a',
+            color: colors.text,
             fontSize: 20,
             fontWeight: '700',
             marginBottom: 8,
             textAlign: 'center',
         },
         emptyMessage: {
-            color: '#64748b',
+            color: colors.mutedText,
             fontSize: 15,
             lineHeight: 22,
             textAlign: 'center',
         },
         retryButton: {
-            backgroundColor: '#0f766e',
+            backgroundColor: colors.primary,
             borderRadius: 10,
             marginTop: 16,
             paddingHorizontal: 18,
             paddingVertical: 11,
         },
         retryText: {
-            color: '#ffffff',
+            color: colors.onPrimary,
             fontWeight: '700',
         }
     });
@@ -306,7 +307,7 @@ function Products({ searchQuery }: ProductsProps) {
 
                 {isLoading ? (
                     <View style={styles.emptyState} accessibilityRole='progressbar'>
-                        <ActivityIndicator size='large' color='#0f766e' />
+                        <ActivityIndicator size='large' color={colors.primary} />
                         <Text style={styles.emptyMessage}>{t('Loading products…')}</Text>
                     </View>
                 ) : loadError ? (
@@ -318,7 +319,7 @@ function Products({ searchQuery }: ProductsProps) {
                     </View>
                 ) : products.length === 0 ? (
                     <View style={styles.emptyState}>
-                        <MaterialCommunityIcons name='shopping-outline' size={46} color='#94a3b8' />
+                        <MaterialCommunityIcons name='shopping-outline' size={46} color={colors.mutedText} />
                         <Text style={styles.emptyTitle}>{searchQuery ? t('No products found') : t('No products yet')}</Text>
                         <Text style={styles.emptyMessage}>{searchQuery ? t('Try another search or clear the search field.') : t('Be the first to share something with the community.')}</Text>
                     </View>
@@ -335,7 +336,7 @@ function Products({ searchQuery }: ProductsProps) {
                     return (
                         <View style={styles.productContainer} key={product.id} >
 
-                            <Image style={styles.productImage} source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={accessibilityImageLabel} />
+                            <Image style={styles.productImage} resizeMode='cover' source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={accessibilityImageLabel} />
 
                             <View style={styles.productInfoContainer} key={product.id}>
 
@@ -350,7 +351,7 @@ function Products({ searchQuery }: ProductsProps) {
                             <View style={styles.actionsContainer}>
                                 <View style={styles.likeContainer}>
                                     <TouchableOpacity style={isLiked ? styles.button : styles.buttonPressIn} onPress={() => handleToggleLikeProduct(product.id)} accessibilityLabel={t(isLiked ? 'Unlike {title}. Currently has {count} likes.' : 'Like {title}. Currently has {count} likes.', { title: product.title, count: likeCount })} accessibilityRole='button' accessibilityState={{ checked: isLiked }}>
-                                        <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={'red'} />
+                                        <MaterialCommunityIcons name={isLiked ? 'heart' : 'heart-outline'} size={25} color={colors.danger} />
                                     </TouchableOpacity>
                                     <Text style={styles.likeCountText} accessibilityLabel={t('{count} likes', { count: likeCount })}>{likeCount}</Text>
                                 </View>
@@ -358,12 +359,12 @@ function Products({ searchQuery }: ProductsProps) {
                                     ? t('View comments for product {title}. Has 1 comment.', { title: product.title })
                                     : t('View comments for product {title}. Has {count} comments.', { title: product.title, count: product.commentCount ?? 0 })} accessibilityRole='button'>
                                     <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>
-                                        <MaterialCommunityIcons name='comment-multiple-outline' size={25} color='#607d8b' />
+                                        <MaterialCommunityIcons name='comment-multiple-outline' size={25} color={colors.primary} />
                                     </TouchableOpacity>
                                     <Text style={styles.commentsCountText} accessibilityLabel={product.commentCount === 1 ? t('1 comment') : t('{count} comments', { count: product.commentCount ?? 0 })}>{product.commentCount ?? 0}</Text>
                                 </View>
                                 <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPress={() => handleToggleSavedProduct(product.id)} accessibilityLabel={t(isSaved ? 'Unsave {title}' : 'Save {title}', { title: product.title })} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
-                                    <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={'blue'} />
+                                    <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={colors.accent} />
                                 </TouchableOpacity>
                             </View>
                         </View>

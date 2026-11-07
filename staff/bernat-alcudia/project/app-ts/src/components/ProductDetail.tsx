@@ -7,19 +7,20 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import type { Product } from '../types/models'
 import type { ProductRoute, RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme, type ThemeColors } from '../theme/ThemeContext'
 
 
 const screenWidth = Dimensions.get('window').width;
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
 
     mainContainer: {
         flex: 1,
-
+        backgroundColor: colors.background,
     },
     productCard: {
         margin: 15,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: colors.surface,
         borderRadius: 10,
         padding: 15,
         shadowColor: '#000',
@@ -43,7 +44,6 @@ const styles = StyleSheet.create({
         height: screenWidth - 30,
         borderRadius: 10,
         marginRight: 0,
-        resizeMode: 'cover',
         marginLeft: 10,
     },
     infoContainer: {
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: colors.text,
         marginBottom: 10,
     },
     detailRow: {
@@ -64,56 +64,56 @@ const styles = StyleSheet.create({
     },
     detailLabel: {
         fontSize: 15,
-        color: '#555',
+        color: colors.mutedText,
         fontWeight: '500',
     },
     detailValue: {
         fontSize: 15,
-        color: '#333',
+        color: colors.text,
         flexShrink: 1,
         textAlign: 'right',
     },
     dateText: {
         fontSize: 12,
-        color: '#888',
+        color: colors.mutedText,
         marginBottom: 5,
     },
     titleText: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#222',
+        color: colors.text,
         marginBottom: 8,
         textAlign: 'center',
     },
     brandText: {
         fontSize: 16,
-        color: '#666',
+        color: colors.mutedText,
         marginBottom: 8,
         textAlign: 'center',
     },
     priceText: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#28a745',
+        color: colors.primary,
         marginBottom: 10,
         textAlign: 'center',
     },
     stateText: {
         fontSize: 14,
         fontStyle: 'italic',
-        color: '#777',
+        color: colors.mutedText,
         marginBottom: 5,
         textAlign: 'center',
     },
     stockText: {
         fontSize: 14,
-        color: '#777',
+        color: colors.mutedText,
         marginBottom: 10,
         textAlign: 'center',
     },
     descriptionText: {
         fontSize: 15,
-        color: '#444',
+        color: colors.text,
         lineHeight: 22,
         marginTop: 10,
         textAlign: 'justify',
@@ -123,33 +123,33 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         paddingTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#eee',
+        borderTopColor: colors.border,
         marginTop: 15,
     },
     actionButton: {
         padding: 10,
         borderRadius: 5,
-        backgroundColor: '#e9ecef',
+        backgroundColor: colors.surfaceAlt,
 
     },
     modifyIcon: {
         fontSize: 26,
-        color: '#007bff',
+        color: colors.primary,
     },
     deleteIcon: {
         fontSize: 26,
-        color: '#dc3545',
+        color: colors.danger,
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.background,
     },
     loadingText: {
         fontSize: 16,
         marginTop: 12,
-        color: '#555',
+        color: colors.mutedText,
     }
 });
 
@@ -165,6 +165,8 @@ function ProductDetail() {
 
     const { id: productId } = route.params
     const { language, t } = useLanguage()
+    const { colors } = useTheme()
+    const styles = createStyles(colors)
 
     const handleDeleteProduct = () => {
         const deleteProduct = () => {
@@ -236,7 +238,7 @@ function ProductDetail() {
     if (isLoading) {
         return (
             <View style={styles.loadingContainer} accessible={true} accessibilityLabel={t('Loading product details')} accessibilityRole='alert' >
-                <ActivityIndicator size='large' color='#0f766e' />
+                <ActivityIndicator size='large' color={colors.primary} />
                 <Text style={styles.loadingText}>{t('Loading product details…')}</Text>
             </View>
         );
@@ -267,7 +269,7 @@ function ProductDetail() {
 
                         <View style={styles.imageContainer} key={product.id} accessible={true} accessibilityLabel={t('Product image gallery')}>
                             {product.images.map((image, index) => (
-                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} onError={(error) => console.error('Error loading image:', error)} accessible={true} accessibilityLabel={t('Product image {number} of {count}: {title}', { number: index + 1, count: product.images.length, title: product.title })} accessibilityRole='image' />
+                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} resizeMode='cover' onError={(error) => console.error('Error loading image:', error)} accessible={true} accessibilityLabel={t('Product image {number} of {count}: {title}', { number: index + 1, count: product.images.length, title: product.title })} accessibilityRole='image' />
                             ))}
                         </View>
                     </ScrollView>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { errors } from 'com';
@@ -7,6 +7,7 @@ import { errors } from 'com';
 import logic from '../logic';
 import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme } from '../theme/ThemeContext'
 
 const { ValidationError, MatchError } = errors
 
@@ -19,6 +20,7 @@ function LoginUser() {
 
     const navigation = useNavigation<RootNavigation>()
     const { t } = useLanguage()
+    const { colors } = useTheme()
 
     const handleSubmit = () => {
         if (isSubmitting) return
@@ -62,30 +64,30 @@ function LoginUser() {
             padding: 24,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#f1f5f9',
+            backgroundColor: colors.background,
         },
         card: {
             alignItems: 'center',
-            backgroundColor: '#ffffff',
+            backgroundColor: colors.surface,
             borderRadius: 18,
             elevation: 3,
             maxWidth: 420,
             padding: 24,
-            shadowColor: '#0f172a',
+            shadowColor: colors.text,
             shadowOffset: { width: 0, height: 3 },
             shadowOpacity: 0.1,
             shadowRadius: 12,
             width: '100%',
         },
         heading: {
-            color: '#0f172a',
+            color: colors.text,
             fontSize: 26,
             fontWeight: '700',
             marginBottom: 8,
             textAlign: 'center',
         },
         subtitle: {
-            color: '#64748b',
+            color: colors.mutedText,
             fontSize: 15,
             marginBottom: 20,
             textAlign: 'center',
@@ -96,34 +98,35 @@ function LoginUser() {
             paddingVertical: 13,
             marginBottom: 12,
             borderWidth: 1,
-            borderColor: '#cbd5e1',
+            borderColor: colors.border,
             borderRadius: 10,
-            backgroundColor: '#ffffff',
+            backgroundColor: colors.input,
+            color: colors.text,
             fontSize: 16,
         },
         button: {
             width: '100%',
             padding: 14,
-            backgroundColor: '#0f766e',
+            backgroundColor: colors.primary,
             borderRadius: 10,
             marginTop: 6,
         },
         secondaryButton: {
             width: '100%',
             padding: 13,
-            borderColor: '#0f766e',
+            borderColor: colors.primary,
             borderWidth: 1,
             borderRadius: 10,
             marginTop: 10,
         },
         buttonText: {
-            color: '#fff',
+            color: colors.onPrimary,
             fontSize: 16,
             fontWeight: '700',
             textAlign: 'center',
         },
         secondaryButtonText: {
-            color: '#0f766e',
+            color: colors.primary,
             fontSize: 16,
             fontWeight: '700',
             textAlign: 'center',
@@ -132,12 +135,13 @@ function LoginUser() {
 
     return <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
         <View style={styles.card}>
+            <Image source={require('../../assets/bonita-fallera-logo.png')} style={{ width: 190, height: 150, marginBottom: 8 }} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
             <Text style={styles.heading} accessibilityRole='header'>{t('Welcome back')}</Text>
             <Text style={styles.subtitle}>{t('Sign in to discover products')}</Text>
             <TextInput
                 style={styles.input}
                 placeholder={t('Username')}
-                placeholderTextColor='#64748b'
+                placeholderTextColor={colors.mutedText}
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize='none'
@@ -149,7 +153,7 @@ function LoginUser() {
                 style={styles.input}
                 secureTextEntry
                 placeholder={t('Password')}
-                placeholderTextColor='#64748b'
+                placeholderTextColor={colors.mutedText}
                 value={password}
                 onChangeText={setPassword}
                 autoCapitalize='none'
@@ -167,7 +171,7 @@ function LoginUser() {
                 accessibilityState={{ disabled: isSubmitting || !username.trim() || !password }}
             >
                 {isSubmitting
-                    ? <ActivityIndicator color='#ffffff' />
+                    ? <ActivityIndicator color={colors.onPrimary} />
                     : <Text style={styles.buttonText}>{t('Login')}</Text>}
             </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryButton} onPress={handleRegister} accessibilityRole='button'>

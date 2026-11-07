@@ -1,6 +1,7 @@
 import React from 'react'
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useLanguage, type Language } from '../i18n/LanguageContext'
+import { useTheme } from '../theme/ThemeContext'
 
 const languages: Language[] = ['en', 'es']
 
@@ -10,6 +11,26 @@ interface LanguageSwitcherProps {
 
 export default function LanguageSwitcher({ compact = false }: LanguageSwitcherProps) {
     const { language, setLanguage, t } = useLanguage()
+    const { colors } = useTheme()
+
+    const styles = StyleSheet.create({
+        container: {
+            alignItems: 'center',
+            alignSelf: 'stretch',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+            width: '100%',
+        },
+        compactContainer: { alignSelf: 'center', marginBottom: 0, marginRight: 8, width: 'auto' },
+        label: { color: colors.text, fontSize: 14, fontWeight: '600' },
+        options: { backgroundColor: colors.surfaceAlt, borderColor: colors.border, borderWidth: 1, borderRadius: 10, flexDirection: 'row', padding: 3 },
+        option: { alignItems: 'center', borderRadius: 8, minHeight: 40, minWidth: 52, justifyContent: 'center', paddingHorizontal: 10 },
+        compactOption: { minWidth: 36, paddingHorizontal: 8, minHeight: 36 },
+        selectedOption: { backgroundColor: colors.primary },
+        optionText: { color: colors.text, fontSize: 13, fontWeight: '700' },
+        selectedText: { color: colors.onPrimary },
+    })
 
     const handleSelectLanguage = (nextLanguage: Language) => {
         setLanguage(nextLanguage).catch(error => {
@@ -40,55 +61,3 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        alignSelf: 'stretch',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-        maxWidth: 420,
-        width: '100%',
-    },
-    compactContainer: {
-        alignSelf: 'center',
-        marginBottom: 0,
-        marginRight: 8,
-        width: 'auto',
-    },
-    label: {
-        color: '#475569',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    options: {
-        backgroundColor: '#e8eef2',
-        borderRadius: 10,
-        flexDirection: 'row',
-        padding: 3,
-    },
-    option: {
-        alignItems: 'center',
-        borderRadius: 8,
-        minWidth: 48,
-        paddingHorizontal: 10,
-        paddingVertical: 7,
-    },
-    compactOption: {
-        minWidth: 36,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-    },
-    selectedOption: {
-        backgroundColor: '#0f766e',
-    },
-    optionText: {
-        color: '#334155',
-        fontSize: 13,
-        fontWeight: '700',
-    },
-    selectedText: {
-        color: '#ffffff',
-    },
-})

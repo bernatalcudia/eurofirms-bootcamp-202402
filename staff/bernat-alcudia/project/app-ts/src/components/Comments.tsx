@@ -10,6 +10,7 @@ import logic from '../logic';
 import Comment from './Comment';
 import type { Comment as ProductComment } from '../types/models'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme } from '../theme/ThemeContext'
 
 const screenHeight = Dimensions.get('window').height || 600;
 
@@ -22,6 +23,8 @@ interface CommentsProps {
 }
 
 function Comments({ visible, onClose, productId, onCommentCreated, onCommentDeleted }: CommentsProps) {
+    const { t } = useLanguage()
+    const { colors } = useTheme()
 
     const styles = StyleSheet.create({
 
@@ -29,7 +32,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             position: 'absolute',
             height: '85%',
             width: '100%',
-            backgroundColor: 'white',
+            backgroundColor: colors.surface,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             paddingTop: 5,
@@ -41,7 +44,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
         dragBar: {
             width: 60,
             height: 5,
-            backgroundColor: '#ccc',
+            backgroundColor: colors.border,
             borderRadius: 3,
             alignSelf: 'center',
             marginBottom: 10,
@@ -59,6 +62,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             fontWeight: 'bold',
             marginLeft: 15,
             flex: 1,
+            color: colors.text,
         },
         header: {
             flexDirection: 'row',
@@ -86,19 +90,20 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
             alignItems: 'center',
             padding: 10,
             borderTopWidth: 1,
-            borderTopColor: '#eee',
-            backgroundColor: 'white'
+            borderTopColor: colors.border,
+            backgroundColor: colors.surface
         },
         input: {
             flex: 1,
             paddingVertical: 10,
             paddingHorizontal: 15,
             borderWidth: 1,
-            borderColor: '#ccc',
+            borderColor: colors.border,
             borderRadius: 20,
             marginRight: 10,
             fontSize: 16,
-            color: '#333'
+            color: colors.text,
+            backgroundColor: colors.input,
 
         },
 
@@ -120,7 +125,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
         },
         emptyListText: {
             fontSize: 16,
-            color: '#aaa'
+            color: colors.mutedText
         },
 
     })
@@ -131,8 +136,6 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
     const [comment, setComment] = useState('')
     const [text, seText] = useState('')
     const commentInputRef = useRef<TextInput | null>(null)
-    const { t } = useLanguage()
-
     useEffect(() => {
 
         Animated.timing(panY, {
@@ -295,7 +298,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                             useNativeDriver: true
                         }).start(() => onClose())
                     }} style={styles.closeButton} accessibilityLabel={t('Close comments')} accessibilityRole='button'>
-                        <MaterialCommunityIcons name='chevron-down' size={30} color='black' />
+                        <MaterialCommunityIcons name='chevron-down' size={30} color={colors.text} />
                     </TouchableOpacity>
                     <Text style={styles.title} accessibilityRole='header'>{t('Comments')}</Text>
                 </View>
@@ -328,7 +331,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
                     <View style={styles.inputContainer}>
                         <TextInput ref={commentInputRef} style={styles.input} placeholder={t('Add a comment')} value={comment} onChangeText={setComment} multiline accessibilityLabel={t('Comment input field')} accessibilityHint={t('Add a comment')} returnKeyType='send' onSubmitEditing={handleCreateComment} />
                         <TouchableOpacity style={styles.sendButton} onPress={handleCreateComment} disabled={!comment.trim()} accessibilityLabel={t('Send comment')} accessibilityState={{ disabled: !comment.trim() }}>
-                            <MaterialCommunityIcons name='send' size={24} color={comment.trim() ? 'black' : '#ccc'}></MaterialCommunityIcons>
+                            <MaterialCommunityIcons name='send' size={24} color={comment.trim() ? colors.primary : colors.border}></MaterialCommunityIcons>
                         </TouchableOpacity>
                     </View>
                 </KeyboardAvoidingView>

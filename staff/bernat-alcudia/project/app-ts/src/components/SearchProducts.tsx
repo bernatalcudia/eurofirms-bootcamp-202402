@@ -2,6 +2,7 @@ import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useTheme } from '../theme/ThemeContext'
 
 
 
@@ -12,6 +13,7 @@ interface SearchProductProps {
 function SearchProduct({ onSearch }: SearchProductProps) {
     const [text, setText] = useState('')
     const { t } = useLanguage()
+    const { colors } = useTheme()
 
     useEffect(() => {
         const timeout = setTimeout(() => onSearch(text.trim()), 250)
@@ -24,10 +26,11 @@ function SearchProduct({ onSearch }: SearchProductProps) {
             paddingHorizontal: 14,
             paddingVertical: 8,
             borderWidth: 1,
-            borderColor: '#ccc',
+            borderColor: colors.border,
             borderRadius: 10,
             height: 42,
-            backgroundColor: '#fff',
+            backgroundColor: colors.input,
+            color: colors.text,
         },
         view: {
             alignItems: 'center',
@@ -48,7 +51,7 @@ function SearchProduct({ onSearch }: SearchProductProps) {
                 onChangeText={setText}
                 style={styles.input}
                 placeholder={t('Search products')}
-                placeholderTextColor='#64748b'
+                placeholderTextColor={colors.mutedText}
                 value={text}
                 returnKeyType='search'
                 accessibilityLabel={t('Search products')}
@@ -60,7 +63,7 @@ function SearchProduct({ onSearch }: SearchProductProps) {
                     accessibilityRole='button'
                     accessibilityLabel={t('Clear search')}
                 >
-                    <MaterialCommunityIcons name='close-circle' size={22} color='#64748b' />
+                    <MaterialCommunityIcons name='close-circle' size={22} color={colors.mutedText} />
                 </TouchableOpacity>
             )}
         </View>
