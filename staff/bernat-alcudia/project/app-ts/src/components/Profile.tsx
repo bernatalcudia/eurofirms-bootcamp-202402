@@ -17,7 +17,6 @@ function Profile() {
     const styles = StyleSheet.create({
         container: { flexGrow: 1, backgroundColor: colors.background, padding: 20, alignItems: 'center' },
         content: { width: '100%', maxWidth: 520 },
-        heading: { color: colors.text, fontSize: 24, fontWeight: '700', marginBottom: 6 },
         subtitle: { color: colors.mutedText, fontSize: 15, lineHeight: 22, marginBottom: 24 },
         sectionTitle: { color: colors.mutedText, fontSize: 13, fontWeight: '700', marginBottom: 8, marginTop: 16, textTransform: 'uppercase' },
         card: { backgroundColor: colors.surface, borderRadius: 16, borderColor: colors.border, borderWidth: 1, overflow: 'hidden' },
@@ -73,7 +72,6 @@ function Profile() {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.heading} accessibilityRole='header'>{t('My profile')}</Text>
                 <Text style={styles.subtitle}>{t('Manage your account and personalize your experience.')}</Text>
 
                 <Text style={styles.sectionTitle}>{t('Preferences')}</Text>
