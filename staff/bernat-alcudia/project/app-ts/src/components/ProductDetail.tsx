@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Alert, Platform, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, Image, ScrollView, Alert, Modal, Pressable, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import logic from '../logic';
 import { utils } from 'com'
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useRoute, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { Product } from '../types/models'
 import type { ProductRoute, RootNavigation } from '../types/navigation'
@@ -16,6 +16,9 @@ function ProductDetail() {
     const [loadError, setLoadError] = useState(false)
     const [isStartingChat, setIsStartingChat] = useState(false)
     const [failedImages, setFailedImages] = useState<number[]>([])
+    const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [deleteError, setDeleteError] = useState('')
 
     const navigation = useNavigation<RootNavigation>()
 
@@ -29,42 +32,20 @@ function ProductDetail() {
     const galleryHeight = Math.min(Math.max(galleryWidth * 0.72, 220), 520)
     const styles = createProductDetailStyles(colors, galleryWidth, galleryHeight)
 
-    const handleDeleteProduct = () => {
-        const deleteProduct = () => {
-            try {
-                logic.removeProduct(productId)
-                    .then(() => navigation.navigate('tabs'))
-                    .catch(error => {
-                        console.error(error)
-
-                        alert(error instanceof Error ? error.message : t('Unexpected error'))
-                    })
-            } catch (error) {
-                console.error(error)
-
-                alert(error instanceof Error ? error.message : t('Unexpected error'))
-            }
+    const handleDeleteProduct = async () => {
+        if (isDeleting) return
+        setIsDeleting(true)
+        setDeleteError('')
+        try {
+            await logic.removeProduct(productId)
+            setIsDeleteDialogVisible(false)
+            navigation.navigate('tabs')
+        } catch (error) {
+            console.error('Could not delete product:', error)
+            setDeleteError(t('Could not delete this product. Please try again.'))
+        } finally {
+            setIsDeleting(false)
         }
-
-        if (Platform.OS === 'web') {
-            if (globalThis.confirm(t('Are you sure you want to delete this product?'))) {
-                deleteProduct()
-            }
-
-            return
-        }
-
-        Alert.alert(t('Delete product'), t('Are you sure you want to delete this product?'), [
-            {
-                text: t('Cancel'),
-                style: 'cancel',
-            },
-            {
-                text: t('Delete'),
-                onPress: deleteProduct,
-                style: 'destructive',
-            },
-        ])
     }
 
     const handleModifyProductDetail = () => {
@@ -85,7 +66,7 @@ function ProductDetail() {
         }
     }
 
-    const showProductDetails = () => {
+    const showProductDetails = useCallback(() => {
         setIsLoading(true)
         setLoadError(false)
         try {
@@ -104,12 +85,12 @@ function ProductDetail() {
             setLoadError(true)
             setIsLoading(false)
         }
-    }
-
-
-    useEffect(() => {
-        showProductDetails()
     }, [productId])
+
+
+    useFocusEffect(useCallback(() => {
+        showProductDetails()
+    }, [showProductDetails]))
 
     if (isLoading) {
         return (
@@ -200,7 +181,17 @@ function ProductDetail() {
                                 <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' />
                                 <Text style={styles.editButtonText}>{t('Modify product')}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDeleteProduct} accessible={true} accessibilityLabel={t('Delete product')} accessibilityHint={t('Delete product')} accessibilityRole='button'>
+                            <TouchableOpacity
+                                style={[styles.actionButton, styles.deleteButton]}
+                                onPress={() => {
+                                    setDeleteError('')
+                                    setIsDeleteDialogVisible(true)
+                                }}
+                                accessible={true}
+                                accessibilityLabel={t('Delete product')}
+                                accessibilityHint={t('Delete product')}
+                                accessibilityRole='button'
+                            >
                                 <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' />
                                 <Text style={styles.deleteButtonText}>{t('Delete product')}</Text>
                             </TouchableOpacity>
@@ -221,6 +212,47 @@ function ProductDetail() {
                     )}
                 </View>
             </ScrollView >
+            <Modal
+                visible={isDeleteDialogVisible}
+                transparent
+                animationType='fade'
+                onRequestClose={() => {
+                    if (!isDeleting) setIsDeleteDialogVisible(false)
+                }}
+            >
+                <View style={styles.dialogBackdrop}>
+                    <View style={styles.confirmDialog} accessibilityRole='alert'>
+                        <View style={styles.dialogIcon}>
+                            <MaterialCommunityIcons name='trash-can-outline' size={26} color={colors.danger} />
+                        </View>
+                        <Text style={styles.dialogTitle}>{t('Delete product')}</Text>
+                        <Text style={styles.dialogMessage}>
+                            {t('Are you sure you want to delete {title}? This action cannot be undone.', { title: product.title })}
+                        </Text>
+                        {deleteError ? <Text style={styles.dialogError} accessibilityRole='alert' accessibilityLiveRegion='polite'>{deleteError}</Text> : null}
+                        <View style={styles.dialogActions}>
+                            <Pressable
+                                style={[styles.dialogButton, styles.cancelDialogButton]}
+                                onPress={() => setIsDeleteDialogVisible(false)}
+                                disabled={isDeleting}
+                                accessibilityRole='button'
+                            >
+                                <Text style={styles.cancelDialogText}>{t('Cancel')}</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.dialogButton, styles.confirmDeleteButton, isDeleting && { opacity: 0.65 }]}
+                                onPress={() => void handleDeleteProduct()}
+                                disabled={isDeleting}
+                                accessibilityRole='button'
+                                accessibilityState={{ disabled: isDeleting }}
+                            >
+                                {isDeleting ? <ActivityIndicator size='small' color={colors.onDanger} /> : null}
+                                <Text style={styles.confirmDeleteText}>{isDeleting ? t('Deleting…') : t('Delete product')}</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     )
 };
