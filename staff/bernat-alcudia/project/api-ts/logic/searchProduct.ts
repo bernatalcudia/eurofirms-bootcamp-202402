@@ -4,6 +4,8 @@ import { validate, errors } from "com"
 
 const { SystemError, NotFoundError } = errors
 
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+
 export const searchProduct: SearchProduct = (userId: string, searchQuery: string) => {
     validate.id(userId, "userId")
     validate.searchQuery(searchQuery, "searchQuery")
@@ -13,7 +15,7 @@ export const searchProduct: SearchProduct = (userId: string, searchQuery: string
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.find({ "title": { "$regex": searchQuery, "$options": "i" } }).select("-__v").populate("author", "username").lean()
+            return Product.find({ "title": { "$regex": escapeRegExp(searchQuery), "$options": "i" } }).select("-__v").populate("author", "username").lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(product => {
                     if (!product) { throw new NotFoundError("product not found") }

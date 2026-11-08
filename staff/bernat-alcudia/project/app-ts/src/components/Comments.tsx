@@ -34,7 +34,7 @@ function Comments({ visible, onClose, productId, onCommentCreated, onCommentDele
     const [commentsRefreshVersion, setCommentsRefreshVersion] = useState(0)
     const [comment, setComment] = useState('')
     const [text, seText] = useState('')
-    const commentInputRef = useRef<TextInput | null>(null)
+    const commentInputRef = useRef<React.ComponentRef<typeof TextInput>>(null)
     useEffect(() => {
 
         Animated.timing(panY, {

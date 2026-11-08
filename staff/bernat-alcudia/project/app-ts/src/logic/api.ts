@@ -6,6 +6,9 @@ import { executeApiRequest, type ApiRequestOptions } from "./http"
 function apiUrl(path: string): string {
   const baseUrl = process.env.EXPO_PUBLIC_API_URL
   if (!baseUrl) throw new errors.SystemError("EXPO_PUBLIC_API_URL is not configured")
+  if (!__DEV__ && !baseUrl.startsWith("https://")) {
+    throw new errors.SystemError("EXPO_PUBLIC_API_URL must use HTTPS in production builds")
+  }
   return `${baseUrl.replace(/\/+$/, "")}${path}`
 }
 

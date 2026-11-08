@@ -114,7 +114,7 @@ function Profile() {
                 return
             }
             const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: ['images'],
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.6,
@@ -130,12 +130,13 @@ function Profile() {
                 { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
             )
             const encoded = resized.base64
-            if (!encoded || encoded.length + 23 > 512_000) {
+            const mime = encoded?.startsWith('/9j/') ? 'jpeg' : encoded?.startsWith('iVBORw0KGgo') ? 'png' : null
+            if (!encoded || !mime || encoded.length + 23 > 512_000) {
                 setPhotoError(t('Choose a JPEG or PNG profile photo smaller than 375 KB.'))
                 return
             }
             setPhotoFailed(false)
-            setProfile(current => current ? { ...current, photo: `data:image/jpeg;base64,${encoded}` } : current)
+            setProfile(current => current ? { ...current, photo: `data:image/${mime};base64,${encoded}` } : current)
         } catch (error) {
             console.error('Could not select profile photo:', error)
             setPhotoError(t('Could not select a profile photo. Please try again.'))

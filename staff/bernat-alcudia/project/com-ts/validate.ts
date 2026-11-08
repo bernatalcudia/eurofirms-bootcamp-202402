@@ -41,14 +41,15 @@ const textSchema = z.string().min(1)
 //     .refine(val => /^[A-Za-z0-9+/]*={0,2}$/.test(val), { message: "wrong format" }))
 
 
-const singleImageUrlSchema = z.string().min(1, { message: "images are empty" })
+const singleImageUrlSchema = z.string().min(1, { message: "images are empty" }).max(1_200_000, { message: "image is too large" })
 
 const imagesArraySchema = z
     .array(singleImageUrlSchema)
     .min(1, 'at least 1 image')
-const descriptionSchema = z.string({ message: "description is not a string" })
-const titleSchema = z.string().min(1, { message: "title is empty" })
-const brandSchema = z.string().min(1, { message: "brand is empty" })
+    .max(10, 'at most 10 images')
+const descriptionSchema = z.string({ message: "description is not a string" }).max(2000, { message: "description is too long" })
+const titleSchema = z.string().min(1, { message: "title is empty" }).max(120, { message: "title is too long" })
+const brandSchema = z.string().min(1, { message: "brand is empty" }).max(120, { message: "brand is too long" })
 const priceSchema = z.number().min(0, { message: "price is lower than 0" })
 const stockSchema = z.number().min(0, { message: "stock is lower than 0" })
 const stateSchema = z.enum(["new", "used"], { message: "invalid state" })
@@ -59,7 +60,7 @@ const tokenSchema = z.string().min(1, { message: "token is empty" }).refine(valu
     return now < exp
 }, { message: "token expired" })
 const roleSchema = z.enum(["admin", "regular"], { message: "invalid role" })
-const searchQuerySchema = z.string().min(1, { message: "search query is empty" })
+const searchQuerySchema = z.string().min(1, { message: "search query is empty" }).max(100, { message: "search query is too long" })
 const stringSchema = z.string()
 const numberSchema = z.number()
 

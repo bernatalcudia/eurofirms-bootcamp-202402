@@ -1,11 +1,16 @@
 {
   "expo": {
     "android": {
+      "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ]
+      ],
+      "package": "com.anonymous.bonitafallerats"
     },
     "name": "Bonit@ Faller@ (TypeScript)",
     "slug": "bonita-fallera-ts",

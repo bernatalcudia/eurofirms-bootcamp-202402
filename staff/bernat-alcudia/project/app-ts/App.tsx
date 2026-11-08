@@ -1,5 +1,6 @@
 import React from "react"
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
+import { useFonts } from "expo-font"
 import { StatusBar } from "expo-status-bar"
 import AppNavigator from "./src/navigation/AppNavigator"
 import { LanguageProvider } from "./src/i18n/LanguageContext"
@@ -31,6 +32,12 @@ function AppNavigation() {
 }
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    MaterialCommunityIcons: require("react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
+    "Material Design Icons": require("react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
+  })
+  if (!fontsLoaded && !fontError) return null
+
   return (
     <LanguageProvider>
       <ThemeProvider>

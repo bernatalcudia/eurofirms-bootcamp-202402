@@ -1,10 +1,11 @@
 node_modules/
 .expo/
+android/
+ios/
 dist/
 web-build/
 .env
 .env.*
-!.env.example
 *.tsbuildinfo
 *.log
 test-results/

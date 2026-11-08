@@ -1,6 +1,8 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { prepareProductImages } from '../logic/productImages';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ComponentRef } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
 import type { RadioButtonProps } from 'react-native-radio-buttons-group'
@@ -22,6 +24,11 @@ function ModifyProduct() {
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState(false)
     const [formError, setFormError] = useState('')
+    const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null)
+
+    useEffect(() => {
+        if (formError) scrollRef.current?.scrollTo({ y: 0, animated: true })
+    }, [formError])
 
     const [selectedId, setSelectedId] = useState('');
     const { t } = useLanguage()
@@ -91,10 +98,10 @@ function ModifyProduct() {
                 return
             }
 
-            const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, mediaTypes: ImagePicker.MediaTypeOptions.Images, base64: true })
+            const result = await ImagePicker.launchImageLibraryAsync({             allowsMultipleSelection: true, mediaTypes: ['images'] })
             if (result.canceled) return
             if (result.assets && result.assets.length > 0) {
-                const base64Images = result.assets.map(asset => asset.base64).filter((image): image is string => image !== null)
+                            const base64Images = await prepareProductImages(result.assets)
                 if (images.length + base64Images.length > 10) {
                     Alert.alert(t('Add photos to continue'), t('You can select up to 10 photos.'))
                     return
@@ -124,8 +131,7 @@ function ModifyProduct() {
             }
 
             const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                base64: true,
+                            mediaTypes: ['images'],
             })
 
             if (result.canceled) {
@@ -133,7 +139,7 @@ function ModifyProduct() {
             }
 
             if (result.assets && result.assets.length > 0) {
-                const base64Images = result.assets.map(asset => asset.base64).filter((image): image is string => image !== null)
+                const base64Images = await prepareProductImages(result.assets)
                 if (images.length + base64Images.length > 10) {
                     Alert.alert(t('Add photos to continue'), t('You can select up to 10 photos.'))
                     return
@@ -220,7 +226,7 @@ function ModifyProduct() {
 
     return (
         <>
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel={t('Modify product scroll view')}>
+            <ScrollView ref={scrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel={t('Modify product scroll view')}>
                 <View style={styles.container}>
                     <Text style={styles.pageTitle} accessibilityRole='header'>{t('Modify product')}</Text>
                     <Text style={styles.introText}>{t('Update the photos and details buyers see.')}</Text>
@@ -261,13 +267,13 @@ function ModifyProduct() {
                     <TextInput style={styles.input} value={title} onChangeText={value => {
                         setTitle(value)
                         setFormError('')
-                    }} placeholder={t('Enter product title')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
+                    }} placeholder={t('Enter product title')} maxLength={120} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
 
                     <Text style={styles.label} accessibilityLabel={t('Product brand input')}>{t('Brand')}</Text>
                     <TextInput style={styles.input} value={brand} onChangeText={value => {
                         setBrand(value)
                         setFormError('')
-                    }} placeholder={t('Enter product brand')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
+                    }} placeholder={t('Enter product brand')} maxLength={120} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
 
                     <Text style={styles.label} accessibilityLabel={t('Product price input')}>{t('Price')}</Text>
                     <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={value => {
@@ -299,7 +305,7 @@ function ModifyProduct() {
                     <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={value => {
                         setDescription(value)
                         setFormError('')
-                    }} placeholder={t('Describe your product')} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
+                    }} placeholder={t('Describe your product')} maxLength={2000} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
 
                     <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && styles.disabledButton]} onPress={handleModifyProduct} disabled={isSubmitting} accessibilityRole='button' accessibilityLabel={t('Save changes')} accessibilityState={{ disabled: isSubmitting }}>

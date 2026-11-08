@@ -5,6 +5,9 @@ import { AuthenticateUser } from "./types.js"
 
 const { SystemError, CredentialsError } = errors
 
+// Comparing against a fixed hash keeps response time similar for unknown usernames.
+const unknownUserHash = bcrypt.hashSync("unknown-user-placeholder", 10)
+
 export const authenticateUser: AuthenticateUser = (username: string, password: string) => {
     validate.username(username, "username")
     validate.password(password, "password")
@@ -12,7 +15,11 @@ export const authenticateUser: AuthenticateUser = (username: string, password: s
     return User.findOne({ username })
         .catch(error => { throw new SystemError(error.message) })
         .then(user => {
-            if (!user) throw new CredentialsError("wrong credentials")
+            if (!user) {
+                return bcrypt.compare(password, unknownUserHash)
+                    .catch(error => { throw new SystemError(error.message) })
+                    .then(() => { throw new CredentialsError("wrong credentials") })
+            }
 
             return bcrypt.compare(password, user.password)
                 .catch(error => { throw new SystemError(error.message) })

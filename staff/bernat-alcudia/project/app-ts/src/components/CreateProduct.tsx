@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import logic from '../logic'
 import { View, Image, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useNavigation } from '@react-navigation/native'
 import RadioGroup from 'react-native-radio-buttons-group'
 import * as ImagePicker from 'expo-image-picker'
+import { prepareProductImages } from '../logic/productImages'
 import type { RadioButtonProps } from 'react-native-radio-buttons-group'
 import type { ProductState } from '../types/models'
 import type { RootNavigation } from '../types/navigation'
@@ -22,6 +23,11 @@ function CreateProduct({ }) {
     const [stock, setStock] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
+    const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null)
+
+    useEffect(() => {
+        if (formError) scrollRef.current?.scrollTo({ y: 0, animated: true })
+    }, [formError])
 
     const [selectedId, setSelectedId] = useState('1')
 
@@ -66,10 +72,10 @@ function CreateProduct({ }) {
                 return
             }
 
-            const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, mediaTypes: ImagePicker.MediaTypeOptions.Images, base64: true })
+            const result = await ImagePicker.launchImageLibraryAsync({             allowsMultipleSelection: true, mediaTypes: ['images'] })
             if (result.canceled) return
             if (result.assets && result.assets.length > 0) {
-                const base64Images = result.assets.map(asset => asset.base64).filter((image): image is string => image !== null)
+                            const base64Images = await prepareProductImages(result.assets)
                 if (images.length + base64Images.length > 10) {
                     Alert.alert(t('Add photos to continue'), t('You can select up to 10 photos.'))
                     return
@@ -98,8 +104,7 @@ function CreateProduct({ }) {
             }
 
             const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                base64: true,
+                            mediaTypes: ['images'],
             })
 
             if (result.canceled) {
@@ -107,7 +112,7 @@ function CreateProduct({ }) {
             }
 
             if (result.assets && result.assets.length > 0) {
-                const base64Images = result.assets.map(asset => asset.base64).filter((image): image is string => image !== null)
+                const base64Images = await prepareProductImages(result.assets)
                 if (images.length + base64Images.length > 10) {
                     Alert.alert(t('Add photos to continue'), t('You can select up to 10 photos.'))
                     return
@@ -190,7 +195,7 @@ function CreateProduct({ }) {
 
 
     return (
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        <ScrollView ref={scrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
             <View style={styles.container}>
                 <Text style={styles.pageTitle} accessibilityRole='header'>{t('Create product')}</Text>
                 <Text style={styles.introText}>{t('Add a clear photo and a few details to help buyers.')}</Text>
@@ -232,13 +237,13 @@ function CreateProduct({ }) {
                 <TextInput style={styles.input} value={title} onChangeText={value => {
                     setTitle(value)
                     setFormError('')
-                }} placeholder={t('Enter product title')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
+                }} placeholder={t('Enter product title')} maxLength={120} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
 
                 <Text style={styles.label}>{t('Brand')}</Text>
                 <TextInput style={styles.input} value={brand} onChangeText={value => {
                     setBrand(value)
                     setFormError('')
-                }} placeholder={t('Enter product brand')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
+                }} placeholder={t('Enter product brand')} maxLength={120} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
 
                 <Text style={styles.label}>{t('Price')}</Text>
                 <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={value => {
@@ -256,7 +261,7 @@ function CreateProduct({ }) {
                 }} placeholder='1' placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
 
                 <Text style={styles.label}>{t('Description')}</Text>
-                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
+                <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} maxLength={2000} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
                 <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && styles.disabledButton]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Publish product')} accessibilityHint={t('Publish product')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
                     <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Publish product')}</Text>

@@ -34,7 +34,7 @@ function ChatConversation() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [loadError, setLoadError] = useState(false)
     const [syncError, setSyncError] = useState(false)
-    const scrollRef = useRef<ScrollView>(null)
+    const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null)
     const route = useRoute<ChatConversationRoute>()
     const navigation = useNavigation<RootNavigation>()
     const { language, t } = useLanguage()

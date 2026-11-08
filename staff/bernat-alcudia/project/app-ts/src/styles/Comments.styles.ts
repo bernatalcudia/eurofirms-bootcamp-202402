@@ -25,7 +25,7 @@ const createCommentsStyles = (colors: ThemeColors) => StyleSheet.create({
     inputContainer: { flexDirection: 'row', alignItems: 'center', padding: 10, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface },
     input: { flex: 1, paddingVertical: 10, paddingHorizontal: 15, borderWidth: 1, borderColor: colors.border, borderRadius: 20, marginRight: 10, fontSize: 16, color: colors.text, backgroundColor: colors.input },
     sendButton: { padding: 10 },
-    overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'black', zIndex: 999 },
+    overlay: { ...StyleSheet.absoluteFill, backgroundColor: 'black', zIndex: 999 },
     emptyListContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50 },
     emptyListText: { fontSize: 16, color: colors.mutedText },
 })

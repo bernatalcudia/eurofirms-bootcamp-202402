@@ -5,16 +5,24 @@ El cliente consume el paquete compartido local `com-ts/` para validaciones, util
 
 ## Desarrollo
 
-1. Instala las dependencias desde `app-ts/` con `npm install`.
-2. Crea `app-ts/.env` a partir de `.env.example` y configura `EXPO_PUBLIC_API_URL` con la URL accesible de `api-ts/`.
+1. Utiliza Node.js `^22.13.0`, `^24.3.0`, `^26.0.0` o `>=27.0.0` e instala las dependencias desde `app-ts/` con `npm ci`.
+2. Crea localmente `app-ts/.env` y configura `EXPO_PUBLIC_API_URL` con la URL accesible de `api-ts/`. No subas el archivo a Git.
 3. Inicia Expo desde `app-ts/` con `npm start`; usa `npm run android`, `npm run ios` o `npm run web` para las plataformas correspondientes.
 4. Comprueba los tipos con `npm run typecheck`.
 
 Los estilos de pantallas, componentes y navegación están centralizados en `src/styles/`, en módulos por pantalla/componente. Las fábricas de estilos reciben la paleta activa para conservar la compatibilidad con los temas; los estilos de autenticación compartidos se definen en `Auth.styles.ts`.
 
-El cliente consume las rutas de `api-ts/` para registro, autenticación, productos y comentarios. La foto de perfil se selecciona desde la biblioteca, se reduce y guarda con el perfil; también se puede eliminar. Al añadir el módulo nativo de procesamiento de imágenes es necesario reconstruir los clientes de desarrollo instalados.
+El cliente usa Expo SDK 58, React Native 0.88 y React Navigation 7 y consume las rutas de `api-ts/` para registro, autenticación, productos y comentarios. La foto de perfil se selecciona desde la biblioteca, se reduce y guarda con el perfil; también se puede eliminar. Tras actualizar Expo y los módulos nativos hay que reconstruir los clientes de desarrollo instalados; no basta con actualizar JavaScript.
 
 El catálogo utiliza una cuadrícula adaptable de una a tres columnas y limita la altura de las imágenes. Los productos guardados permiten abrir la ficha.
+
+## Android
+
+Requiere el SDK de Android (plataforma 36/37, el Gradle plugin lo descarga si has aceptado las licencias), JDK 17 o superior y un emulador o dispositivo. Los directorios `android/` e `ios/` se generan con `npx expo prebuild` y están ignorados por Git; la app sigue siendo un proyecto Expo gestionado. Inicia `api-ts/` y Expo con `EXPO_PUBLIC_API_URL=http://10.0.2.2:<puerto>` (el emulador accede al equipo anfitrión por `10.0.2.2`), y ejecuta `npm run android`. En Windows, el build C++ de los módulos nativos falla si la ruta del proyecto es larga (límite de 260 caracteres): compila desde una copia en una ruta corta como `C:\b\app-ts`, o activa las rutas largas de Windows. Las versiones de producción exigen una URL de API `https://`; el tráfico HTTP solo se admite en desarrollo. La copia de seguridad automática de Android está desactivada y la app no solicita el permiso de micrófono.
+
+Se ha comprobado un build de depuración (x86_64) en un emulador Pixel 9 con Android 36: inicio de sesión, catálogo, likes, guardados, ficha del producto, chat con el vendedor, perfil y creación de un producto con foto de la galería. No se ha probado en dispositivos físicos ni en versiones de Android distintas. Las fuentes de iconos se cargan desde JavaScript con `expo-font` (`App.tsx`), porque `react-native-vector-icons` no las enlaza solo en un proyecto Expo gestionado.
+
+iOS no se ha compilado ni probado: requiere macOS y Xcode. Solo se ha comprobado que el bundle JavaScript de iOS se exporta (`npx expo export --platform ios`).
 
 ## Pruebas de navegador
 
@@ -22,7 +30,7 @@ Instala también las dependencias de `api-ts/`. Desde `app-ts/`, ejecuta `npm ru
 
 ## Auditoría de dependencias
 
-La auditoría del 8 de noviembre de 2026 sigue señalando vulnerabilidades en el árbol de `app-ts/`, incluida una crítica en `tar` utilizada por herramientas de Expo, y avisos en navegación. Se ha actualizado la validación compartida y se ha fijado una versión corregida de PostCSS para Metro; el override debe revisarse al migrar Expo. La resolución completa requiere actualizar Expo/React Native y navegación, y validar las aplicaciones nativas; no se debe asumir que la aplicación está libre de avisos. `api-ts/` conserva tres avisos moderados en dependencias de desarrollo de Mocha.
+La auditoría del 8 de noviembre de 2026 señala cinco avisos moderados en `app-ts/`, propagados desde `glob` y `minimatch` en las herramientas de Expo, y tres moderados en `api-ts/` a través de Mocha, una dependencia de desarrollo. Las versiones corregidas disponibles no satisfacen los rangos declarados por esos paquetes; no se ha aplicado `npm audit fix --force` porque propone cambios incompatibles. Revisa las auditorías y las actualizaciones de los proveedores antes de cada despliegue. Los bundles web, Android e iOS se pueden comprobar con `npx expo export --platform all`, pero esto no sustituye compilar los proyectos nativos ni probarlos en dispositivos. Android se probó en emulador (véase la sección Android); iOS sigue pendiente de validación en macOS con Xcode.
 
 El registro público crea usuarios con el rol `regular`; no permite elegir ni asignar `admin`. Las cuentas `admin` deben aprovisionarse por un mecanismo de confianza del servidor. Tanto `regular` como `admin` pueden acceder a la creación de productos. La aplicación solo acepta los roles `regular` y `admin`.
 
