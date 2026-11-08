@@ -22,6 +22,7 @@ function RegisterUser() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [feedback, setFeedback] = useState('')
 
     const navigation = useNavigation<RootNavigation>()
     const { t } = useLanguage()
@@ -31,11 +32,13 @@ function RegisterUser() {
 
     const handleDateChange = (_event: DateTimePickerEvent, date?: Date) => {
         if (date) setBirthdate(date)
+        setFeedback('')
         setShowDatePicker(false)
     }
 
     const handleBirthdateTextChange = (value: string) => {
         setBirthdateInput(value)
+        setFeedback('')
         if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
             setBirthdate(null)
             return
@@ -47,10 +50,11 @@ function RegisterUser() {
 
     const handleRegister = () => {
         if (!birthdate) {
-            alert(t('Please select a valid birthdate.'))
+            setFeedback(t('Please select a valid birthdate.'))
             return
         }
         if (isSubmitting) return
+        setFeedback('')
         setIsSubmitting(true)
         try {
             logic.registerUser(name, birthdate.toISOString(), email, username, password)
@@ -66,23 +70,23 @@ function RegisterUser() {
                 })
                 .catch(error => {
                     console.error(error)
-                    const feedback = error instanceof ValidationError
+                    const message = error instanceof ValidationError
                         ? t('Please correct the highlighted information and try again.')
                         : error instanceof DuplicityError
                             ? t('That username or email is already in use.')
                             : t('Something went wrong while creating your account. Please try again.')
-                    alert(feedback)
+                    setFeedback(message)
                 })
                 .finally(() => setIsSubmitting(false))
         } catch (error) {
             console.error(error)
             setIsSubmitting(false)
-            const feedback = error instanceof ValidationError
+            const message = error instanceof ValidationError
                 ? t('Please correct the highlighted information and try again.')
                 : error instanceof DuplicityError
                     ? t('That username or email is already in use.')
                     : t('Something went wrong while creating your account. Please try again.')
-            alert(feedback)
+            setFeedback(message)
         }
     };
 
@@ -94,9 +98,46 @@ function RegisterUser() {
                     <Image source={require('../../assets/bonita-fallera-logo.png')} style={authLogo} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
                     <Text style={styles.heading} accessibilityRole='header'>{t('Create your account')}</Text>
                 <Text style={styles.subtitle}>{t('Join the community and find something you love.')}</Text>
-                <TextInput style={styles.input} placeholder={t('Name')} placeholderTextColor={colors.mutedText} value={name} onChangeText={setName} autoCapitalize='words' accessibilityLabel={t('Name')} />
-                <TextInput style={styles.input} placeholder={t('Email')} placeholderTextColor={colors.mutedText} value={email} onChangeText={setEmail} keyboardType='email-address' autoCapitalize='none' autoCorrect={false} accessibilityLabel={t('Email')} />
-                <TextInput style={styles.input} placeholder={t('Username')} placeholderTextColor={colors.mutedText} value={username} onChangeText={setUsername} autoCapitalize='none' autoCorrect={false} accessibilityLabel={t('Username')} />
+                {feedback ? <Text style={styles.feedback} accessibilityRole='alert' accessibilityLiveRegion='polite'>{feedback}</Text> : null}
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t('Name')}
+                        placeholderTextColor={colors.mutedText}
+                        value={name}
+                        onChangeText={value => {
+                            setName(value)
+                            setFeedback('')
+                        }}
+                        autoCapitalize='words'
+                        accessibilityLabel={t('Name')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t('Email')}
+                        placeholderTextColor={colors.mutedText}
+                        value={email}
+                        onChangeText={value => {
+                            setEmail(value)
+                            setFeedback('')
+                        }}
+                        keyboardType='email-address'
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        accessibilityLabel={t('Email')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t('Username')}
+                        placeholderTextColor={colors.mutedText}
+                        value={username}
+                        onChangeText={value => {
+                            setUsername(value)
+                            setFeedback('')
+                        }}
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        accessibilityLabel={t('Username')}
+                    />
                 <TextInput
                     style={styles.input}
                     onPress={() => Platform.OS !== 'web' && setShowDatePicker(true)}
@@ -111,7 +152,20 @@ function RegisterUser() {
                 {Platform.OS !== 'web' && showDatePicker && (
                     <DateTimePicker display='spinner' onChange={handleDateChange} value={birthdate || new Date()} maximumDate={new Date()} />
                 )}
-                <TextInput style={styles.input} secureTextEntry placeholder={t('Password')} placeholderTextColor={colors.mutedText} value={password} onChangeText={setPassword} autoCapitalize='none' accessibilityLabel={t('Password')} textContentType='newPassword' />
+                <TextInput
+                    style={styles.input}
+                    secureTextEntry
+                    placeholder={t('Password')}
+                    placeholderTextColor={colors.mutedText}
+                    value={password}
+                    onChangeText={value => {
+                        setPassword(value)
+                        setFeedback('')
+                    }}
+                    autoCapitalize='none'
+                    accessibilityLabel={t('Password')}
+                    textContentType='newPassword'
+                />
                 <TouchableOpacity
                     style={[styles.button, isSubmitting && authDisabledButton]}
                     onPress={handleRegister}

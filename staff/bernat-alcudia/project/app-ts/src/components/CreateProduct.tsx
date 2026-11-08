@@ -1,6 +1,6 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useMemo, useState } from 'react'
 import logic from '../logic'
-import { View, Image, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform, Linking } from 'react-native'
+import { View, Image, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useNavigation } from '@react-navigation/native'
 import RadioGroup from 'react-native-radio-buttons-group'
@@ -28,7 +28,6 @@ function CreateProduct({ }) {
     const { t } = useLanguage()
     const { colors } = useTheme()
     const styles = createCreateProductStyles(colors)
-    const permissionsRequested = useRef(false)
 
     const radioButtons = useMemo<RadioButtonProps[]>(() => ([
         {
@@ -56,46 +55,6 @@ function CreateProduct({ }) {
     const selectedRadioButton = radioButtons.find(button => button.id === selectedId)
 
 
-
-    useEffect(() => {
-        if (permissionsRequested.current) return
-        permissionsRequested.current = true
-        const requestPermissions = async () => {
-            try {
-                if (Platform.OS !== 'web') {
-                    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync()
-
-                    const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-
-                    if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
-                        Alert.alert(
-                            t('Permission required'),
-                            t('Grant access to your camera and photo library in device settings.'),
-                            [
-                                {
-                                    text: t('Cancel'),
-                                    style: 'cancel'
-                                },
-                                {
-                                    text: t('Open settings'),
-                                    onPress: () => Linking.openSettings()
-                                }
-                            ],
-                            { cancelable: false }
-                        )
-                    }
-                }
-            } catch (error) {
-                console.error('Error requesting permissions:', error)
-                Alert.alert(
-                    t('Error'),
-                    t('Grant access to your camera and photo library in device settings.')
-                )
-            }
-        }
-
-        requestPermissions()
-    }, [t])
 
     const selectImage = async () => {
         try {

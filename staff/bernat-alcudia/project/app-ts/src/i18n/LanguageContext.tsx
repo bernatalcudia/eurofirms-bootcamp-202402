@@ -30,7 +30,7 @@ const translations = {
         'Password': 'Password',
         'Login': 'Log in',
         'Register': 'Create account',
-        'Please correct the highlighted information and try again.': 'Please correct the highlighted information and try again.',
+        'Please correct the highlighted information and try again.': 'Please check your details and try again.',
         'Please verify your username and password.': 'Please verify your username and password.',
         'Something went wrong. Please try again.': 'Something went wrong. Please try again.',
         'Create your account': 'Create your account',

@@ -18,6 +18,7 @@ function LoginUser() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [feedback, setFeedback] = useState('')
 
     const navigation = useNavigation<RootNavigation>()
     const { t } = useLanguage()
@@ -25,6 +26,7 @@ function LoginUser() {
 
     const handleSubmit = () => {
         if (isSubmitting) return
+        setFeedback('')
         setIsSubmitting(true)
         try {
             logic.loginUser(username, password)
@@ -35,23 +37,23 @@ function LoginUser() {
                 })
                 .catch(error => {
                     console.error(error)
-                    const feedback = error instanceof ValidationError
+                    const message = error instanceof ValidationError
                         ? t('Please correct the highlighted information and try again.')
                         : error instanceof MatchError
                             ? t('Please verify your username and password.')
                             : t('Something went wrong. Please try again.')
-                    alert(feedback)
+                    setFeedback(message)
                 })
                 .finally(() => setIsSubmitting(false))
         } catch (error) {
             console.error(error)
             setIsSubmitting(false)
-            const feedback = error instanceof ValidationError
+            const message = error instanceof ValidationError
                 ? t('Please correct the highlighted information and try again.')
                 : error instanceof MatchError
                     ? t('Please verify your username and password.')
                     : t('Something went wrong. Please try again.')
-            alert(feedback)
+            setFeedback(message)
         }
     }
 
@@ -66,12 +68,16 @@ function LoginUser() {
             <Image source={require('../../assets/bonita-fallera-logo.png')} style={authLogo} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
             <Text style={styles.heading} accessibilityRole='header'>{t('Welcome back')}</Text>
             <Text style={styles.subtitle}>{t('Sign in to discover products')}</Text>
+            {feedback ? <Text style={styles.feedback} accessibilityRole='alert' accessibilityLiveRegion='polite'>{feedback}</Text> : null}
             <TextInput
                 style={styles.input}
                 placeholder={t('Username')}
                 placeholderTextColor={colors.mutedText}
                 value={username}
-                onChangeText={setUsername}
+                onChangeText={value => {
+                    setUsername(value)
+                    setFeedback('')
+                }}
                 autoCapitalize='none'
                 autoCorrect={false}
                 accessibilityLabel={t('Username')}
@@ -83,7 +89,10 @@ function LoginUser() {
                 placeholder={t('Password')}
                 placeholderTextColor={colors.mutedText}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={value => {
+                    setPassword(value)
+                    setFeedback('')
+                }}
                 autoCapitalize='none'
                 accessibilityLabel={t('Password')}
                 textContentType='password'
