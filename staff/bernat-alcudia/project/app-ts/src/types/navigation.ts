@@ -13,6 +13,7 @@ export type RootStackParamList = {
   CreateProduct: undefined
   RetrieveSavedProducts: undefined
   ChatConversation: { chatId: string }
+  UserProfile: { userId: string }
 }
 
 export type MainTabParamList = {
@@ -26,6 +27,7 @@ export type MainTabParamList = {
 export type RootNavigation = StackNavigationProp<RootStackParamList>
 export type ProductRoute = RouteProp<RootStackParamList, "ProductDetail" | "ModifyProduct">
 export type ChatConversationRoute = RouteProp<RootStackParamList, "ChatConversation">
+export type UserProfileRoute = RouteProp<RootStackParamList, "UserProfile">
 export type TabNavigation = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList>,
   StackNavigationProp<RootStackParamList>

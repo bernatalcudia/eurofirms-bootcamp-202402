@@ -63,3 +63,12 @@ chatsRouter.patch("/:chatId/offers/:offerId", smallJsonBodyParser, async (req, r
         next(error)
     }
 })
+
+chatsRouter.post("/:chatId/offers/:offerId/checkout", async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        res.status(200).json(await logic.createOfferCheckout(userId, req.params.chatId, req.params.offerId))
+    } catch (error) {
+        next(error)
+    }
+})

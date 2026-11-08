@@ -50,6 +50,73 @@ usersRouter.post("/authenticate", authenticationRateLimiter, smallJsonBodyParser
     }
 })
 
+usersRouter.get("/profiles/:targetUserid", requireAuthentication, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        res.status(200).json(await logic.retrievePublicProfile(userId, req.params.targetUserid))
+    } catch (error) {
+        next(error)
+    }
+})
+
+usersRouter.patch("/me/profile", requireAuthentication, smallJsonBodyParser, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        res.status(200).json(await logic.updateUserProfile(userId, req.body))
+    } catch (error) {
+        next(error)
+    }
+})
+
+usersRouter.get("/me/blocked", requireAuthentication, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        res.status(200).json(await logic.retrieveBlockedUsers(userId))
+    } catch (error) {
+        next(error)
+    }
+})
+
+usersRouter.post("/profiles/:targetUserid/follow", requireAuthentication, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        await logic.followUser(userId, req.params.targetUserid)
+        res.status(204).send()
+    } catch (error) {
+        next(error)
+    }
+})
+
+usersRouter.delete("/profiles/:targetUserid/follow", requireAuthentication, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        await logic.unfollowUser(userId, req.params.targetUserid)
+        res.status(204).send()
+    } catch (error) {
+        next(error)
+    }
+})
+
+usersRouter.post("/profiles/:targetUserid/block", requireAuthentication, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        await logic.blockUser(userId, req.params.targetUserid)
+        res.status(204).send()
+    } catch (error) {
+        next(error)
+    }
+})
+
+usersRouter.delete("/profiles/:targetUserid/block", requireAuthentication, async (req, res, next) => {
+    try {
+        const { userId } = getAuthContext(req)
+        await logic.unblockUser(userId, req.params.targetUserid)
+        res.status(204).send()
+    } catch (error) {
+        next(error)
+    }
+})
+
 usersRouter.get("/:targetUserid", requireAuthentication, async (req, res, next) => {
 
     try {

@@ -3,6 +3,7 @@ import {
     ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
+    Linking,
     Platform,
     RefreshControl,
     ScrollView,
@@ -28,6 +29,7 @@ function ChatConversation() {
     const [chat, setChat] = useState<Chat | null>(null)
     const [message, setMessage] = useState('')
     const [offerAmount, setOfferAmount] = useState('')
+    const [checkoutUrls, setCheckoutUrls] = useState<Record<string, string>>({})
     const [isLoading, setIsLoading] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [loadError, setLoadError] = useState(false)
@@ -132,6 +134,40 @@ function ChatConversation() {
         }
     }
 
+    const prepareCheckout = async (offerId: string) => {
+        if (isSubmitting) return
+        setIsSubmitting(true)
+        try {
+            const checkoutUrl = await logic.createOfferCheckout(chatId, offerId)
+            if (Platform.OS === 'web') {
+                setCheckoutUrls(current => ({ ...current, [offerId]: checkoutUrl }))
+            } else {
+                await Linking.openURL(checkoutUrl)
+            }
+        } catch (error) {
+            console.error('Could not open secure checkout:', error)
+            Alert.alert(t('Error'), t('Secure checkout could not be opened. Please try again.'))
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const openPreparedCheckout = (checkoutUrl: string) => {
+        if (Platform.OS === 'web') {
+            const checkoutWindow = window.open(checkoutUrl, '_blank')
+            if (!checkoutWindow) {
+                window.location.assign(checkoutUrl)
+                return
+            }
+            checkoutWindow.opener = null
+            return
+        }
+        void Linking.openURL(checkoutUrl).catch(error => {
+            console.error('Could not open secure checkout:', error)
+            Alert.alert(t('Error'), t('Secure checkout could not be opened. Please try again.'))
+        })
+    }
+
     const respondToOffer = (offerId: string, decision: 'accept' | 'reject') => {
         const action = async () => {
             setIsSubmitting(true)
@@ -146,7 +182,7 @@ function ChatConversation() {
         }
         const title = decision === 'accept' ? t('Accept offer?') : t('Reject offer?')
         const description = decision === 'accept'
-            ? t('Accepting confirms that both people agree on this price. It does not process a payment or change product stock.')
+            ? t('Accepting confirms the agreed price. The buyer can then continue to secure checkout.')
             : t('The other person can send a new offer after this one is rejected.')
 
         if (Platform.OS === 'web') {
@@ -186,7 +222,13 @@ function ChatConversation() {
     return (
         <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <View style={styles.chatHeader}>
-                <Text style={styles.chatHeaderTitle}>{chat.otherUser.username}</Text>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('UserProfile', { userId: chat.otherUser.id })}
+                    accessibilityRole='button'
+                    accessibilityLabel={t('View {username} profile', { username: chat.otherUser.username })}
+                >
+                    <Text style={styles.chatHeaderTitle}>@{chat.otherUser.username}</Text>
+                </TouchableOpacity>
                 <Text style={styles.chatHeaderSubtitle}>
                     {chat.product?.title ?? t('Unavailable product')}
                     {chat.product ? ` · ${formatPrice(chat.product.price)}` : ''}
@@ -219,9 +261,51 @@ function ChatConversation() {
                             {item.value.status === 'pending'
                                 ? t('Waiting for the other person to respond.')
                                 : item.value.status === 'accepted'
-                                    ? t('Agreed by both people. No payment or stock change has been made.')
+                                    ? t('Agreed by both people.')
                                     : t('Offer rejected.')}
                         </Text>
+                        {item.value.status === 'accepted' && (
+                            <>
+                                <Text style={styles.paymentStatus}>
+                                    {item.value.paymentStatus === 'paid'
+                                        ? t('Payment confirmed. The reserved stock is now sold.')
+                                        : item.value.paymentStatus === 'pending'
+                                            ? t('Payment is being confirmed. This status updates securely from the payment provider.')
+                                            : item.value.paymentStatus === 'creating'
+                                                ? t('Preparing secure checkout…')
+                                                : item.value.paymentStatus === 'expired'
+                                                    ? t('Checkout expired. The reserved stock has been released.')
+                                                    : item.value.paymentStatus === 'failed'
+                                                        ? t('Payment was not completed. You can try checkout again.')
+                                                        : t('The buyer can now pay securely to complete the purchase.')}
+                                </Text>
+                                {chat.product && chat.product.sellerId !== currentUserId && item.value.paymentStatus !== 'paid' && (
+                                    <TouchableOpacity
+                                        style={[styles.checkoutButton, isSubmitting && styles.disabledButton]}
+                                        onPress={() => {
+                                            const preparedUrl = checkoutUrls[item.value.id]
+                                            const checkoutEnded = item.value.paymentStatus === 'expired' || item.value.paymentStatus === 'failed'
+                                            if (Platform.OS === 'web' && preparedUrl && !checkoutEnded) {
+                                                openPreparedCheckout(preparedUrl)
+                                            } else {
+                                                void prepareCheckout(item.value.id)
+                                            }
+                                        }}
+                                        disabled={isSubmitting}
+                                        accessibilityRole='button'
+                                    >
+                                        {isSubmitting
+                                            ? <ActivityIndicator size='small' color={colors.onPrimary} />
+                                            : <Text style={styles.checkoutButtonText}>
+                                                {Platform.OS === 'web' && checkoutUrls[item.value.id] &&
+                                                item.value.paymentStatus !== 'expired' && item.value.paymentStatus !== 'failed'
+                                                    ? t('Open secure checkout')
+                                                    : t('Continue to secure payment')}
+                                            </Text>}
+                                    </TouchableOpacity>
+                                )}
+                            </>
+                        )}
                         {item.value.status === 'pending' && item.value.offeredBy !== currentUserId && (
                             <View style={styles.offerActions}>
                                 <TouchableOpacity
@@ -293,8 +377,8 @@ function ChatConversation() {
                     {hasPendingOffer
                         ? t('There is a pending offer. Wait for the other person to respond.')
                         : hasAcceptedOffer
-                            ? t('An offer has already been accepted for this product.')
-                        : t('An offer is only agreed when the other person accepts it. No payment or stock changes happen here.')}
+                            ? t('This offer is agreed. Complete payment securely from the accepted offer above.')
+                        : t('An offer is only agreed when the other person accepts it.')}
                 </Text>
             </View>
         </KeyboardAvoidingView>

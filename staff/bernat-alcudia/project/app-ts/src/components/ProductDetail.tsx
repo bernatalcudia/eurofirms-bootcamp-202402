@@ -113,6 +113,7 @@ function ProductDetail() {
     }
 
     const isAuthor = product.own || product.author === logic.getLoggedInUserId()
+    const sellerId = typeof product.author === 'string' ? product.author : product.author.id
     const formattedPrice = new Intl.NumberFormat(language === 'es' ? 'es-ES' : 'en-IE', {
         style: 'currency',
         currency: 'EUR',
@@ -198,17 +199,27 @@ function ProductDetail() {
                         </View>
                     )}
                     {!isAuthor && (
-                        <TouchableOpacity
-                            style={[styles.contactSellerButton, isStartingChat && { opacity: 0.6 }]}
-                            onPress={() => void handleContactSeller()}
-                            disabled={isStartingChat}
-                            accessibilityRole='button'
-                            accessibilityLabel={t('Message seller')}
-                        >
-                            <Text style={styles.contactSellerText}>
-                                {isStartingChat ? t('Loading…') : t('Message seller')}
-                            </Text>
-                        </TouchableOpacity>
+                        <>
+                            <TouchableOpacity
+                                style={styles.sellerProfileButton}
+                                onPress={() => navigation.navigate('UserProfile', { userId: sellerId })}
+                                accessibilityRole='button'
+                                accessibilityLabel={t('View seller profile')}
+                            >
+                                <Text style={styles.sellerProfileText}>{t('View seller profile')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.contactSellerButton, isStartingChat && { opacity: 0.6 }]}
+                                onPress={() => void handleContactSeller()}
+                                disabled={isStartingChat}
+                                accessibilityRole='button'
+                                accessibilityLabel={t('Message seller')}
+                            >
+                                <Text style={styles.contactSellerText}>
+                                    {isStartingChat ? t('Loading…') : t('Message seller')}
+                                </Text>
+                            </TouchableOpacity>
+                        </>
                     )}
                 </View>
             </ScrollView >

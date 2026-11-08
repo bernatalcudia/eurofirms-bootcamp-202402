@@ -1,9 +1,10 @@
-import { Alert, Platform, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import logic from '../logic'
 import type { RootNavigation } from '../types/navigation'
+import type { BlockedProfile, User } from '../types/models'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../i18n/LanguageContext'
 import { themeColors, useTheme, type ThemeName } from '../theme/ThemeContext'
@@ -14,8 +15,34 @@ function Profile() {
     const { t } = useLanguage()
     const { theme, colors, setTheme } = useTheme()
     const [expandedSection, setExpandedSection] = useState<'language' | 'appearance' | null>(null)
+    const [profile, setProfile] = useState<User | null>(null)
+    const [originalEmail, setOriginalEmail] = useState('')
+    const [currentPassword, setCurrentPassword] = useState('')
+    const [blockedUsers, setBlockedUsers] = useState<BlockedProfile[]>([])
+    const [profileError, setProfileError] = useState(false)
+    const [isSavingProfile, setIsSavingProfile] = useState(false)
+    const [isLoadingBlocked, setIsLoadingBlocked] = useState(false)
+    const [showBlockedUsers, setShowBlockedUsers] = useState(false)
 
     const styles = createProfileStyles(colors)
+
+    const loadAccount = useCallback(async () => {
+        setProfileError(false)
+        try {
+            const [user, blocked] = await Promise.all([logic.retrieveUser(), logic.retrieveBlockedUsers()])
+            setProfile(user)
+            setOriginalEmail(user.email)
+            setCurrentPassword('')
+            setBlockedUsers(blocked)
+        } catch (error) {
+            console.error('Could not load account details:', error)
+            setProfileError(true)
+        }
+    }, [])
+
+    useFocusEffect(useCallback(() => {
+        void loadAccount()
+    }, [loadAccount]))
 
     const toggleSection = (section: 'language' | 'appearance') => {
         setExpandedSection(current => current === section ? null : section)
@@ -45,6 +72,41 @@ function Profile() {
         ])
     }
 
+    const saveProfile = async () => {
+        if (!profile || isSavingProfile) return
+        setIsSavingProfile(true)
+        try {
+            setProfile(await logic.updateUserProfile({
+                name: profile.name,
+                email: profile.email,
+                username: profile.username,
+                birthdate: profile.birthdate ?? '',
+                ...(profile.email.trim() !== originalEmail.toLowerCase() ? { currentPassword } : {}),
+            }))
+            setOriginalEmail(profile.email.trim().toLowerCase())
+            setCurrentPassword('')
+            Alert.alert(t('Profile updated'), t('Your personal details have been saved.'))
+        } catch (error) {
+            console.error('Could not update profile:', error)
+            Alert.alert(t('Error'), t('Profile could not be updated. Check your details and try again.'))
+        } finally {
+            setIsSavingProfile(false)
+        }
+    }
+
+    const removeBlock = async (userId: string) => {
+        setIsLoadingBlocked(true)
+        try {
+            await logic.unblockUser(userId)
+            setBlockedUsers(current => current.filter(user => user.id !== userId))
+        } catch (error) {
+            console.error('Could not unblock user:', error)
+            Alert.alert(t('Error'), t('User could not be unblocked. Please try again.'))
+        } finally {
+            setIsLoadingBlocked(false)
+        }
+    }
+
     const themeOptions: { id: ThemeName; title: string; description: string }[] = [
         { id: 'light', title: t('Light'), description: t('Use the bright, minimal theme.') },
         { id: 'dark', title: t('Dark'), description: t('Use the dark theme.') },
@@ -55,6 +117,84 @@ function Profile() {
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.subtitle}>{t('Manage your account and personalize your experience.')}</Text>
+
+                <Text style={styles.sectionTitle}>{t('Personal details')}</Text>
+                <View style={styles.card}>
+                    {profileError ? (
+                        <View style={styles.profileMessage}>
+                            <Text style={styles.hint}>{t('Account details could not be loaded.')}</Text>
+                            <TouchableOpacity onPress={() => void loadAccount()} style={styles.inlineButton} accessibilityRole='button'>
+                                <Text style={styles.inlineButtonText}>{t('Retry')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : !profile ? (
+                        <View style={styles.profileMessage}>
+                            <ActivityIndicator color={colors.primary} />
+                            <Text style={styles.hint}>{t('Loading account details…')}</Text>
+                        </View>
+                    ) : (
+                        <View style={styles.profileForm}>
+                            <Text style={styles.inputLabel}>{t('Name')}</Text>
+                            <TextInput
+                                style={styles.profileInput}
+                                value={profile.name}
+                                onChangeText={name => setProfile(current => current ? { ...current, name } : current)}
+                                autoCapitalize='words'
+                                accessibilityLabel={t('Name')}
+                            />
+                            <Text style={styles.inputLabel}>{t('Email')}</Text>
+                            <TextInput
+                                style={styles.profileInput}
+                                value={profile.email}
+                                onChangeText={email => setProfile(current => current ? { ...current, email } : current)}
+                                autoCapitalize='none'
+                                keyboardType='email-address'
+                                accessibilityLabel={t('Email')}
+                            />
+                            {profile.email.trim().toLowerCase() !== originalEmail.toLowerCase() && (
+                                <>
+                                    <Text style={styles.inputLabel}>{t('Current password to change email')}</Text>
+                                    <TextInput
+                                        style={styles.profileInput}
+                                        value={currentPassword}
+                                        onChangeText={setCurrentPassword}
+                                        secureTextEntry
+                                        autoCapitalize='none'
+                                        accessibilityLabel={t('Current password to change email')}
+                                    />
+                                </>
+                            )}
+                            <Text style={styles.inputLabel}>{t('Username')}</Text>
+                            <TextInput
+                                style={styles.profileInput}
+                                value={profile.username}
+                                onChangeText={username => setProfile(current => current ? { ...current, username } : current)}
+                                autoCapitalize='none'
+                                accessibilityLabel={t('Username')}
+                            />
+                            <Text style={styles.inputLabel}>{t('Birth date (YYYY-MM-DD)')}</Text>
+                            <TextInput
+                                style={styles.profileInput}
+                                value={profile.birthdate ? profile.birthdate.slice(0, 10) : ''}
+                                onChangeText={birthdate => setProfile(current => current ? { ...current, birthdate } : current)}
+                                placeholder='YYYY-MM-DD'
+                                placeholderTextColor={colors.mutedText}
+                                accessibilityLabel={t('Birth date')}
+                            />
+                            <Text style={styles.hint}>{t('Your role and account ID cannot be changed.')}</Text>
+                            <TouchableOpacity
+                                onPress={() => void saveProfile()}
+                                style={[styles.inlineButton, isSavingProfile && styles.disabledButton]}
+                                disabled={isSavingProfile}
+                                accessibilityRole='button'
+                            >
+                                {isSavingProfile
+                                    ? <ActivityIndicator color={colors.onPrimary} />
+                                    : <Text style={styles.primaryButtonText}>{t('Save profile')}</Text>}
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
 
                 <Text style={styles.sectionTitle}>{t('Preferences')}</Text>
                 <View style={styles.card}>
@@ -129,6 +269,38 @@ function Profile() {
                         <MaterialCommunityIcons name='logout' size={22} color={colors.danger} />
                         <Text style={[styles.actionText, styles.logoutText]}>{t('Log out')}</Text>
                     </TouchableOpacity>
+                    <Pressable
+                        onPress={() => setShowBlockedUsers(current => !current)}
+                        style={[styles.action, styles.disclosureWithTopBorder]}
+                        accessibilityRole='button'
+                        accessibilityState={{ expanded: showBlockedUsers }}
+                    >
+                        <MaterialCommunityIcons name='account-cancel-outline' size={22} color={colors.primary} />
+                        <Text style={styles.actionText}>{t('Blocked accounts')}</Text>
+                        <MaterialCommunityIcons name={showBlockedUsers ? 'chevron-up' : 'chevron-down'} size={22} color={colors.mutedText} />
+                    </Pressable>
+                    {showBlockedUsers && (
+                        <View style={styles.blockedList}>
+                            {blockedUsers.length === 0
+                                ? <Text style={styles.hint}>{t('You have no blocked accounts.')}</Text>
+                                : blockedUsers.map(user => (
+                                    <View key={user.id} style={styles.blockedUser}>
+                                        <View style={styles.blockedUserInfo}>
+                                            <Text style={styles.blockedName}>{user.name}</Text>
+                                            <Text style={styles.hint}>@{user.username}</Text>
+                                        </View>
+                                        <TouchableOpacity
+                                            onPress={() => void removeBlock(user.id)}
+                                            disabled={isLoadingBlocked}
+                                            accessibilityRole='button'
+                                            accessibilityLabel={t('Unblock {username}', { username: user.username })}
+                                        >
+                                            <Text style={styles.inlineButtonText}>{t('Unblock')}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                        </View>
+                    )}
                 </View>
             </View>
         </ScrollView>

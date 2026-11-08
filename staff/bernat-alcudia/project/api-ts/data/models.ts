@@ -16,6 +16,15 @@ type UserDocType = {
     __v: number
 }
 
+type UserRelationDocType = {
+    _id: Types.ObjectId
+    from: Types.ObjectId
+    to: Types.ObjectId
+    kind: "follow" | "block"
+    createdAt: Date
+    updatedAt: Date
+}
+
 type ProductDocType = {
     _id: Types.ObjectId
     author: Types.ObjectId
@@ -56,6 +65,11 @@ type ChatOfferDocType = {
     date: Date
     respondedBy?: Types.ObjectId
     respondedAt?: Date
+    paymentStatus: "unpaid" | "creating" | "pending" | "paid" | "expired" | "failed"
+    checkoutAttemptId?: string
+    checkoutSessionId?: string
+    checkoutUrl?: string
+    inventoryReserved: boolean
 }
 
 type ChatDocType = {
@@ -104,6 +118,26 @@ const userSchema = new Schema<UserDocType>({
         ref: "Product"
     }]
 })
+
+const userRelationSchema = new Schema<UserRelationDocType>({
+    from: {
+        type: ObjectId,
+        required: true,
+        ref: "User"
+    },
+    to: {
+        type: ObjectId,
+        required: true,
+        ref: "User"
+    },
+    kind: {
+        type: String,
+        enum: ["follow", "block"],
+        required: true
+    }
+}, { timestamps: true })
+userRelationSchema.index({ from: 1, to: 1, kind: 1 }, { unique: true })
+userRelationSchema.index({ to: 1, kind: 1 })
 
 const productSchema = new Schema<ProductDocType>({
     author: {
@@ -225,7 +259,21 @@ const chatOfferSchema = new Schema<ChatOfferDocType>({
         type: ObjectId,
         ref: "User"
     },
-    respondedAt: Date
+    respondedAt: Date,
+    paymentStatus: {
+        type: String,
+        enum: ["unpaid", "creating", "pending", "paid", "expired", "failed"],
+        required: true,
+        default: "unpaid"
+    },
+    checkoutAttemptId: String,
+    checkoutSessionId: String,
+    checkoutUrl: String,
+    inventoryReserved: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 })
 
 const chatSchema = new Schema<ChatDocType>({
@@ -260,6 +308,7 @@ const User = model<UserDocType>("User", userSchema)
 const Product = model<ProductDocType>("Product", productSchema)
 const Comment = model<CommentDocType>("Comment", commentSchema)
 const Chat = model<ChatDocType>("Chat", chatSchema)
+const UserRelation = model<UserRelationDocType>("UserRelation", userRelationSchema)
 
 export {
     Chat,
@@ -267,12 +316,14 @@ export {
     ChatMessageDocType,
     ChatOfferDocType,
     UserDocType,
+    UserRelationDocType,
     ProductDocType,
     CommentDocType,
 
     User,
     Product,
-    Comment
+    Comment,
+    UserRelation
 }
 
 export type { UserRole }

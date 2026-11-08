@@ -10,6 +10,8 @@
     "compile": "npx tsc",
     "compile-watch": "npx tsc --watch",
     "test": "tsx --env-file=.env logic/registerUser.test.ts",
+    "test:unit": "mocha --node-option import=tsx logic/payments.spec.ts",
+    "test:integration": "mocha --node-option import=tsx --require logic/testSetup.ts logic/userRelations.spec.ts logic/updateUserProfile.spec.ts logic/paymentsIntegration.spec.ts logic/chat.spec.ts",
     "test-mocha": "mocha --node-option env-file=.env --node-option import=tsx \"logic/*.spec.ts\"",
     "test-inspect": "mocha --inspect-brk --node-option env-file=.env --node-option import=tsx \"logic/*.spec.ts\"",
     "test-watch": "mocha --node-option env-file=.env --node-option import=tsx --watch \"logic/*.spec.ts\""
@@ -25,7 +27,8 @@
     "express-rate-limit": "^8.7.3",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.1"
+    "mongoose": "^8.17.1",
+    "stripe": "^23.1.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -38,6 +41,7 @@
     "bcrypt": "^6.0.0",
     "chai": "^6.0.1",
     "mocha": "^12.0.3",
+    "mongodb-memory-server": "^11.3.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

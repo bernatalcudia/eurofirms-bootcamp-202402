@@ -18,17 +18,15 @@ In this application, products will be published and then sold until the stock ru
 - view products
 - toggle like a product
 - toggle save a product (buyer)
-
-Version 0.1
-- chat crud between seller-buyer
-- view user profile
-- search user
-
 - block a user
 - follow a user
-- edit profile 
+- edit profile
 - search products
 - comments (CRUD)
+- seller-buyer chat and offers
+- hosted payment checkout after an offer is accepted (TypeScript client/API)
+
+The profile, social relationship, and payment flows are implemented in `app-ts/` and `api-ts/`; the JavaScript client/API are separate and do not yet provide these flows.
 
 ### UI Design
 
@@ -56,7 +54,9 @@ Version 0.1
 
 - Users can start a product-specific conversation with its seller, send messages, and review their conversations in the Messages tab.
 - Either participant can propose a price. Only the other participant can accept or reject a pending offer; only one offer can be awaiting a response at a time.
-- Acceptance records that both users agree on the proposed price. It does not process a payment, complete a sale, or change product stock.
+- In the TypeScript flow, an accepted offer allows the buyer to open a EUR Stripe Checkout session. Stock is reserved while checkout is open, and payment is confirmed only from a verified Stripe webhook.
+- Blocking a user removes follows in both directions and prevents further profile discovery, chats, messages, offers, and checkout. Existing product listings and conversation history are retained.
+- The Stripe Checkout integration charges the configured platform account. Seller payouts and Stripe Connect onboarding are not implemented.
 
 ### Data Model
 
@@ -69,6 +69,12 @@ Version 0.1
 - password (string,required)
 - role (`regular` | `admin`; new accounts default to `regular`)
 - saved (array of Post.id)
+
+#### User relationship
+- from (User.id)
+- to (User.id)
+- kind (`follow` | `block`)
+- createdAt / updatedAt (Date)
 
 #### Product
 - id (auto)
@@ -101,5 +107,5 @@ Version 0.1
 - product (Product.id)
 - participants (two User.id values)
 - messages (Message[])
-- offers ({ amount, offeredBy, status, date, respondedBy, respondedAt }[])
+- offers ({ amount, offeredBy, status, date, respondedBy, respondedAt, paymentStatus, checkoutAttemptId, checkoutSessionId, inventoryReserved }[])
 - createdAt / updatedAt (Date)

@@ -10,7 +10,20 @@ export interface User {
   email: string
   role: UserRole
   saved?: string[]
+  birthdate?: string
 }
+
+export interface PublicProfile {
+  id: string
+  name: string
+  username: string
+  followersCount: number
+  followingCount: number
+  isFollowing: boolean
+  isBlocked: boolean
+}
+
+export type BlockedProfile = Pick<PublicProfile, "id" | "name" | "username">
 
 export interface Product {
   id: string
@@ -56,11 +69,12 @@ export interface ChatOffer {
   date: string
   respondedBy?: string
   respondedAt?: string
+  paymentStatus: "unpaid" | "creating" | "pending" | "paid" | "expired" | "failed"
 }
 
 export interface ChatSummary {
   id: string
-  product: { id: string; title: string; images: string[]; price: number } | null
+  product: { id: string; title: string; images: string[]; price: number; sellerId: string } | null
   otherUser: { id: string; username: string }
   lastMessage: ChatMessage | null
   updatedAt: string

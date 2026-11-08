@@ -7,6 +7,7 @@ import ModifyProduct from "../components/ModifyProduct"
 import RetrieveSavedProducts from "../components/RetrieveSavedProducts"
 import MyTabs from "../components/MyTabs"
 import ChatConversation from "../components/ChatConversation"
+import UserProfile from "../components/UserProfile"
 import Home from "../pages/Home"
 import LoginUser from "../pages/LoginUser"
 import RegisterUser from "../pages/RegisterUser"
@@ -48,6 +49,11 @@ export default function AppNavigator() {
         name="ChatConversation"
         component={ChatConversation}
         options={{ title: t('Conversation') }}
+      />
+      <Stack.Screen
+        name="UserProfile"
+        component={UserProfile}
+        options={{ title: t('Profile') }}
       />
     </Stack.Navigator>
   )

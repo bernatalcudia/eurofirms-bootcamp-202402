@@ -59,6 +59,8 @@ const createProductDetailStyles = (colors: ThemeColors, galleryWidth: number, ga
         confirmDeleteText: { color: colors.onDanger, fontSize: 14, fontWeight: '700' },
         contactSellerButton: { backgroundColor: colors.primary, borderRadius: 14, minHeight: 52, alignItems: 'center', justifyContent: 'center', marginTop: 8, paddingHorizontal: 18 },
         contactSellerText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+        sellerProfileButton: { borderWidth: 1, borderColor: colors.border, borderRadius: 14, minHeight: 46, alignItems: 'center', justifyContent: 'center', marginTop: 16, paddingHorizontal: 18 },
+        sellerProfileText: { color: colors.primary, fontSize: 15, fontWeight: '700' },
         modifyIcon: { fontSize: 26, color: colors.primary },
         deleteIcon: { fontSize: 26, color: colors.danger },
         loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },

@@ -12,6 +12,20 @@ The API limiter is in-memory and intended for a single process. Use a shared lim
 
 Authenticated clients can create or reuse a conversation for a product with `POST /chats` (`{ "productId": "..." }`), list conversations with `GET /chats`, and retrieve a thread with `GET /chats/:chatId`. Conversation participants can post messages to `POST /chats/:chatId/messages` (`{ "text": "..." }`).
 
-Participants can propose a positive amount at `POST /chats/:chatId/offers` (`{ "amount": 12.5 }`). The other participant can respond with `PATCH /chats/:chatId/offers/:offerId` and `{ "decision": "accept" }` or `{ "decision": "reject" }`. A user cannot accept their own offer, and another offer cannot be proposed until the pending one is answered. An accepted offer represents mutual agreement only: payments, sale completion, and stock updates are intentionally outside this feature.
+Participants can propose a positive amount at `POST /chats/:chatId/offers` (`{ "amount": 12.5 }`). The other participant can respond with `PATCH /chats/:chatId/offers/:offerId` and `{ "decision": "accept" }` or `{ "decision": "reject" }`. A user cannot accept their own offer, and another offer cannot be proposed until the pending one is answered.
+
+Once accepted, the buyer can open a Stripe-hosted Checkout session with `POST /chats/:chatId/offers/:offerId/checkout`. The server uses the accepted offer amount in EUR, reserves one unit of stock in a MongoDB transaction, and reuses an existing open Checkout session on retries. Payment is marked complete only after a correctly signed Stripe webhook is received at `POST /payments/webhook`; browser redirects are not proof of payment. Expired and failed checkout webhooks release reserved stock. Configure `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and an HTTPS `PAYMENT_RETURN_URL` before enabling payments; localhost HTTP return URLs are allowed for development only.
+
+Checkout reservation and webhook fulfillment use MongoDB transactions, so payment deployments must use a replica set (including a single-node replica set for local development). Configure Stripe to send `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`, and `checkout.session.async_payment_failed` events to the public webhook URL. Keep Stripe secrets outside source control and use Stripe test keys and a test webhook secret during development.
+
+Checkout charges the configured Stripe account. Seller onboarding, marketplace fee calculation, and payouts via Stripe Connect are not implemented; do not treat a successful Checkout payment as a seller payout.
+
+Run `npm run test:unit` for payment amount and webhook-signature unit tests. `npm run test:integration` starts an isolated temporary replica set and tests profile, social, chat, and payment-webhook behavior; it may download the MongoDB test binary the first time.
+
+## Profiles, follows, and blocks
+
+Authenticated users can edit their own name, email, username, and birth date with `PATCH /users/me/profile`. Role and account ID are not editable. Changing an email address requires the current password. `GET /users/profiles/:targetUserid` returns only public name, username, follow counts, and relationship state.
+
+Follow and unfollow with `POST` and `DELETE /users/profiles/:targetUserid/follow`. Block and unblock with `POST` and `DELETE /users/profiles/:targetUserid/block`; `GET /users/me/blocked` lists accounts the current user can unblock. Blocking removes follows in both directions and prevents further profile discovery, chats, messages, offers, and checkout between the pair. Existing products and conversation records are preserved, but blocked conversations are hidden until unblocked.
 
 The mobile conversation view refreshes the thread periodically while open and when pulled down; no WebSocket service is required.

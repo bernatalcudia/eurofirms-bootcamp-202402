@@ -1,6 +1,7 @@
 import { Types } from "mongoose"
 import { errors, validate } from "com"
-import { Chat, Product, User } from "../data/models.js"
+import { Chat, Product, User, UserRelation } from "../data/models.js"
+import { ensureUsersNotBlocked } from "./userRelations.js"
 import type {
     ChatMessageType,
     ChatOfferType,
@@ -38,6 +39,7 @@ function mapOffer(offer: {
     date: Date
     respondedBy?: Types.ObjectId
     respondedAt?: Date
+    paymentStatus: "unpaid" | "creating" | "pending" | "paid" | "expired" | "failed"
 }): ChatOfferType {
     return {
         id: offer._id.toString(),
@@ -45,6 +47,7 @@ function mapOffer(offer: {
         offeredBy: offer.offeredBy.toString(),
         status: offer.status,
         date: offer.date,
+        paymentStatus: offer.paymentStatus,
         ...(offer.respondedBy ? { respondedBy: offer.respondedBy.toString() } : {}),
         ...(offer.respondedAt ? { respondedAt: offer.respondedAt } : {}),
     }
@@ -57,6 +60,10 @@ async function findChat(userId: string, chatId: string) {
     const chat = await Chat.findOne({ _id: chatId, participants: userId })
         .catch(error => { throw new SystemError(error.message) })
     if (!chat) throw new NotFoundError("chat not found")
+    const otherParticipant = chat.participants.find(participant => participant.toString() !== userId)
+    if (otherParticipant) {
+        await ensureUsersNotBlocked(userId, otherParticipant.toString())
+    }
     return chat
 }
 
@@ -69,7 +76,7 @@ async function mapChats(userId: string, chats: ChatDocument[]): Promise<ChatType
     const participantIds = [...new Set(chats.flatMap(chat => chat.participants.map(id => id.toString())))]
     const [product, users] = await Promise.all([
         Product.find({ _id: { $in: productIds } })
-            .select({ title: 1, price: 1, images: { $slice: 1 } })
+            .select({ title: 1, price: 1, author: 1, images: { $slice: 1 } })
             .lean()
             .catch(error => { throw new SystemError(error.message) }),
         User.find({ _id: { $in: participantIds } }).select("username").lean()
@@ -93,6 +100,7 @@ async function mapChats(userId: string, chats: ChatDocument[]): Promise<ChatType
                 title: relatedProduct.title,
                 images: relatedProduct.images,
                 price: relatedProduct.price,
+                sellerId: relatedProduct.author.toString(),
             } : null,
             otherUser: {
                 id: otherParticipantId,
@@ -117,6 +125,7 @@ export const startChat: StartChat = async (userId, productId) => {
     if (!user) throw new NotFoundError("user not found")
     if (!product) throw new NotFoundError("product not found")
     if (product.author.toString() === userId) throw new OwnershipError("cannot start a chat with yourself")
+    await ensureUsersNotBlocked(userId, product.author.toString())
 
     const participants = [userId, product.author.toString()].sort()
     const key = `${productId}:${participants.join(":")}`
@@ -139,10 +148,22 @@ export const startChat: StartChat = async (userId, productId) => {
 export const retrieveChats: RetrieveChats = async userId => {
     validate.id(userId, "userId")
 
-    const chats = await Chat.find({ participants: userId }).sort({ updatedAt: -1 })
+    const [chats, blockedRelations] = await Promise.all([
+        Chat.find({ participants: userId }).sort({ updatedAt: -1 })
         .catch(error => { throw new SystemError(error.message) })
+        ,
+        UserRelation.find({
+            kind: "block",
+            $or: [{ from: userId }, { to: userId }],
+        }).select("from to").lean()
+            .catch(error => { throw new SystemError(error.message) }),
+    ])
 
-    const mappedChats = await mapChats(userId, chats)
+    const blockedUserIds = new Set(blockedRelations.map(relation =>
+        relation.from.toString() === userId ? relation.to.toString() : relation.from.toString()))
+    const visibleChats = chats.filter(chat =>
+        !chat.participants.some(participant => participant.toString() !== userId && blockedUserIds.has(participant.toString())))
+    const mappedChats = await mapChats(userId, visibleChats)
     return mappedChats.map(mapped => {
         const { messages: _messages, offers: _offers, ...summary } = mapped
         return summary satisfies ChatSummaryType

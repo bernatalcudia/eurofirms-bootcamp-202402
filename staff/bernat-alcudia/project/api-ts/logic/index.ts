@@ -4,6 +4,15 @@ import { registerUser } from "./registerUser.js"
 import { authenticateUser } from "./authenticateUser.js"
 import { changeUserPassword } from "./changeUserPassword.js"
 import { retrieveUser } from "./retrieveUser.js"
+import { updateUserProfile } from "./updateUserProfile.js"
+import {
+    blockUser,
+    followUser,
+    retrieveBlockedUsers,
+    retrievePublicProfile,
+    unblockUser,
+    unfollowUser,
+} from "./userRelations.js"
 import { createProduct } from "./createProduct.js"
 import { modifyProduct } from "./modifyProduct.js"
 import { removeProduct } from "./removeProduct.js"
@@ -18,12 +27,15 @@ import { modifyComment } from "./modifyComment.js"
 import { removeComment } from "./removeComment.js"
 import { retrieveComments } from "./retrieveComments.js"
 import { createChatOffer, respondToChatOffer, retrieveChat, retrieveChats, sendChatMessage, startChat } from "./chat.js"
+import { createOfferCheckout, handleStripeWebhook } from "./payments.js"
 
 
 
 export const logic: Logic = {
-    registerUser, authenticateUser, changeUserPassword, retrieveUser,
+    registerUser, authenticateUser, changeUserPassword, retrieveUser, updateUserProfile,
+    retrievePublicProfile, followUser, unfollowUser, blockUser, unblockUser, retrieveBlockedUsers,
     createProduct, modifyProduct, removeProduct, retrieveProductDetails, retrieveProducts, retrieveSavedProducts, searchProduct, toggleLikeProduct, toggleSaveProduct,
     createComment, modifyComment, removeComment, retrieveComments,
-    startChat, retrieveChats, retrieveChat, sendChatMessage, createChatOffer, respondToChatOffer
+    startChat, retrieveChats, retrieveChat, sendChatMessage, createChatOffer, respondToChatOffer,
+    createOfferCheckout, handleStripeWebhook,
 }

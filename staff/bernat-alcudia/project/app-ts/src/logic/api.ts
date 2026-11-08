@@ -1,6 +1,6 @@
 import SessionStorage from "react-native-session-storage"
 import { errors, isUserRole, validate, utils, type UserRole } from "com"
-import type { Chat, ChatSummary, Comment, Product, ProductState, User } from "../types/models"
+import type { BlockedProfile, Chat, ChatSummary, Comment, Product, ProductState, PublicProfile, User } from "../types/models"
 import { executeApiRequest, type ApiRequestOptions } from "./http"
 
 function apiUrl(path: string): string {
@@ -47,6 +47,42 @@ function getUserRole(): UserRole {
   throw new errors.ValidationError("invalid user role in token")
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function parseUser(value: unknown): User {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== "string" ||
+    typeof value.name !== "string" ||
+    typeof value.username !== "string" ||
+    typeof value.email !== "string" ||
+    !isUserRole(value.role) ||
+    typeof value.birthdate !== "string" ||
+    !Number.isFinite(Date.parse(value.birthdate)) ||
+    !Array.isArray(value.saved)
+  ) {
+    throw new errors.SystemError("The server returned an invalid user profile")
+  }
+  const saved: string[] = []
+  for (const productId of value.saved as unknown[]) {
+    if (typeof productId !== "string") {
+      throw new errors.SystemError("The server returned an invalid user profile")
+    }
+    saved.push(productId)
+  }
+  return {
+    id: value.id,
+    name: value.name,
+    username: value.username,
+    email: value.email,
+    role: value.role,
+    birthdate: value.birthdate,
+    saved,
+  }
+}
+
 export async function registerUser(
   name: string,
   birthdate: string,
@@ -82,7 +118,107 @@ export async function loginUser(username: string, password: string): Promise<voi
 }
 
 export async function retrieveUser(): Promise<User> {
-  return request<User>(`/users/${getUserId()}`)
+  return parseUser(await request<unknown>(`/users/${getUserId()}`))
+}
+
+export async function updateUserProfile(
+  profile: Pick<User, "name" | "email" | "username" | "birthdate"> & { currentPassword?: string },
+): Promise<User> {
+  validate.name(profile.name.trim())
+  validate.email(profile.email.trim())
+  validate.username(profile.username.trim())
+  if (!profile.birthdate) throw new errors.ValidationError("birthdate is required")
+  validate.birthdate(profile.birthdate)
+  return parseUser(await request<unknown>("/users/me/profile", {
+    method: "PATCH",
+    body: {
+      name: profile.name.trim(),
+      email: profile.email.trim(),
+      username: profile.username.trim(),
+      birthdate: profile.birthdate,
+      ...(profile.currentPassword ? { currentPassword: profile.currentPassword } : {}),
+    },
+  }))
+}
+
+export async function retrievePublicProfile(userId: string): Promise<PublicProfile> {
+  validate.id(userId, "userId")
+  const result = await request<unknown>(`/users/profiles/${userId}`)
+  if (
+    !isRecord(result) ||
+    typeof result.id !== "string" ||
+    typeof result.name !== "string" ||
+    typeof result.username !== "string" ||
+    typeof result.followersCount !== "number" ||
+    !Number.isSafeInteger(result.followersCount) ||
+    typeof result.followingCount !== "number" ||
+    !Number.isSafeInteger(result.followingCount) ||
+    typeof result.isFollowing !== "boolean" ||
+    typeof result.isBlocked !== "boolean"
+  ) {
+    throw new errors.SystemError("The server returned an invalid public profile")
+  }
+  return {
+    id: result.id,
+    name: result.name,
+    username: result.username,
+    followersCount: result.followersCount,
+    followingCount: result.followingCount,
+    isFollowing: result.isFollowing,
+    isBlocked: result.isBlocked,
+  }
+}
+
+export async function followUser(userId: string): Promise<void> {
+  validate.id(userId, "userId")
+  await request<void>(`/users/profiles/${userId}/follow`, {
+    method: "POST",
+    expectedStatus: expectedStatuses.noContent,
+  })
+}
+
+export async function unfollowUser(userId: string): Promise<void> {
+  validate.id(userId, "userId")
+  await request<void>(`/users/profiles/${userId}/follow`, {
+    method: "DELETE",
+    expectedStatus: expectedStatuses.noContent,
+  })
+}
+
+export async function blockUser(userId: string): Promise<void> {
+  validate.id(userId, "userId")
+  await request<void>(`/users/profiles/${userId}/block`, {
+    method: "POST",
+    expectedStatus: expectedStatuses.noContent,
+  })
+}
+
+export async function unblockUser(userId: string): Promise<void> {
+  validate.id(userId, "userId")
+  await request<void>(`/users/profiles/${userId}/block`, {
+    method: "DELETE",
+    expectedStatus: expectedStatuses.noContent,
+  })
+}
+
+export async function retrieveBlockedUsers(): Promise<BlockedProfile[]> {
+  const result = await request<unknown>("/users/me/blocked")
+  if (!Array.isArray(result)) {
+    throw new errors.SystemError("The server returned an invalid blocked-user list")
+  }
+  const blockedUsers: BlockedProfile[] = []
+  for (const user of result as unknown[]) {
+    if (
+      !isRecord(user) ||
+      typeof user.id !== "string" ||
+      typeof user.name !== "string" ||
+      typeof user.username !== "string"
+    ) {
+      throw new errors.SystemError("The server returned an invalid blocked-user list")
+    }
+    blockedUsers.push({ id: user.id, name: user.name, username: user.username })
+  }
+  return blockedUsers
 }
 
 export function logoutUser(): void {
@@ -298,4 +434,25 @@ export async function respondToChatOffer(
     method: "PATCH",
     body: { decision },
   })
+}
+
+export async function createOfferCheckout(chatId: string, offerId: string): Promise<string> {
+  validate.id(chatId, "chatId")
+  validate.id(offerId, "offerId")
+  const result = await request<unknown>(`/chats/${chatId}/offers/${offerId}/checkout`, {
+    method: "POST",
+  })
+  if (!isRecord(result) || typeof result.url !== "string") {
+    throw new errors.SystemError("The server returned an invalid checkout URL")
+  }
+  let checkoutUrl: URL
+  try {
+    checkoutUrl = new URL(result.url)
+  } catch {
+    throw new errors.SystemError("The server returned an invalid checkout URL")
+  }
+  if (checkoutUrl.protocol !== "https:" || checkoutUrl.hostname !== "checkout.stripe.com") {
+    throw new errors.SystemError("The server returned an untrusted checkout URL")
+  }
+  return checkoutUrl.toString()
 }

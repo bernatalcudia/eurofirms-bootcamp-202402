@@ -6,8 +6,21 @@ type UserType = {
     email: string,
     username: string,
     role: UserRole,
-    saved: string[]
+    saved: string[],
+    birthdate: Date
 }
+
+type PublicProfileType = {
+    id: string,
+    name: string,
+    username: string,
+    followersCount: number,
+    followingCount: number,
+    isFollowing: boolean,
+    isBlocked: boolean
+}
+
+type BlockedProfileType = Pick<PublicProfileType, "id" | "name" | "username">
 
 type ProductType = {
     id: string,
@@ -50,11 +63,12 @@ type ChatOfferType = {
     date: Date
     respondedBy?: string
     respondedAt?: Date
+    paymentStatus: "unpaid" | "creating" | "pending" | "paid" | "expired" | "failed"
 }
 
 type ChatSummaryType = {
     id: string
-    product: { id: string; title: string; images: string[]; price: number } | null
+    product: { id: string; title: string; images: string[]; price: number; sellerId: string } | null
     otherUser: { id: string; username: string }
     lastMessage: ChatMessageType | null
     updatedAt: Date
@@ -73,6 +87,13 @@ type AuthenticateUser = (username: string, password: string) => Promise<{ id: st
 type ChangeUserPassword = (userId: string, oldPassword: string, newPassword: string, newPasswordRepeat: string) => Promise<void>
 
 type RetrieveUser = (userId: string, targetUserId: string) => Promise<UserType>
+type UpdateUserProfile = (userId: string, profile: unknown) => Promise<UserType>
+type RetrievePublicProfile = (userId: string, targetUserId: string) => Promise<PublicProfileType>
+type FollowUser = (userId: string, targetUserId: string) => Promise<void>
+type UnfollowUser = (userId: string, targetUserId: string) => Promise<void>
+type BlockUser = (userId: string, targetUserId: string) => Promise<void>
+type UnblockUser = (userId: string, targetUserId: string) => Promise<void>
+type RetrieveBlockedUsers = (userId: string) => Promise<BlockedProfileType[]>
 
 type CreateProduct = (userId: string, images: string[], title: string, description: string, brand: string, price: number, state: string, stock: number) => Promise<void>
 
@@ -117,11 +138,21 @@ type RespondToChatOffer = (
     decision: "accept" | "reject",
 ) => Promise<ChatType>
 
+type CreateOfferCheckout = (userId: string, chatId: string, offerId: string) => Promise<{ url: string }>
+type HandleStripeWebhook = (rawBody: Buffer, signature: string) => Promise<void>
+
 type Logic = {
     registerUser: RegisterUser,
     authenticateUser: AuthenticateUser,
     changeUserPassword: ChangeUserPassword,
     retrieveUser: RetrieveUser,
+    updateUserProfile: UpdateUserProfile,
+    retrievePublicProfile: RetrievePublicProfile,
+    followUser: FollowUser,
+    unfollowUser: UnfollowUser,
+    blockUser: BlockUser,
+    unblockUser: UnblockUser,
+    retrieveBlockedUsers: RetrieveBlockedUsers,
 
     createProduct: CreateProduct,
     modifyProduct: ModifyProduct,
@@ -143,7 +174,9 @@ type Logic = {
     retrieveChat: RetrieveChat,
     sendChatMessage: SendChatMessage,
     createChatOffer: CreateChatOffer,
-    respondToChatOffer: RespondToChatOffer
+    respondToChatOffer: RespondToChatOffer,
+    createOfferCheckout: CreateOfferCheckout,
+    handleStripeWebhook: HandleStripeWebhook
 }
 
 export {
@@ -152,9 +185,11 @@ export {
     RetrieveProducts,
     RetrieveSavedProducts, RetrieveUser, SearchProduct,
     ToggleLikeProduct,
-    ToggleSaveProduct, UserType,
+    ToggleSaveProduct, UserType, PublicProfileType, BlockedProfileType,
     ChatMessageType, ChatOfferType, ChatSummaryType, ChatType,
-    StartChat, RetrieveChats, RetrieveChat, SendChatMessage, CreateChatOffer, RespondToChatOffer
+    StartChat, RetrieveChats, RetrieveChat, SendChatMessage, CreateChatOffer, RespondToChatOffer,
+    UpdateUserProfile, RetrievePublicProfile, FollowUser, UnfollowUser, BlockUser, UnblockUser,
+    RetrieveBlockedUsers, CreateOfferCheckout, HandleStripeWebhook
 }
 
 export type { UserRole }
