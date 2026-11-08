@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
     ActivityIndicator,
     Alert,
-    KeyboardAvoidingView,
     Linking,
     Platform,
     RefreshControl,
@@ -20,6 +19,7 @@ import type { ChatConversationRoute, RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
 import createChatStyles from '../styles/Chat.styles'
+import KeyboardAvoidingContainer from './KeyboardAvoidingContainer'
 
 type TimelineItem =
     | { kind: 'message'; value: ChatMessage; timestamp: number }
@@ -220,7 +220,7 @@ function ChatConversation() {
     const hasAcceptedOffer = chat.offers.some(offer => offer.status === 'accepted')
 
     return (
-        <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardAvoidingContainer style={styles.screen}>
             <View style={styles.chatHeader}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('UserProfile', { userId: chat.otherUser.id })}
@@ -381,7 +381,7 @@ function ChatConversation() {
                         : t('An offer is only agreed when the other person accepts it.')}
                 </Text>
             </View>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingContainer>
     )
 }
 

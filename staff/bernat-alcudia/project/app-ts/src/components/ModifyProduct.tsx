@@ -1,9 +1,10 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { prepareProductImages } from '../logic/productImages';
+import KeyboardAwareScrollView from './KeyboardAwareScrollView';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ComponentRef } from 'react';
-import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
 import type { RadioButtonProps } from 'react-native-radio-buttons-group'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,7 +25,7 @@ function ModifyProduct() {
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState(false)
     const [formError, setFormError] = useState('')
-    const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null)
+    const scrollRef = useRef<ScrollViewInstance>(null)
 
     useEffect(() => {
         if (formError) scrollRef.current?.scrollTo({ y: 0, animated: true })
@@ -226,7 +227,7 @@ function ModifyProduct() {
 
     return (
         <>
-            <ScrollView ref={scrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel={t('Modify product scroll view')}>
+            <KeyboardAwareScrollView ref={scrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel={t('Modify product scroll view')}>
                 <View style={styles.container}>
                     <Text style={styles.pageTitle} accessibilityRole='header'>{t('Modify product')}</Text>
                     <Text style={styles.introText}>{t('Update the photos and details buyers see.')}</Text>
@@ -313,7 +314,7 @@ function ModifyProduct() {
                         <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Save changes')}</Text>
                     </TouchableOpacity>
                 </View>
-            </ScrollView >
+            </KeyboardAwareScrollView >
         </>
     )
 }

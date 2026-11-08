@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { errors } from 'com'
-import { ActivityIndicator, AccessibilityInfo, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, AccessibilityInfo, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import logic from '../logic'
 import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
 import createChangePasswordStyles from '../styles/ChangePassword.styles'
+import KeyboardAwareScrollView from './KeyboardAwareScrollView'
 
 const { ValidationError } = errors
 
@@ -54,7 +55,7 @@ function ChangePassword() {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
+        <KeyboardAwareScrollView contentContainerStyle={styles.view}>
             <View style={styles.card}>
                 <TextInput
                     style={styles.input}
@@ -109,7 +110,7 @@ function ChangePassword() {
                         : <Text style={styles.buttonText}>{t('Save new password')}</Text>}
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     )
 }
 

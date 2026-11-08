@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { errors } from 'com';
@@ -9,6 +9,7 @@ import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
 import { authDisabledButton, authLogo, createLoginStyles } from '../styles/Auth.styles'
+import KeyboardAwareScrollView from '../components/KeyboardAwareScrollView'
 
 const { ValidationError, MatchError } = errors
 
@@ -63,7 +64,7 @@ function LoginUser() {
 
     const styles = createLoginStyles(colors)
 
-    return <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
+    return <KeyboardAwareScrollView contentContainerStyle={styles.view}>
         <View style={styles.card}>
             <Image source={require('../../assets/bonita-fallera-logo.png')} style={authLogo} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
             <Text style={styles.heading} accessibilityRole='header'>{t('Welcome back')}</Text>
@@ -115,7 +116,7 @@ function LoginUser() {
                 <Text style={styles.secondaryButtonText}>{t('Register')}</Text>
             </TouchableOpacity>
         </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
 }
 
 export default LoginUser

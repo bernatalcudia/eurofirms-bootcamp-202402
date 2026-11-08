@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import logic from '../logic'
-import { View, Image, ScrollView, TextInput, Alert, Text, TouchableOpacity, Platform } from 'react-native'
+import { View, Image, TextInput, Alert, Text, TouchableOpacity, Platform } from 'react-native'
+import type { ScrollViewInstance } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useNavigation } from '@react-navigation/native'
 import RadioGroup from 'react-native-radio-buttons-group'
 import * as ImagePicker from 'expo-image-picker'
 import { prepareProductImages } from '../logic/productImages'
+import KeyboardAwareScrollView from './KeyboardAwareScrollView'
 import type { RadioButtonProps } from 'react-native-radio-buttons-group'
 import type { ProductState } from '../types/models'
 import type { RootNavigation } from '../types/navigation'
@@ -23,7 +25,7 @@ function CreateProduct({ }) {
     const [stock, setStock] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
-    const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null)
+    const scrollRef = useRef<ScrollViewInstance>(null)
 
     useEffect(() => {
         if (formError) scrollRef.current?.scrollTo({ y: 0, animated: true })
@@ -195,7 +197,7 @@ function CreateProduct({ }) {
 
 
     return (
-        <ScrollView ref={scrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        <KeyboardAwareScrollView ref={scrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
             <View style={styles.container}>
                 <Text style={styles.pageTitle} accessibilityRole='header'>{t('Create product')}</Text>
                 <Text style={styles.introText}>{t('Add a clear photo and a few details to help buyers.')}</Text>
@@ -267,7 +269,7 @@ function CreateProduct({ }) {
                     <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Publish product')}</Text>
                 </TouchableOpacity>
             </View>
-        </ScrollView >
+        </KeyboardAwareScrollView >
     )
 }
 

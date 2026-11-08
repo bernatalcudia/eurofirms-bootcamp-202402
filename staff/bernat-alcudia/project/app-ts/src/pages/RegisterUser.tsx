@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import logic from '../logic';
 import { errors, utils } from 'com';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -9,6 +9,7 @@ import type { RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
 import { authDisabledButton, authLogo, createRegisterStyles } from '../styles/Auth.styles'
+import KeyboardAwareScrollView from '../components/KeyboardAwareScrollView'
 
 
 
@@ -93,7 +94,7 @@ function RegisterUser() {
     const styles = createRegisterStyles(colors)
 
     return (
-        <ScrollView contentContainerStyle={styles.view} keyboardShouldPersistTaps='handled'>
+        <KeyboardAwareScrollView contentContainerStyle={styles.view}>
             <View style={styles.card}>
                     <Image source={require('../../assets/bonita-fallera-logo.png')} style={authLogo} resizeMode='contain' accessibilityLabel={t('Bonita Fallera logo')} />
                     <Text style={styles.heading} accessibilityRole='header'>{t('Create your account')}</Text>
@@ -179,7 +180,7 @@ function RegisterUser() {
                         : <Text style={styles.buttonText}>{t('Register')}</Text>}
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     )
 }
 

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -11,6 +11,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../i18n/LanguageContext'
 import { themeColors, useTheme, type ThemeName } from '../theme/ThemeContext'
 import createProfileStyles, { getPaletteSwatchStyle } from '../styles/Profile.styles'
+import KeyboardAwareScrollView from './KeyboardAwareScrollView'
 
 function Profile() {
     const navigation = useNavigation<RootNavigation>()
@@ -163,7 +164,7 @@ function Profile() {
     ]
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <KeyboardAwareScrollView contentContainerStyle={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.subtitle}>{t('Manage your account and personalize your experience.')}</Text>
 
@@ -369,7 +370,7 @@ function Profile() {
                     )}
                 </View>
             </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     )
 }
 
