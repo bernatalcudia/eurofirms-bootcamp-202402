@@ -54,7 +54,7 @@ describe("retrieveSavedProducts", () => {
                     liked: false,
                     own: true,
                 })
-                expect(products?.[0].images).to.deep.equal(images)
+                expect(products?.[0].images).to.deep.equal([images[0]])
             })
     })
 

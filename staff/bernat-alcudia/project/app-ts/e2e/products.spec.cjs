@@ -42,6 +42,17 @@ test('products and profile photo work through the app and API', async ({ page, r
   const regexSearch = await request.get(`${api}/products/search?query=${encodeURIComponent('(')}`, { headers: { Authorization: `Bearer ${token}` } })
   expect(regexSearch.status()).toBe(200)
   expect(await regexSearch.json()).toEqual([])
+  const galleryCreate = await request.post(`${api}/products/create`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { images: [image.toString('base64'), image.toString('base64'), image.toString('base64')], title: 'Gallery Item', brand: 'Test brand', description: '', price: 5, stock: 1, state: 'new' },
+  })
+  expect(galleryCreate.status()).toBe(201)
+  const catalog = await (await request.get(`${api}/products/retrieve`, { headers: { Authorization: `Bearer ${token}` } })).json()
+  const gallery = catalog.find(product => product.title === 'Gallery Item')
+  expect(gallery.images).toHaveLength(1)
+  const galleryDetails = await (await request.get(`${api}/products/${gallery.id}`, { headers: { Authorization: `Bearer ${token}` } })).json()
+  expect(galleryDetails.images).toHaveLength(3)
+  expect((await request.delete(`${api}/products/${gallery.id}`, { headers: { Authorization: `Bearer ${token}` } })).status()).toBe(204)
 
   await page.goto('/')
   await page.getByLabel('Username', { exact: true }).fill(username)

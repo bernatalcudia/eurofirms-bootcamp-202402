@@ -8,6 +8,8 @@ The API allows browser origins at `http://localhost:8081`, `http://127.0.0.1:808
 
 The server applies Helmet security headers, exact-origin CORS, a general request limit, stricter per-IP registration and authentication limits, bounded JSON request bodies, and centralized bearer-token verification restricted to HS256. Private endpoints require a valid token; users can retrieve their own profile, while admins can retrieve other profiles. Internal server errors are logged on the server and returned with a generic message.
 
+Product list endpoints (`GET /products/retrieve`, `GET /products/search` and the saved list) return only the cover image of each product (`images` has at most one item) to keep the catalog light; `GET /products/:productId` returns every image. The client labels each base64 image with its real format (JPEG, PNG, GIF or WebP) instead of assuming PNG.
+
 Input limits: product requests accept at most 10 images of 1,200,000 characters each (the general JSON body limit is 14 MB), titles and brands up to 120 characters, descriptions up to 2,000 characters, and search text up to 100 characters. Search text is matched literally, never as a regular expression. Authentication spends a password-hash comparison on unknown usernames so response time does not reveal whether an account exists.
 
 The API limiter is in-memory and intended for a single process. Use a shared limiter store and appropriate proxy configuration when deploying multiple instances behind a trusted reverse proxy.

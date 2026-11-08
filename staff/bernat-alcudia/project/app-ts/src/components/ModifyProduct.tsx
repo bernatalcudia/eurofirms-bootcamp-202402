@@ -9,6 +9,7 @@ import RadioGroup from 'react-native-radio-buttons-group';
 import type { RadioButtonProps } from 'react-native-radio-buttons-group'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import logic from '../logic';
+import { productImageUri } from '../logic/productImageUri';
 import type { ProductRoute, RootNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../theme/ThemeContext'
@@ -249,7 +250,7 @@ function ModifyProduct() {
                     <View style={styles.galleryPreview} accessibilityLabel={t('Product images')}>
                         {images.length > 0 ? images.map((image, index) => (
                             <View key={`${index}-${image.slice(0, 12)}`} style={styles.imageContainer}>
-                                <Image source={{ uri: 'data:image/png;base64,' + image }} style={styles.imageThumbnail} onError={error => console.error('Error loading product image:', error.nativeEvent.error)} accessibilityLabel={t('Product image {number}', { number: index + 1 })} />
+                                <Image source={{ uri: productImageUri(image) }} style={styles.imageThumbnail} onError={error => console.error('Error loading product image:', error.nativeEvent.error)} accessibilityLabel={t('Product image {number}', { number: index + 1 })} />
                                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(index)} accessibilityRole='button' accessibilityLabel={t('Remove image {number}', { number: index + 1 })}>
                                     <MaterialCommunityIcons name='close-circle' size={25} color={colors.text} style={styles.deleteIconBackground} accessibilityElementsHidden={true} />
                                 </TouchableOpacity>

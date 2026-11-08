@@ -3,6 +3,7 @@ import { ActivityIndicator, Image, RefreshControl, ScrollView, Text, TouchableOp
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import logic from '../logic'
+import { productImageUri } from '../logic/productImageUri'
 import type { ChatSummary } from '../types/models'
 import type { TabNavigation } from '../types/navigation'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -80,7 +81,7 @@ function ChatInbox() {
                             })}
                         >
                             {chat.product?.images[0] ? (
-                                <Image source={{ uri: `data:image/png;base64,${chat.product.images[0]}` }} style={styles.productThumbnail} />
+                                <Image source={{ uri: productImageUri(chat.product.images[0]) }} style={styles.productThumbnail} />
                             ) : (
                                 <View style={[styles.productThumbnail, { alignItems: 'center', justifyContent: 'center' }]}>
                                     <MaterialCommunityIcons name='image-off-outline' size={24} color={colors.mutedText} />

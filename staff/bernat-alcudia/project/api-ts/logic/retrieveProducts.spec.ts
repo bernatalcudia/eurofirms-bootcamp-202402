@@ -45,7 +45,7 @@ describe("retrieveProducts", () => {
                 expect(product).to.exist
                 expect(products).to.exist
                 expect(products?.length).to.equal(1)
-                expect(products?.[0].images).to.deep.equal(images)
+                expect(products?.[0].images).to.deep.equal([images[0]])
                 expect(products?.[0].title).to.equal("suns")
                 expect(products?.[0].description).to.equal("suns galaxy")
                 expect(products?.[0].brand).to.equal("galaxy")

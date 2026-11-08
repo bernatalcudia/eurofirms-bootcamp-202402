@@ -11,7 +11,7 @@
     "compile-watch": "npx tsc --watch",
     "test": "tsx --env-file=.env logic/registerUser.test.ts",
     "test:unit": "mocha --node-option import=tsx logic/payments.spec.ts",
-    "test:integration": "mocha --node-option import=tsx --require logic/testSetup.ts logic/userRelations.spec.ts logic/updateUserProfile.spec.ts logic/paymentsIntegration.spec.ts logic/chat.spec.ts logic/inputLimits.spec.ts",
+    "test:integration": "mocha --node-option import=tsx --require logic/testSetup.ts logic/userRelations.spec.ts logic/updateUserProfile.spec.ts logic/paymentsIntegration.spec.ts logic/chat.spec.ts logic/inputLimits.spec.ts logic/productImages.spec.ts",
     "test-mocha": "mocha --node-option env-file=.env --node-option import=tsx \"logic/*.spec.ts\"",
     "test-inspect": "mocha --inspect-brk --node-option env-file=.env --node-option import=tsx \"logic/*.spec.ts\"",
     "test-watch": "mocha --node-option env-file=.env --node-option import=tsx --watch \"logic/*.spec.ts\""

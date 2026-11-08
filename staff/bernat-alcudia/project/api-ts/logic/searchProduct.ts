@@ -15,7 +15,7 @@ export const searchProduct: SearchProduct = (userId: string, searchQuery: string
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.find({ "title": { "$regex": escapeRegExp(searchQuery), "$options": "i" } }).select("-__v").populate("author", "username").lean()
+            return Product.find({ "title": { "$regex": escapeRegExp(searchQuery), "$options": "i" } }).select({ __v: 0, images: { $slice: 1 } }).populate("author", "username").lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(product => {
                     if (!product) { throw new NotFoundError("product not found") }

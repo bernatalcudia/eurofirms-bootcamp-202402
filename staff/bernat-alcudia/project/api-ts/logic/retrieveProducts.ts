@@ -12,7 +12,7 @@ export const retrieveProducts: RetrieveProducts = (userId: string) => {
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.find().select("-__v").populate("author", "username").sort("-date").lean()
+            return Product.find().select({ __v: 0, images: { $slice: 1 } }).populate("author", "username").sort("-date").lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then(products => {
                     if (!products) throw new NotFoundError("products not found")

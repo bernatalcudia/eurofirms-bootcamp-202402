@@ -1,4 +1,5 @@
 import logic from '../logic';
+import { productImageUri } from '../logic/productImageUri';
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { utils } from 'com'
@@ -75,7 +76,7 @@ function RetrieveSavedProducts() {
                         currency: 'EUR',
                     }).format(product.price)
                     return <TouchableOpacity key={product.id} style={styles.productContainer} onPress={() => navigation.navigate('ProductDetail', { id: product.id })} accessibilityRole='button' accessibilityLabel={t('View details for product {title}', { title: product.title })}>
-                        {product.images[0] && <Image source={{ uri: 'data:image/png;base64,' + product.images[0] }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={t('Product image {number}', { number: 1 })} />}
+                        {product.images[0] && <Image source={{ uri: productImageUri(product.images[0]) }} style={styles.image} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={t('Product image {number}', { number: 1 })} />}
                         <View >
                             <Text style={styles.dateText}>{product.date ? utils.formatDate(new Date(product.date)) : ''}</Text>
                             <Text style={styles.titleText}>{product.title}</Text>

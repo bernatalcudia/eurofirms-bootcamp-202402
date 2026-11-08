@@ -13,7 +13,7 @@ export const retrieveSavedProducts: RetrieveSavedProducts = (userId: string) => 
         .then(user => {
             if (!user) throw new NotFoundError("user not found")
 
-            return Product.find({ _id: { $in: user.saved } }).select("-__v").populate("author", "username").lean()
+            return Product.find({ _id: { $in: user.saved } }).select({ __v: 0, images: { $slice: 1 } }).populate("author", "username").lean()
                 .catch(error => { throw new SystemError(error.message) })
         })
         .then(products => {

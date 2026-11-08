@@ -5,6 +5,7 @@ import { errors } from 'com'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import logic from '../logic';
+import { productImageUri } from '../logic/productImageUri';
 
 import Comments from './Comments';
 import type { Product, User } from '../types/models'
@@ -222,7 +223,7 @@ function Products({ searchQuery }: ProductsProps) {
                                     <Image
                                         style={styles.productImage}
                                         resizeMode='cover'
-                                        source={{ uri: 'data:image/png;base64,' + imageSource }}
+                                        source={{ uri: productImageUri(imageSource) }}
                                         onError={error => {
                                             console.error('Error loading product image:', error.nativeEvent.error)
                                             setImageErrors(current => ({ ...current, [product.id]: imageSource }))

@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, Image, ScrollView, Alert, Modal, Pressable, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import logic from '../logic';
+import { productImageUri } from '../logic/productImageUri';
 import { utils } from 'com'
 import { useFocusEffect, useRoute, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -133,7 +134,7 @@ function ProductDetail() {
                                     </View>
                                 ) : (
                                     <Image
-                                        source={{ uri: 'data:image/png;base64,' + image }}
+                                        source={{ uri: productImageUri(image) }}
                                         style={styles.productImage}
                                         resizeMode='contain'
                                         onError={error => {

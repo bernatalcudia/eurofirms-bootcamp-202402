@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import logic from '../logic'
+import { productImageUri } from '../logic/productImageUri'
 import { View, Image, TextInput, Alert, Text, TouchableOpacity, Platform } from 'react-native'
 import type { ScrollViewInstance } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -219,7 +220,7 @@ function CreateProduct({ }) {
                 <View style={styles.galleryPreview} accessibilityLabel={t('Product images')}>
                     {images.length > 0 ? images.map((image, index) => (
                         <View key={`${index}-${image.slice(0, 12)}`} style={styles.imageContainer}>
-                            <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityLabel={t('Product image {number}', { number: index + 1 })}></Image>
+                            <Image style={styles.imageThumbnail} source={{ uri: productImageUri(image) }} accessibilityLabel={t('Product image {number}', { number: index + 1 })}></Image>
                             <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(image)} accessibilityLabel={t('Remove image {number}', { number: index + 1 })} accessibilityRole='button' accessible={true}>
                                 <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityElementsHidden={true} />
                             </TouchableOpacity>
