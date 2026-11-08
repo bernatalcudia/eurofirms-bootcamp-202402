@@ -220,7 +220,7 @@ function ModifyProduct() {
 
     return (
         <>
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel={t('Modify product scroll view')} accessible={true}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} accessibilityLabel={t('Modify product scroll view')}>
                 <View style={styles.container}>
                     <Text style={styles.pageTitle} accessibilityRole='header'>{t('Modify product')}</Text>
                     <Text style={styles.introText}>{t('Update the photos and details buyers see.')}</Text>

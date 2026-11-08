@@ -26,6 +26,8 @@ Run `npm run test:unit` for payment amount and webhook-signature unit tests. `np
 
 Authenticated users can edit their own name, email, username, and birth date with `PATCH /users/me/profile`. Role and account ID are not editable. Changing an email address requires the current password. `GET /users/profiles/:targetUserid` returns only public name, username, follow counts, and relationship state.
 
+An optional `photo` field on that PATCH accepts a JPEG or PNG base64 data URL of at most 512,000 characters, or `null` to remove it. Photos are stored in MongoDB and returned in private and public profile responses; clients should not put private information in them. Existing users without a photo receive `null`.
+
 Follow and unfollow with `POST` and `DELETE /users/profiles/:targetUserid/follow`. Block and unblock with `POST` and `DELETE /users/profiles/:targetUserid/block`; `GET /users/me/blocked` lists accounts the current user can unblock. Blocking removes follows in both directions and prevents further profile discovery, chats, messages, offers, and checkout between the pair. Existing products and conversation records are preserved, but blocked conversations are hidden until unblocked.
 
 The mobile conversation view refreshes the thread periodically while open and when pulled down; no WebSocket service is required.

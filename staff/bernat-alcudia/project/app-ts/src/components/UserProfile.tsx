@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { ActivityIndicator, Alert, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import logic from '../logic'
@@ -14,6 +14,7 @@ export default function UserProfile() {
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [photoFailed, setPhotoFailed] = useState(false)
     const route = useRoute<UserProfileRoute>()
     const navigation = useNavigation<RootNavigation>()
     const { t } = useLanguage()
@@ -26,6 +27,7 @@ export default function UserProfile() {
         setLoadError(false)
         try {
             setProfile(await logic.retrievePublicProfile(userId))
+            setPhotoFailed(false)
         } catch (error) {
             console.error('Could not load public profile:', error)
             setLoadError(true)
@@ -113,7 +115,9 @@ export default function UserProfile() {
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.profileCard}>
                 <View style={styles.avatar}>
-                    <MaterialCommunityIcons name='account' size={38} color={colors.primary} />
+                    {profile.photo && !photoFailed
+                        ? <Image source={{ uri: profile.photo }} style={styles.avatarImage} onError={() => setPhotoFailed(true)} accessibilityLabel={t('Profile photo')} />
+                        : <MaterialCommunityIcons name='account' size={38} color={colors.primary} />}
                 </View>
                 <Text style={styles.name}>{profile.name}</Text>
                 <Text style={styles.username}>@{profile.username}</Text>

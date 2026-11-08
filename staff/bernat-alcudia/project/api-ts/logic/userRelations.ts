@@ -89,7 +89,7 @@ export const retrievePublicProfile: RetrievePublicProfile = async (userId, targe
     if (isBlocked) throw new NotFoundError("user not found")
 
     const [target, followersCount, followingCount, isFollowing] = await Promise.all([
-        User.findById(targetUserId).select("name username").lean()
+        User.findById(targetUserId).select("name username photo").lean()
             .catch(error => { throw new SystemError(error.message) }),
         UserRelation.countDocuments({ to: targetUserId, kind: "follow" })
             .catch(error => { throw new SystemError(error.message) }),
@@ -103,6 +103,7 @@ export const retrievePublicProfile: RetrievePublicProfile = async (userId, targe
         id: target._id.toString(),
         name: target.name,
         username: target.username,
+        photo: target.photo ?? null,
         followersCount,
         followingCount,
         isFollowing: Boolean(isFollowing),

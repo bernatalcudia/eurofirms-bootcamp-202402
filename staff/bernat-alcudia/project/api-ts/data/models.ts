@@ -10,6 +10,7 @@ type UserDocType = {
     birthdate: Date
     email: string
     username: string
+    photo?: string | null
     password: string
     role: UserRole
     saved: Types.ObjectId[]
@@ -103,6 +104,7 @@ const userSchema = new Schema<UserDocType>({
         required: true,
         unique: true
     },
+    photo: { type: String, default: null },
     password: {
         type: String,
         required: true

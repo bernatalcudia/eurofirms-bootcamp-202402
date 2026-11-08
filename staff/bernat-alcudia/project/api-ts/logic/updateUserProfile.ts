@@ -11,6 +11,7 @@ type EditableProfile = {
     email?: string
     username?: string
     birthdate?: string
+    photo?: string | null
 }
 
 export const updateUserProfile: UpdateUserProfile = async (userId, profile) => {
@@ -20,12 +21,30 @@ export const updateUserProfile: UpdateUserProfile = async (userId, profile) => {
     }
 
     const input = profile as Record<string, unknown>
-    const allowedKeys = new Set(["name", "email", "username", "birthdate", "currentPassword"])
+    const allowedKeys = new Set(["name", "email", "username", "birthdate", "photo", "currentPassword"])
     if (Object.keys(input).length === 0 || Object.keys(input).some(key => !allowedKeys.has(key))) {
         throw new ValidationError("profile contains no editable fields or unsupported fields")
     }
 
     const updates: EditableProfile = {}
+    if ("photo" in input) {
+        if (input.photo === null) {
+            updates.photo = null
+        } else {
+            if (typeof input.photo !== "string" || input.photo.length > 512_000) {
+                throw new ValidationError("profile photo is invalid or too large")
+            }
+            const match = /^data:image\/(jpeg|png);base64,([A-Za-z0-9+/]+={0,2})$/.exec(input.photo)
+            if (!match || match[2].length % 4 !== 0) throw new ValidationError("invalid profile photo")
+            const bytes = Buffer.from(match[2], "base64")
+            const jpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+            const png = bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+            if (bytes.toString("base64") !== match[2] || (match[1] === "jpeg" ? !jpeg : !png)) {
+                throw new ValidationError("invalid profile photo")
+            }
+            updates.photo = input.photo
+        }
+    }
     if ("name" in input) {
         if (typeof input.name !== "string") throw new ValidationError("name must be a string")
         const name = input.name.trim()

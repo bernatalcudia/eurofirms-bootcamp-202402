@@ -62,6 +62,7 @@ function parseUser(value: unknown): User {
     typeof value.birthdate !== "string" ||
     !Number.isFinite(Date.parse(value.birthdate)) ||
     !Array.isArray(value.saved)
+    || (value.photo !== undefined && value.photo !== null && typeof value.photo !== "string")
   ) {
     throw new errors.SystemError("The server returned an invalid user profile")
   }
@@ -76,6 +77,7 @@ function parseUser(value: unknown): User {
     id: value.id,
     name: value.name,
     username: value.username,
+    photo: value.photo ?? null,
     email: value.email,
     role: value.role,
     birthdate: value.birthdate,
@@ -122,7 +124,7 @@ export async function retrieveUser(): Promise<User> {
 }
 
 export async function updateUserProfile(
-  profile: Pick<User, "name" | "email" | "username" | "birthdate"> & { currentPassword?: string },
+  profile: Pick<User, "name" | "email" | "username" | "birthdate" | "photo"> & { currentPassword?: string },
 ): Promise<User> {
   validate.name(profile.name.trim())
   validate.email(profile.email.trim())
@@ -136,6 +138,7 @@ export async function updateUserProfile(
       email: profile.email.trim(),
       username: profile.username.trim(),
       birthdate: profile.birthdate,
+      ...(profile.photo !== undefined ? { photo: profile.photo } : {}),
       ...(profile.currentPassword ? { currentPassword: profile.currentPassword } : {}),
     },
   }))
@@ -154,7 +157,8 @@ export async function retrievePublicProfile(userId: string): Promise<PublicProfi
     typeof result.followingCount !== "number" ||
     !Number.isSafeInteger(result.followingCount) ||
     typeof result.isFollowing !== "boolean" ||
-    typeof result.isBlocked !== "boolean"
+    typeof result.isBlocked !== "boolean" ||
+    (result.photo !== undefined && result.photo !== null && typeof result.photo !== "string")
   ) {
     throw new errors.SystemError("The server returned an invalid public profile")
   }
@@ -162,6 +166,7 @@ export async function retrievePublicProfile(userId: string): Promise<PublicProfi
     id: result.id,
     name: result.name,
     username: result.username,
+    photo: result.photo ?? null,
     followersCount: result.followersCount,
     followingCount: result.followingCount,
     isFollowing: result.isFollowing,

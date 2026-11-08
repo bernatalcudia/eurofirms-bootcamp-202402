@@ -5,6 +5,7 @@ type UserType = {
     name: string,
     email: string,
     username: string,
+    photo: string | null,
     role: UserRole,
     saved: string[],
     birthdate: Date
@@ -14,6 +15,7 @@ type PublicProfileType = {
     id: string,
     name: string,
     username: string,
+    photo: string | null,
     followersCount: number,
     followingCount: number,
     isFollowing: boolean,

@@ -7,6 +7,12 @@ const languageStorageKey = '@app-ts/language'
 
 const translations = {
     en: {
+        'Profile photo': 'Profile photo',
+        'Choose profile photo': 'Choose profile photo',
+        'Remove photo': 'Remove photo',
+        'Save your profile to apply photo changes.': 'Save your profile to apply photo changes.',
+        'Choose a JPEG or PNG profile photo smaller than 375 KB.': 'Choose a JPEG or PNG profile photo smaller than 375 KB.',
+        'Could not select a profile photo. Please try again.': 'Could not select a profile photo. Please try again.',
         'Language': 'Language',
         'Appearance': 'Appearance',
         'Bonita Fallera logo': 'Bonita Fallera logo',
@@ -306,6 +312,12 @@ const translations = {
         'Product image {number} of {count}: {title}': 'Product image {number} of {count}: {title}',
     },
     es: {
+        'Profile photo': 'Foto de perfil',
+        'Choose profile photo': 'Elegir foto de perfil',
+        'Remove photo': 'Eliminar foto',
+        'Save your profile to apply photo changes.': 'Guarda el perfil para aplicar los cambios de foto.',
+        'Choose a JPEG or PNG profile photo smaller than 375 KB.': 'Elige una foto JPEG o PNG de menos de 375 KB.',
+        'Could not select a profile photo. Please try again.': 'No se ha podido seleccionar la foto. Inténtalo de nuevo.',
         'Language': 'Idioma',
         'Appearance': 'Apariencia',
         'Bonita Fallera logo': 'Logo de Bonita Fallera',

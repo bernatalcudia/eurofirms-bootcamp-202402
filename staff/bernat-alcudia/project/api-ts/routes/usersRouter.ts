@@ -59,7 +59,7 @@ usersRouter.get("/profiles/:targetUserid", requireAuthentication, async (req, re
     }
 })
 
-usersRouter.patch("/me/profile", requireAuthentication, smallJsonBodyParser, async (req, res, next) => {
+usersRouter.patch("/me/profile", requireAuthentication, express.json({ limit: "520kb" }), async (req, res, next) => {
     try {
         const { userId } = getAuthContext(req)
         res.status(200).json(await logic.updateUserProfile(userId, req.body))

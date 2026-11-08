@@ -65,6 +65,7 @@ The profile, social relationship, and payment flows are implemented in `app-ts/`
 - name (string,required)
 - birthdate (Date,required)
 - username (string,required)
+- photo (opcional, JPEG/PNG data URL; solo `api-ts/`)
 - email (string,required)
 - password (string,required)
 - role (`regular` | `admin`; new accounts default to `regular`)

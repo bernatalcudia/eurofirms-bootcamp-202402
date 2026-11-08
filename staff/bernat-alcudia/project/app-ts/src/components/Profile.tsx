@@ -1,4 +1,6 @@
-import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useCallback, useState } from 'react'
@@ -18,6 +20,9 @@ function Profile() {
     const [profile, setProfile] = useState<User | null>(null)
     const [originalEmail, setOriginalEmail] = useState('')
     const [currentPassword, setCurrentPassword] = useState('')
+    const [originalPhoto, setOriginalPhoto] = useState<string | null>(null)
+    const [photoError, setPhotoError] = useState('')
+    const [photoFailed, setPhotoFailed] = useState(false)
     const [blockedUsers, setBlockedUsers] = useState<BlockedProfile[]>([])
     const [profileError, setProfileError] = useState(false)
     const [isSavingProfile, setIsSavingProfile] = useState(false)
@@ -32,6 +37,9 @@ function Profile() {
             const [user, blocked] = await Promise.all([logic.retrieveUser(), logic.retrieveBlockedUsers()])
             setProfile(user)
             setOriginalEmail(user.email)
+            setOriginalPhoto(user.photo ?? null)
+            setPhotoError('')
+            setPhotoFailed(false)
             setCurrentPassword('')
             setBlockedUsers(blocked)
         } catch (error) {
@@ -76,14 +84,17 @@ function Profile() {
         if (!profile || isSavingProfile) return
         setIsSavingProfile(true)
         try {
-            setProfile(await logic.updateUserProfile({
+            const updated = await logic.updateUserProfile({
                 name: profile.name,
                 email: profile.email,
                 username: profile.username,
                 birthdate: profile.birthdate ?? '',
+                ...(profile.photo !== originalPhoto ? { photo: profile.photo ?? null } : {}),
                 ...(profile.email.trim() !== originalEmail.toLowerCase() ? { currentPassword } : {}),
-            }))
-            setOriginalEmail(profile.email.trim().toLowerCase())
+            })
+            setProfile(updated)
+            setOriginalEmail(updated.email)
+            setOriginalPhoto(updated.photo ?? null)
             setCurrentPassword('')
             Alert.alert(t('Profile updated'), t('Your personal details have been saved.'))
         } catch (error) {
@@ -91,6 +102,43 @@ function Profile() {
             Alert.alert(t('Error'), t('Profile could not be updated. Check your details and try again.'))
         } finally {
             setIsSavingProfile(false)
+        }
+    }
+
+    const selectPhoto = async () => {
+        try {
+            setPhotoError('')
+            const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+            if (permission.status !== 'granted') {
+                setPhotoError(t('Grant access to your photo library to select images.'))
+                return
+            }
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.6,
+            })
+            if (result.canceled) return
+            const asset = result.assets[0]
+            const resize = Math.max(asset.width, asset.height) > 512
+                ? [{ resize: asset.width >= asset.height ? { width: 512 } : { height: 512 } }]
+                : []
+            const resized = await ImageManipulator.manipulateAsync(
+                asset.uri,
+                resize,
+                { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+            )
+            const encoded = resized.base64
+            if (!encoded || encoded.length + 23 > 512_000) {
+                setPhotoError(t('Choose a JPEG or PNG profile photo smaller than 375 KB.'))
+                return
+            }
+            setPhotoFailed(false)
+            setProfile(current => current ? { ...current, photo: `data:image/jpeg;base64,${encoded}` } : current)
+        } catch (error) {
+            console.error('Could not select profile photo:', error)
+            setPhotoError(t('Could not select a profile photo. Please try again.'))
         }
     }
 
@@ -134,6 +182,23 @@ function Profile() {
                         </View>
                     ) : (
                         <View style={styles.profileForm}>
+                            <View style={styles.photoSection}>
+                                <View style={styles.avatar}>
+                                    {profile.photo && !photoFailed
+                                        ? <Image source={{ uri: profile.photo }} style={styles.avatarImage} onError={() => setPhotoFailed(true)} accessibilityLabel={t('Profile photo')} />
+                                        : <MaterialCommunityIcons name='account' size={42} color={colors.primary} />}
+                                </View>
+                                <TouchableOpacity onPress={() => void selectPhoto()} disabled={isSavingProfile} style={styles.photoButton} accessibilityRole='button'>
+                                    <Text style={styles.photoButtonText}>{t('Choose profile photo')}</Text>
+                                </TouchableOpacity>
+                                {profile.photo && (
+                                    <TouchableOpacity onPress={() => { setPhotoError(''); setProfile(current => current ? { ...current, photo: null } : current) }} disabled={isSavingProfile} style={styles.photoButton} accessibilityRole='button'>
+                                        <Text style={styles.photoButtonText}>{t('Remove photo')}</Text>
+                                    </TouchableOpacity>
+                                )}
+                                {photoError ? <Text style={styles.photoError} accessibilityRole='alert'>{photoError}</Text> : null}
+                                <Text style={styles.hint}>{t('Save your profile to apply photo changes.')}</Text>
+                            </View>
                             <Text style={styles.inputLabel}>{t('Name')}</Text>
                             <TextInput
                                 style={styles.profileInput}

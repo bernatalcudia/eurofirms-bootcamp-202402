@@ -7,6 +7,7 @@ export interface User {
   id: string
   name: string
   username: string
+  photo?: string | null
   email: string
   role: UserRole
   saved?: string[]
@@ -17,6 +18,7 @@ export interface PublicProfile {
   id: string
   name: string
   username: string
+  photo?: string | null
   followersCount: number
   followingCount: number
   isFollowing: boolean

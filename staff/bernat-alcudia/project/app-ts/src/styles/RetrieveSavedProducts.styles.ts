@@ -3,6 +3,8 @@ import type { ThemeColors } from '../theme/ThemeContext'
 
 const createRetrieveSavedProductsStyles = (colors: ThemeColors) => StyleSheet.create({
     centeredContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: colors.background },
+    container: { flex: 1, backgroundColor: colors.background },
+    list: { padding: 16, alignSelf: 'center', width: '100%', maxWidth: 880 },
     productContainer: {
         marginBottom: 20,
         backgroundColor: colors.surface,

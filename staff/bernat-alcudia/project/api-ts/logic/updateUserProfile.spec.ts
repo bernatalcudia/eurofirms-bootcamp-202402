@@ -4,6 +4,7 @@ import { expect } from "chai"
 import { errors } from "com"
 import { User } from "../data/models"
 import { updateUserProfile } from "./updateUserProfile"
+import { retrievePublicProfile } from "./userRelations"
 
 describe("update user profile", function () {
     let userId: string
@@ -73,6 +74,33 @@ describe("update user profile", function () {
         }
         expect(error).to.be.instanceOf(errors.ValidationError)
         expect((await User.findById(userId))?.role).to.equal("regular")
+    })
+
+    it("stores, exposes and removes a profile photo", async () => {
+        const photo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l2kAAAAASUVORK5CYII="
+        const updated = await updateUserProfile(userId, { photo })
+        expect(updated.photo).to.equal(photo)
+        expect((await retrievePublicProfile(userId, userId)).photo).to.equal(photo)
+        expect((await updateUserProfile(userId, { photo: null })).photo).to.equal(null)
+        expect((await retrievePublicProfile(userId, userId)).photo).to.equal(null)
+    })
+
+    it("rejects invalid and oversized profile photos", async () => {
+        for (const photo of [
+            "https://example.test/photo.png",
+            "data:image/png;base64,ZmFrZQ==",
+            "data:image/svg+xml;base64,PHN2Zz4=",
+            `data:image/png;base64,${"A".repeat(512_000)}`,
+        ]) {
+            let error: unknown
+            try {
+                await updateUserProfile(userId, { photo })
+            } catch (caught) {
+                error = caught
+            }
+            expect(error).to.be.instanceOf(errors.ValidationError)
+        }
+        expect((await User.findById(userId))?.photo).to.equal(null)
     })
 
     after(async () => {

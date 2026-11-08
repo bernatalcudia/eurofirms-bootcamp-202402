@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View, ScrollView } from 'react-native';
+import { ActivityIndicator, Image, Text, TouchableOpacity, View, ScrollView, useWindowDimensions } from 'react-native';
 import { errors } from 'com'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -30,6 +30,10 @@ function Products({ searchQuery }: ProductsProps) {
     const navigation = useNavigation<TabNavigation>()
     const { language, t } = useLanguage()
     const { colors } = useTheme()
+    const { width } = useWindowDimensions()
+    const listWidth = Math.max(1, Math.min(width - 32, 1080))
+    const columns = listWidth >= 1000 ? 3 : listWidth >= 620 ? 2 : 1
+    const cardWidth = (listWidth - (columns - 1) * 16) / columns
 
 
 
@@ -85,7 +89,7 @@ function Products({ searchQuery }: ProductsProps) {
                                 : [...saved, productId],
                         }
                     })
-                    refreshProducts()
+                    searchQuery ? searchProducts(searchQuery) : refreshProducts()
                 })
                 .catch(error => {
                     console.error(error)
@@ -101,7 +105,7 @@ function Products({ searchQuery }: ProductsProps) {
     const handleToggleLikeProduct = (productId: string) => {
         try {
             logic.toggleLikeProduct(productId)
-                .then(() => refreshProducts())
+                .then(() => searchQuery ? searchProducts(searchQuery) : refreshProducts())
                 .catch(error => {
                     console.error(error)
 
@@ -115,11 +119,11 @@ function Products({ searchQuery }: ProductsProps) {
     }
 
     const handleCommentCreated = () => {
-        refreshProducts()
+        searchQuery ? searchProducts(searchQuery) : refreshProducts()
     }
 
     const handleCommentDeleted = () => {
-        refreshProducts()
+        searchQuery ? searchProducts(searchQuery) : refreshProducts()
     }
 
     const searchProducts = (searchQuery: string) => {
@@ -173,7 +177,7 @@ function Products({ searchQuery }: ProductsProps) {
     return (
         <View style={styles.mainContainer}>
 
-            <ScrollView contentContainerStyle={products.length === 0 ? styles.emptyState : undefined}>
+            <ScrollView contentContainerStyle={isLoading || loadError || products.length === 0 ? styles.emptyState : styles.productGrid}>
 
                 {isLoading ? (
                     <View style={styles.emptyState} accessibilityRole='progressbar'>
@@ -206,7 +210,7 @@ function Products({ searchQuery }: ProductsProps) {
                     }).format(product.price)
 
                     return (
-                        <View style={styles.productContainer} key={product.id} >
+                        <View style={[styles.productContainer, { width: cardWidth }]} key={product.id} >
 
                             <TouchableOpacity
                                 style={styles.imageButton}

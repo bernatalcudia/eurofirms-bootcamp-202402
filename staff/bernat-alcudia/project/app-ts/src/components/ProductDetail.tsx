@@ -28,8 +28,8 @@ function ProductDetail() {
     const { language, t } = useLanguage()
     const { colors } = useTheme()
     const { width: viewportWidth } = useWindowDimensions()
-    const galleryWidth = Math.min(viewportWidth - 64, 720)
-    const galleryHeight = Math.min(Math.max(galleryWidth * 0.72, 220), 520)
+    const galleryWidth = Math.max(1, Math.min(viewportWidth - 64, 460))
+    const galleryHeight = Math.min(Math.max(galleryWidth * 0.7, 180), 320)
     const styles = createProductDetailStyles(colors, galleryWidth, galleryHeight)
 
     const handleDeleteProduct = async () => {
@@ -120,7 +120,7 @@ function ProductDetail() {
     }).format(product.price)
 
     return (
-        <View style={styles.mainContainer} accessible={true}>
+        <View style={styles.mainContainer}>
             <ScrollView contentContainerStyle={styles.scrollContent} accessibilityLabel={t('Product details for {title}', { title: product.title })}>
                 <View style={styles.productCard}>
                     <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageScrollView} contentContainerStyle={styles.imageGallery} accessibilityLabel={t('Product images')}>
@@ -135,7 +135,7 @@ function ProductDetail() {
                                     <Image
                                         source={{ uri: 'data:image/png;base64,' + image }}
                                         style={styles.productImage}
-                                        resizeMode='cover'
+                                        resizeMode='contain'
                                         onError={error => {
                                             console.error('Error loading product image:', error.nativeEvent.error)
                                             setFailedImages(current => current.includes(index) ? current : [...current, index])
