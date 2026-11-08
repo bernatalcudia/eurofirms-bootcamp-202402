@@ -21,6 +21,7 @@ function CreateProduct({ }) {
     const [state, setState] = useState<ProductState | null>(null)
     const [stock, setStock] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [formError, setFormError] = useState('')
 
     const [selectedId, setSelectedId] = useState('1')
 
@@ -74,6 +75,7 @@ function CreateProduct({ }) {
                     return
                 }
                 setImages(prevImages => [...prevImages, ...base64Images])
+                setFormError('')
             } else {
                 Alert.alert(t('No images selected'), t('Image selection failed. Please try again.'))
             }
@@ -111,6 +113,7 @@ function CreateProduct({ }) {
                     return
                 }
                 setImages(prevImages => [...prevImages, ...base64Images])
+                setFormError('')
             } else {
                 Alert.alert(t('No picture taken'), t('Could not take a picture. Please try again.'))
             }
@@ -126,13 +129,36 @@ function CreateProduct({ }) {
 
     const handleCreateProduct = () => {
         if (isSubmitting) return
+        if (images.length === 0) {
+            setFormError(t('Add at least one product photo to continue.'))
+            return
+        }
+        if (!title.trim()) {
+            setFormError(t('Enter a product title to continue.'))
+            return
+        }
+        if (!brand.trim()) {
+            setFormError(t('Enter a product brand to continue.'))
+            return
+        }
+        const numericPrice = Number(price)
+        if (!price.trim() || !Number.isFinite(numericPrice) || numericPrice < 0) {
+            setFormError(t('Enter a valid product price.'))
+            return
+        }
+        const numericStock = Number(stock)
+        if (!stock.trim() || !Number.isFinite(numericStock) || numericStock < 0) {
+            setFormError(t('Enter a valid stock quantity.'))
+            return
+        }
+        setFormError('')
         setIsSubmitting(true)
         try {
             if (!selectedRadioButton) throw new Error(t('Select a product condition.'))
             if (selectedRadioButton.value !== 'new' && selectedRadioButton.value !== 'used') {
                 throw new Error(t('Select a product condition.'))
             }
-            logic.createProduct(images, title, description, brand, Number(price), selectedRadioButton.value, Number(stock))
+            logic.createProduct(images, title.trim(), description, brand.trim(), numericPrice, selectedRadioButton.value, numericStock)
                 .then(() => {
                     Alert.alert(t('Create product'), t('Product created successfully.'))
                     setImages([])
@@ -146,29 +172,32 @@ function CreateProduct({ }) {
                 })
                 .catch(error => {
                     console.error(error)
-                    Alert.alert(t('Error'), t('Please check product details and try again.'))
+                    setFormError(t('Please check product details and try again.'))
                 })
                 .finally(() => setIsSubmitting(false))
         } catch (error) {
             console.error(error)
             setIsSubmitting(false)
-            Alert.alert(t('Error'), t('Please check product details and try again.'))
+            setFormError(t('Please check product details and try again.'))
         }
     }
 
 
     const handleDeleteImage = (urlImage: string) => {
-        const newImages = images.filter(image => image !== urlImage)
-        setImages(newImages)
+        setImages(currentImages => currentImages.filter(image => image !== urlImage))
+        setFormError('')
     }
 
 
     return (
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
             <View style={styles.container}>
-
+                <Text style={styles.pageTitle} accessibilityRole='header'>{t('Create product')}</Text>
+                <Text style={styles.introText}>{t('Add a clear photo and a few details to help buyers.')}</Text>
+                {formError ? <Text style={styles.formError} accessibilityRole='alert' accessibilityLiveRegion='polite'>{formError}</Text> : null}
 
                 <Text style={styles.sectionTitle} accessibilityRole='header'>{t('Photos')}</Text>
+                <Text style={styles.helperText}>{t('Add at least one photo. You can add up to 10.')}</Text>
                 <View style={styles.photoActionsContainer}>
                     <TouchableOpacity style={[styles.button, styles.buttonOutline]} onPress={selectImage} accessibilityHint={t('Add photos from gallery')} accessibilityLabel={t('Upload photos')} accessible={true} >
                         <MaterialCommunityIcons name='image-plus' size={20} color={styles.buttonOutlineText.color} style={styles.buttonIcon} accessibilityElementsHidden={true} ></MaterialCommunityIcons>
@@ -182,10 +211,10 @@ function CreateProduct({ }) {
 
                 <View style={styles.galleryPreview} accessibilityLabel={t('Product images')}>
                     {images.length > 0 ? images.map((image, index) => (
-                        <View key={index} style={styles.imageContainer} accessible={true} accessibilityLabel={t('Product image {number}', { number: index + 1 })}>
+                        <View key={`${index}-${image.slice(0, 12)}`} style={styles.imageContainer}>
                             <Image style={styles.imageThumbnail} source={{ uri: 'data:image/png;base64,' + image }} accessibilityLabel={t('Product image {number}', { number: index + 1 })}></Image>
-                            <TouchableOpacity onPress={() => handleDeleteImage(image)} accessibilityLabel={t('Remove image {number}', { number: index + 1 })} accessibilityHint={t('Remove image {number}', { number: index + 1 })} accessible={true}>
-                                <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityHint={t('Close icon')} accessible={true} />
+                            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteImage(image)} accessibilityLabel={t('Remove image {number}', { number: index + 1 })} accessibilityRole='button' accessible={true}>
+                                <MaterialCommunityIcons name='close-circle' size={25} style={styles.deleteIconBackground} accessibilityElementsHidden={true} />
                             </TouchableOpacity>
                         </View>
                     ))
@@ -193,32 +222,44 @@ function CreateProduct({ }) {
                         <View style={styles.placeholderContainer} accessibilityLabel={t('No images selected yet')}>
                             <MaterialCommunityIcons name='image-multiple-outline' size={46} color={colors.mutedText} />
                             <Text style={styles.placeholderText}>{t('No images selected yet')}</Text>
-                            <Text style={styles.placeholderText}>{t('Add up to 10 photos')}</Text>
+                            <Text style={styles.placeholderText}>{t('Add at least one photo. You can add up to 10.')}</Text>
                         </View>
                     }
                 </View>
 
 
                 <Text style={styles.label} nativeID='titleLabel'>{t('Title')}</Text>
-                <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder={t('Enter product title')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
+                <TextInput style={styles.input} value={title} onChangeText={value => {
+                    setTitle(value)
+                    setFormError('')
+                }} placeholder={t('Enter product title')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product title input')} accessibilityHint={t('Enter product title')} />
 
                 <Text style={styles.label}>{t('Brand')}</Text>
-                <TextInput style={styles.input} value={brand} onChangeText={setBrand} placeholder={t('Enter product brand')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
+                <TextInput style={styles.input} value={brand} onChangeText={value => {
+                    setBrand(value)
+                    setFormError('')
+                }} placeholder={t('Enter product brand')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product brand input')} accessibilityHint={t('Enter product brand')} />
 
                 <Text style={styles.label}>{t('Price')}</Text>
-                <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={setPrice} placeholder={t('Enter price')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
+                <TextInput style={styles.input} keyboardType='decimal-pad' value={price} onChangeText={value => {
+                    setPrice(value.replace(',', '.'))
+                    setFormError('')
+                }} placeholder={t('Enter price')} placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product price input')} accessibilityHint={t('Enter price')} />
 
                 <Text style={styles.label}>{t('Condition')}</Text>
                 <RadioGroup containerStyle={styles.radioGroupContainer} layout='row' radioButtons={radioButtons} onPress={setSelectedId} selectedId={selectedId} accessibilityLabel={t('Product condition selection')} />
 
                 <Text style={styles.label}>{t('Stock')}</Text>
-                <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={setStock} placeholder='1' placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
+                <TextInput style={styles.input} keyboardType='number-pad' value={stock} onChangeText={value => {
+                    setStock(value)
+                    setFormError('')
+                }} placeholder='1' placeholderTextColor={colors.mutedText} accessibilityLabel={t('Product stock input')} accessibilityHint={t('Enter stock quantity')} />
 
                 <Text style={styles.label}>{t('Description')}</Text>
                 <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} placeholder={t('Describe your product')} placeholderTextColor={colors.mutedText} multiline numberOfLines={4} accessibilityLabel={t('Product description input')} accessibilityHint={t('Describe your product')} />
 
-                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && styles.disabledButton]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Create listing')} accessibilityHint={t('Create listing')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
-                    <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Create listing')}</Text>
+                <TouchableOpacity style={[styles.button, styles.buttonPrimary, styles.submitButton, isSubmitting && styles.disabledButton]} onPress={handleCreateProduct} disabled={isSubmitting} accessibilityLabel={t('Publish product')} accessibilityHint={t('Publish product')} accessibilityState={{ disabled: isSubmitting }} accessible={true}>
+                    <Text style={styles.buttonPrimaryText}>{isSubmitting ? t('Loading…') : t('Publish product')}</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView >

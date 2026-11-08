@@ -22,6 +22,7 @@ function Products({ searchQuery }: ProductsProps) {
     const [user, setUser] = useState<User>()
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState(false)
+    const [imageErrors, setImageErrors] = useState<Record<string, string>>({})
 
     const [commentsProductId, setCommentsProductId] = useState('')
     const [viewComments, setViewComments] = useState(false)
@@ -146,7 +147,9 @@ function Products({ searchQuery }: ProductsProps) {
         setLoadError(false)
         try {
             logic.retrieveProducts() //I return the products
-                .then(products => setProducts(products))
+                .then(products => {
+                    setProducts(products)
+                })
                 .catch(error => {
                     console.error(error)
                     setLoadError(true)
@@ -195,6 +198,8 @@ function Products({ searchQuery }: ProductsProps) {
                     const isSaved = user?.saved?.includes(product.id) ?? false
                     const likeCount = product.likeCount ?? product.likes?.length ?? 0
                     const accessibilityImageLabel = product.images[0] ? t('Product image of {title}', { title: product.title }) : t('No image available for this product.')
+                    const imageSource = product.images[0]
+                    const hasImage = Boolean(imageSource) && imageErrors[product.id] !== imageSource
                     const formattedPrice = new Intl.NumberFormat(language === 'es' ? 'es-ES' : 'en-IE', {
                         style: 'currency',
                         currency: 'EUR',
@@ -203,7 +208,30 @@ function Products({ searchQuery }: ProductsProps) {
                     return (
                         <View style={styles.productContainer} key={product.id} >
 
-                            <Image style={styles.productImage} resizeMode='cover' source={{ uri: 'data:image/png;base64,' + product.images[0] }} onError={(error) => console.error('Error loading image:', error)} accessibilityLabel={accessibilityImageLabel} />
+                            <TouchableOpacity
+                                style={styles.imageButton}
+                                onPress={() => handleProductDetail(product.id)}
+                                accessibilityRole='button'
+                                accessibilityLabel={t('View details for product {title}', { title: product.title })}
+                            >
+                                {hasImage ? (
+                                    <Image
+                                        style={styles.productImage}
+                                        resizeMode='cover'
+                                        source={{ uri: 'data:image/png;base64,' + imageSource }}
+                                        onError={error => {
+                                            console.error('Error loading product image:', error.nativeEvent.error)
+                                            setImageErrors(current => ({ ...current, [product.id]: imageSource }))
+                                        }}
+                                        accessibilityLabel={accessibilityImageLabel}
+                                    />
+                                ) : (
+                                    <View style={styles.imagePlaceholder} accessibilityLabel={accessibilityImageLabel}>
+                                        <MaterialCommunityIcons name='image-off-outline' size={42} color={colors.mutedText} />
+                                        <Text style={styles.imagePlaceholderText}>{t('No image available for this product.')}</Text>
+                                    </View>
+                                )}
+                            </TouchableOpacity>
 
                             <View style={styles.productInfoContainer} key={product.id}>
 
@@ -212,7 +240,14 @@ function Products({ searchQuery }: ProductsProps) {
                                 </TouchableOpacity>
                                 <Text style={styles.productBrand} accessibilityLabel={`${t('Brand')}: ${product.brand}`}>{product.brand}</Text>
                                 <Text style={styles.productPrice} accessibilityLabel={t('Price: {price} euros', { price: product.price })}>{formattedPrice}</Text>
-                                <Text style={styles.productState} accessibilityLabel={t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}>{t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}</Text>
+                                <View style={styles.productMeta}>
+                                    <Text style={styles.productBadge} accessibilityLabel={t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}>
+                                        {t(product.state === 'new' ? 'New' : 'Used')}
+                                    </Text>
+                                    <Text style={styles.stockText}>
+                                        {product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')}
+                                    </Text>
+                                </View>
 
                             </View>
                             <View style={styles.actionsContainer}>
@@ -222,14 +257,17 @@ function Products({ searchQuery }: ProductsProps) {
                                     </TouchableOpacity>
                                     <Text style={styles.likeCountText} accessibilityLabel={t('{count} likes', { count: likeCount })}>{likeCount}</Text>
                                 </View>
-                                <View style={styles.commentsContainer} accessibilityLabel={product.commentCount === 1
-                                    ? t('View comments for product {title}. Has 1 comment.', { title: product.title })
-                                    : t('View comments for product {title}. Has {count} comments.', { title: product.title, count: product.commentCount ?? 0 })} accessibilityRole='button'>
-                                    <TouchableOpacity onPress={() => handleShowProductComments(product.id)}>
+                                <TouchableOpacity
+                                    style={styles.commentsContainer}
+                                    onPress={() => handleShowProductComments(product.id)}
+                                    accessibilityLabel={product.commentCount === 1
+                                        ? t('View comments for product {title}. Has 1 comment.', { title: product.title })
+                                        : t('View comments for product {title}. Has {count} comments.', { title: product.title, count: product.commentCount ?? 0 })}
+                                    accessibilityRole='button'
+                                >
                                         <MaterialCommunityIcons name='comment-multiple-outline' size={25} color={colors.primary} />
-                                    </TouchableOpacity>
                                     <Text style={styles.commentsCountText} accessibilityLabel={product.commentCount === 1 ? t('1 comment') : t('{count} comments', { count: product.commentCount ?? 0 })}>{product.commentCount ?? 0}</Text>
-                                </View>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={isSaved ? styles.button : styles.buttonPressIn} onPress={() => handleToggleSavedProduct(product.id)} accessibilityLabel={t(isSaved ? 'Unsave {title}' : 'Save {title}', { title: product.title })} accessibilityRole='button' accessibilityState={{ checked: isSaved }} >
                                     <MaterialCommunityIcons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={25} color={colors.accent} />
                                 </TouchableOpacity>

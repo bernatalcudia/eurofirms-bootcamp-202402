@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Alert, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Image, ScrollView, Alert, Platform, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import logic from '../logic';
 import { utils } from 'com'
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -15,6 +15,7 @@ function ProductDetail() {
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState(false)
     const [isStartingChat, setIsStartingChat] = useState(false)
+    const [failedImages, setFailedImages] = useState<number[]>([])
 
     const navigation = useNavigation<RootNavigation>()
 
@@ -23,7 +24,10 @@ function ProductDetail() {
     const { id: productId } = route.params
     const { language, t } = useLanguage()
     const { colors } = useTheme()
-    const styles = createProductDetailStyles(colors)
+    const { width: viewportWidth } = useWindowDimensions()
+    const galleryWidth = Math.min(viewportWidth - 64, 720)
+    const galleryHeight = Math.min(Math.max(galleryWidth * 0.72, 220), 520)
+    const styles = createProductDetailStyles(colors, galleryWidth, galleryHeight)
 
     const handleDeleteProduct = () => {
         const deleteProduct = () => {
@@ -88,6 +92,7 @@ function ProductDetail() {
             logic.retrieveProductDetails(productId)
                 .then(product => {
                     setProduct(product)
+                    setFailedImages([])
                 })
                 .catch(error => {
                     console.error(error)
@@ -134,15 +139,40 @@ function ProductDetail() {
 
     return (
         <View style={styles.mainContainer} accessible={true}>
-            <ScrollView accessibilityLabel={t('Product details for {title}', { title: product.title })}>
+            <ScrollView contentContainerStyle={styles.scrollContent} accessibilityLabel={t('Product details for {title}', { title: product.title })}>
                 <View style={styles.productCard}>
-                    <ScrollView horizontal style={styles.imageScrollView} accessibilityLabel={t('Product images')}>
-
-                        <View style={styles.imageContainer} key={product.id} accessible={true} accessibilityLabel={t('Product image gallery')}>
-                            {product.images.map((image, index) => (
-                                <Image key={index} source={{ uri: 'data:image/png;base64,' + image }} style={styles.productImage} resizeMode='cover' onError={(error) => console.error('Error loading image:', error)} accessible={true} accessibilityLabel={t('Product image {number} of {count}: {title}', { number: index + 1, count: product.images.length, title: product.title })} accessibilityRole='image' />
-                            ))}
-                        </View>
+                    <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageScrollView} contentContainerStyle={styles.imageGallery} accessibilityLabel={t('Product images')}>
+                        {product.images.length > 0 ? product.images.map((image, index) => (
+                            <View key={`${product.id}-${index}`} style={styles.imageSlide}>
+                                {failedImages.includes(index) ? (
+                                    <View style={[styles.imageSlide, styles.imagePlaceholder]}>
+                                        <MaterialCommunityIcons name='image-off-outline' size={46} color={colors.mutedText} />
+                                        <Text style={styles.imagePlaceholderText}>{t('No image available for this product.')}</Text>
+                                    </View>
+                                ) : (
+                                    <Image
+                                        source={{ uri: 'data:image/png;base64,' + image }}
+                                        style={styles.productImage}
+                                        resizeMode='cover'
+                                        onError={error => {
+                                            console.error('Error loading product image:', error.nativeEvent.error)
+                                            setFailedImages(current => current.includes(index) ? current : [...current, index])
+                                        }}
+                                        accessible={true}
+                                        accessibilityLabel={t('Product image {number} of {count}: {title}', { number: index + 1, count: product.images.length, title: product.title })}
+                                        accessibilityRole='image'
+                                    />
+                                )}
+                                {product.images.length > 1 && (
+                                    <Text style={styles.imageCount}>{t('{current} of {total}', { current: index + 1, total: product.images.length })}</Text>
+                                )}
+                            </View>
+                        )) : (
+                            <View style={[styles.imageSlide, styles.imagePlaceholder]}>
+                                <MaterialCommunityIcons name='image-off-outline' size={46} color={colors.mutedText} />
+                                <Text style={styles.imagePlaceholderText}>{t('No image available for this product.')}</Text>
+                            </View>
+                        )}
                     </ScrollView>
 
                     <View style={styles.infoContainer}>
@@ -150,18 +180,29 @@ function ProductDetail() {
                         <Text style={styles.titleText} accessible={true} accessibilityRole='header' accessibilityLabel={t('Product name: {title}', { title: product.title })}>{product.title}</Text>
                         <Text style={styles.brandText} accessible={true} accessibilityLabel={t('Brand: {brand}', { brand: product.brand })}>{product.brand}</Text>
                         <Text style={styles.priceText} accessible={true} accessibilityLabel={t('Price: {price} euros', { price: product.price })} accessibilityValue={{ text: t('Price: {price} euros', { price: product.price }) }}>{formattedPrice}</Text>
-                        <Text style={styles.stateText} accessible={true} accessibilityLabel={t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}>{t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}</Text>
-                        <Text style={styles.stockText} accessible={true} accessibilityLabel={product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')} accessibilityValue={{ text: product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock') }}>{product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')}</Text>
-                        <Text style={styles.descriptionText} accessible={true} accessibilityLabel={t('Product description: {description}', { description: product.description })}>{product.description}</Text>
+                        <View style={styles.productMeta}>
+                            <Text style={styles.stateBadge} accessibilityLabel={t('State: {state}', { state: t(product.state === 'new' ? 'New' : 'Used') })}>
+                                {t(product.state === 'new' ? 'New' : 'Used')}
+                            </Text>
+                            <Text style={styles.stockText} accessible={true} accessibilityLabel={product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')} accessibilityValue={{ text: product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock') }}>
+                                {product.stock > 0 ? t('Availability: {count} in stock', { count: product.stock }) : t('Out of stock')}
+                            </Text>
+                        </View>
+                        <View style={styles.descriptionSection}>
+                            <Text style={styles.sectionTitle}>{t('Description')}</Text>
+                            <Text style={styles.descriptionText} accessible={true} accessibilityLabel={t('Product description: {description}', { description: product.description })}>{product.description || t('No description provided.')}</Text>
+                        </View>
                     </View>
 
                     {isAuthor && (
                         <View style={styles.actionButtonsContainer}>
-                            <TouchableOpacity style={styles.actionButton} onPress={handleModifyProductDetail} accessible={true} accessibilityLabel={t('Modify product')} accessibilityHint={t('Modify product')} accessibilityRole='button'>
+                            <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={handleModifyProductDetail} accessible={true} accessibilityLabel={t('Modify product')} accessibilityHint={t('Modify product')} accessibilityRole='button'>
                                 <MaterialCommunityIcons style={styles.modifyIcon} name='pencil' />
+                                <Text style={styles.editButtonText}>{t('Modify product')}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteProduct} accessible={true} accessibilityLabel={t('Delete product')} accessibilityHint={t('Delete product')} accessibilityRole='button'>
+                            <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDeleteProduct} accessible={true} accessibilityLabel={t('Delete product')} accessibilityHint={t('Delete product')} accessibilityRole='button'>
                                 <MaterialCommunityIcons style={styles.deleteIcon} name='trash-can-outline' />
+                                <Text style={styles.deleteButtonText}>{t('Delete product')}</Text>
                             </TouchableOpacity>
                         </View>
                     )}
